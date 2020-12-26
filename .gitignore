@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+*.elf
+
+# Binaries
+*.bin
+
+# Binary module interfaces
+*.pcm
+
+_sc.lds
+inclde/config.h
