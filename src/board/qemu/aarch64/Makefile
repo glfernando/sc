@@ -1,4 +1,7 @@
 
 LOCAL_DIR = $(GET_LOCAL_DIR)
 
-include $(LOCAL_DIR)/init/Makefile
+dirs := $(LOCAL_DIR)/init
+dirs += $(LOCAL_DIR)/debug
+
+include $(foreach dir,$(dirs),$(dir)/Makefile)

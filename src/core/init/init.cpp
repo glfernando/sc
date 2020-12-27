@@ -5,7 +5,13 @@
  */
 
 import board.init;
+import board.debug;
+
+using sc::board::debug::uart::puts;
 
 extern "C" [[noreturn]] void init() {
+    sc::board::init();
+
+    puts("Welcome to SC\n");
     for (;;) {}
 }
