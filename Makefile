@@ -14,8 +14,9 @@ Q = @
 endif
 
 CPPFLAGS = -std=c++2a -fno-rtti -nodefaultlibs -nostdinc++ -fno-builtin -flto -fpie -Oz -Wall -g
-CPPFLAGS += -ffunction-sections -fdata-sections
-CPPFLAGS += -include include/config.h
+CPPFLAGS += -ffunction-sections -fdata-sections -Wno-deprecated-volatile
+CPPFLAGS += -Iinclude -Isrc/libc/include
+CPPFLAGS += -include config.h
 OBJCPYFLAGS = -O binary --strip-all
 LDFLAGS = --gc-sections --pie
 
