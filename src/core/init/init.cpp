@@ -9,7 +9,8 @@ import board.debug;
 
 using sc::board::debug::uart::puts;
 
-extern "C" [[noreturn]] void init() {
+extern "C" [[noreturn]] void init()
+{
     sc::board::init();
 
     puts("Welcome to SC\n");
