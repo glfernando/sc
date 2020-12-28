@@ -4,9 +4,9 @@
  * Copyright (C) 2020 Fernando Lugo <lugo.fernando@gmail.com>.
  */
 
-#include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 /*
  * Formatting flags
@@ -100,16 +100,16 @@ static int print_num(char** pbuf, char* end, uint64_t n, int b, int w, int f)
     /* check if negative value for base 10 number */
     if (b == 10 && f & SIGN && (int64_t)n < 0) {
         neg = 1;
-        n   = -(int64_t)n;
+        n = -(int64_t)n;
     }
 
-    s  = num_buf + NUM_BUF_MAX - 1;
+    s = num_buf + NUM_BUF_MAX - 1;
     *s = '\0';
 
     /*
      * mask and shift for base 8 and 16 (to avoid division)
      */
-    mask  = b - 1;
+    mask = b - 1;
     shift = 3 + (b >> 4);
 
     while (n) {
@@ -140,9 +140,9 @@ static int print_num(char** pbuf, char* end, uint64_t n, int b, int w, int f)
 
 int vsnprintf(char* buf, size_t size, const char* fmt, va_list va)
 {
-    int n       = 0;
+    int n = 0;
     char** pbuf = buf ? &buf : NULL;
-    char* end   = buf + size;
+    char* end = buf + size;
 
     if (!size)
         return 0;
