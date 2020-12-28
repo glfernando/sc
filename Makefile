@@ -15,7 +15,7 @@ endif
 
 CPPFLAGS = -std=c++2a -fno-rtti -nodefaultlibs -nostdinc++ -fno-builtin -flto -fpie -Oz -Wall -g
 CPPFLAGS += -ffunction-sections -fdata-sections -Wno-deprecated-volatile
-CPPFLAGS += -Iinclude -Isrc/libc/include
+CPPFLAGS += -Iinclude
 CPPFLAGS += -include config.h
 OBJCPYFLAGS = -O binary --strip-all
 LDFLAGS = --gc-sections --pie
@@ -26,6 +26,7 @@ MOD_PREBUILT_DIR ?= prebuilts
 srcs :=
 mod_srcs :=
 dirs :=
+GLOBAL_CPPFLAGS :=
 
 include make/utils.mk
 include target/$(TARGET).mk
@@ -36,6 +37,8 @@ include src/$(BOARD_PATH)/Makefile
 
 # use default linker script if none was set by target makefile
 LINKER_SCRIPT ?= sc_linker.lds
+
+CPPFLAGS += $(GLOBAL_CPPFLAGS)
 
 cpp_srcs = $(filter %.cpp, $(srcs))
 asm_srcs = $(filter %.S, $(srcs))
