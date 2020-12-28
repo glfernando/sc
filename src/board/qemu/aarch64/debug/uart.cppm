@@ -15,17 +15,15 @@ import lib.reg;
 using namespace sc::lib::reg;
 
 enum reg_offset : unsigned {
-    UART_DR	= 0x00,
-    UART_FR	= 0x18,
-    UART_LCR_H	= 0x2c,
-    UART_CR	= 0x30,
+    UART_DR = 0x00,
+    UART_FR = 0x18,
+    UART_LCR_H = 0x2c,
+    UART_CR = 0x30,
 };
 
 constexpr uintptr_t uart_base = CONFIG_DEBUG_UART_BASE;
 
-static inline volatile uint32_t& reg(reg_offset offset) {
-    return reg32(uart_base + offset);
-}
+static inline volatile uint32_t& reg(reg_offset offset) { return reg32(uart_base + offset); }
 
 export namespace sc::board::debug::uart {
 
@@ -39,13 +37,14 @@ int putchar(int c)
 {
     reg(UART_DR) = c;
     if (c == '\n')
-	putchar('\r');
+        putchar('\r');
     return c;
 }
 
-void puts(char const* str) {
+void puts(char const* str)
+{
     while (int c = *str++)
-	putchar(c);
+        putchar(c);
 }
 
-}
+}  // namespace sc::board::debug::uart
