@@ -13,7 +13,8 @@ else
 Q = @
 endif
 
-CFLAGS = -fno-builtin -nodefaultlibs -flto -fpie -Oz -Wall -g -ffunction-sections -fdata-sections
+CFLAGS = -fno-builtin -nodefaultlibs -flto -fpie -Oz -Wall -Wextra -Werror
+CFLAGS += -g -ffunction-sections -fdata-sections
 CFLAGS += -Iinclude
 CFLAGS += -include config.h
 CPPFLAGS = -std=c++2a -fno-rtti -nostdinc++ -Wno-deprecated-volatile
