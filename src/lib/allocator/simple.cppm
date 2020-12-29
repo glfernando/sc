@@ -35,7 +35,7 @@ struct chunk {
 
     chunk* split_at(size_t offset)
     {
-        if (offset <= CHUNK_SIZE)
+        if (size <= CHUNK_SIZE)
             return nullptr;
 
         if (offset > size - CHUNK_SIZE)
@@ -114,6 +114,13 @@ class simple {
 
 namespace {
 
+template <typename T>
+constexpr T align_up(T v, size_t a)
+{
+    size_t mask = a - 1;
+    return (v + mask) & ~mask;
+}
+
 // computes the offset that needs to be appiled to the pinter in order to make it aligned to @align
 size_t align_offset(void* ptr, size_t align)
 {
@@ -157,18 +164,17 @@ void* simple::alloc(size_t const size, size_t align) noexcept
     if (offset)
         c = c->split_at(offset - CHUNK_SIZE);
 
-    auto tmp = c->size;
+    auto actual_size = align_up(size + CHUNK_SIZE, MIN_ALIGNMENT) - CHUNK_SIZE;
+    actual_size = actual_size > c->size ? c->size : actual_size;
+
+    auto nc = c->split_at(actual_size);
+    if (nc) {
+	nc->state = FREE;
+	// update free chunk pointer
+	free_chunk = nc;
+    }
 
     c->state = USED;
-    c->size = size;
-
-    auto nc = c->next();
-    nc->state = FREE;
-    nc->size = tmp - size - CHUNK_SIZE;
-
-    // update free chunk pointer
-    free_chunk = nc;
-
     return c->mem_ptr();
 }
 
