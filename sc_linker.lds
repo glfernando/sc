@@ -18,6 +18,12 @@ SECTIONS
         *(.rodata*);
     }
 
+    .init.array ALIGN(8) : {
+        __init_array_start = .;
+        KEEP(*(.init_array))
+        __init_array_end = .;
+    }
+
     .data ALIGN(8) : {
         *(.data*)
     }
