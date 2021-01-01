@@ -11,6 +11,11 @@ module;
 
 export module std.string;
 
+import lib.heap;
+
+using sc::lib::heap::alloc;
+using sc::lib::heap::free;
+
 export namespace std {
 
 template <typename C>
@@ -58,7 +63,7 @@ class basic_string {
 
     static C* expand(const C* ptr, int n)
     {
-        C* p = new C[n];
+        C* p = static_cast<C*>(alloc(sizeof(C) * n, alignof(C)));
         string_copy(p, ptr);
         return p;
     }
@@ -107,7 +112,9 @@ basic_string<C>::basic_string() : sz{0}, ptr{ch}
 
 template <typename C>
 basic_string<C>::basic_string(const C* p)
-    : sz{string_len(p)}, ptr{sz <= short_max ? ch : new C[sz + 1]}, space{0}
+    : sz{string_len(p)},
+    ptr{sz <= short_max ? ch : static_cast<C*>(alloc(sizeof(C) * (sz + 1), alignof(C)))},
+    space{0}
 {
     string_copy(ptr, p);
 }
@@ -131,7 +138,7 @@ basic_string<C>& basic_string<C>::operator=(const basic_string& s)
         return *this;
     C* p = (short_max < sz) ? ptr : nullptr;
     copy_from(s);
-    delete[] p;
+    free(p);
     return *this;
 }
 
@@ -141,7 +148,7 @@ basic_string<C>& basic_string<C>::operator=(basic_string&& s)
     if (this == &s)
         return *this;
     if (short_max < sz)
-        delete[] ptr;
+        free(ptr);
     move_from(s);
     return *this;
 }
@@ -157,7 +164,7 @@ basic_string<C>& basic_string<C>::operator+=(C c)
         if (space == 0) {
             int n = sz + sz + 2;
             C* p = expand(ptr, n);
-            delete[] ptr;
+            free(ptr);
             ptr = p;
             space = n - sz - 2;
         } else {
@@ -182,7 +189,7 @@ template <typename C>
 basic_string<C>::~basic_string()
 {
     if (short_max < sz)
-        delete[] ptr;
+        free(ptr);
 }
 
 template <typename C>
