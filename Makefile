@@ -13,7 +13,9 @@ else
 Q = @
 endif
 
-CFLAGS = -fno-builtin -nodefaultlibs -flto -fpie -Oz -Wall -Wextra -Werror
+CFLAGS = -fno-builtin -nodefaultlibs -fpie -Oz -Wall -Wextra -Werror
+# TODO: fix libunwind when LTO is enabled
+# CFLAGS += -flto
 CFLAGS += -g -ffunction-sections -fdata-sections
 CFLAGS += -Iinclude
 CFLAGS += -include config.h
@@ -36,6 +38,7 @@ include target/$(TARGET).mk
 # include top directories
 include src/Makefile
 include src/$(BOARD_PATH)/Makefile
+include external/src/Makefile
 
 # use default linker script if none was set by target makefile
 LINKER_SCRIPT ?= sc_linker.lds
