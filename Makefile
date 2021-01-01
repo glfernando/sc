@@ -95,6 +95,7 @@ src/board/qemu/aarch64/debug/debug.pcm : | src/board/qemu/aarch64/debug/uart.pcm
 src/board/qemu/aarch64/debug/uart.pcm : | src/lib/reg.pcm
 src/board/qemu/aarch64/init/init.pcm : | src/board/qemu/aarch64/debug/debug.pcm
 src/lib/heap.pcm : | src/lib/allocator/simple.pcm
+src/lib/exception.pcm : | src/libcxx/string.pcm
 
 
 config_file: src/$(CONFIG_FILE)
