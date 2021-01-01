@@ -21,6 +21,11 @@
 #include "DwarfParser.hpp"
 #include "config.h"
 
+#define PRIx64
+#define PRIu64
+
+extern void* stderr;
+int fprintf(void* stream, const char* fmt, ...);
 
 namespace libunwind {
 
