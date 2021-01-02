@@ -1850,6 +1850,7 @@ bool UnwindCursor<A, R>::getInfoFromSEH(pint_t pc) {
 }
 #endif
 
+#pragma clang optimize off
 
 template <typename A, typename R>
 void UnwindCursor<A, R>::setInfoBasedOnIPRegister(bool isReturnAddress) {
@@ -1987,6 +1988,8 @@ void UnwindCursor<A, R>::setInfoBasedOnIPRegister(bool isReturnAddress) {
   // no unwind info, flag that we can't reliably unwind
   _unwindInfoMissing = true;
 }
+
+#pragma clang optimize on
 
 template <typename A, typename R>
 int UnwindCursor<A, R>::step() {
