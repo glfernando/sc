@@ -13,9 +13,7 @@ else
 Q = @
 endif
 
-CFLAGS = -fno-builtin -nodefaultlibs -fpie -Oz -Wall -Wextra -Werror
-# TODO: fix libunwind when LTO is enabled
-# CFLAGS += -flto
+CFLAGS = -fno-builtin -nodefaultlibs -fpie -Oz -Wall -Wextra -Werror -flto
 CFLAGS += -g -ffunction-sections -fdata-sections
 CFLAGS += -Isrc/include
 CFLAGS += -include config.h
