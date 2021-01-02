@@ -113,8 +113,8 @@ basic_string<C>::basic_string() : sz{0}, ptr{ch}
 template <typename C>
 basic_string<C>::basic_string(const C* p)
     : sz{string_len(p)},
-    ptr{sz <= short_max ? ch : static_cast<C*>(alloc(sizeof(C) * (sz + 1), alignof(C)))},
-    space{0}
+      ptr{sz <= short_max ? ch : static_cast<C*>(alloc(sizeof(C) * (sz + 1), alignof(C)))},
+      space{0}
 {
     string_copy(ptr, p);
 }
