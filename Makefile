@@ -32,6 +32,7 @@ GLOBAL_CFLAGS :=
 
 include make/utils.mk
 include target/$(TARGET).mk
+-include make/$(ARCH).mk
 
 # include top directories
 include src/Makefile
@@ -96,6 +97,7 @@ src/lib/heap.pcm : | src/lib/allocator/simple.pcm
 src/lib/exception.pcm : | src/libcxx/string.pcm
 src/libcxx/concepts.pcm : | src/libcxx/type_traits.pcm
 src/lib/fmt.pcm : | src/libcxx/string.pcm src/libcxx/concepts.pcm src/board/qemu/aarch64/debug/uart.pcm
+src/lib/lock/lock.pcm : | src/lib/lock/lock_aarch64.pcm
 
 
 config_file: src/$(CONFIG_FILE)
