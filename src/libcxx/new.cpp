@@ -11,14 +11,15 @@ import lib.exception;
 
 #include <stddef.h>
 
+using sc::lib::exception::exception;
 using sc::lib::heap::alloc;
 using sc::lib::heap::free;
-using sc::lib::exception::exception;
 
 void* operator new(size_t size)
 {
     void* ptr = alloc(size);
-    if (!ptr) throw exception("new failed", ERR_NO_MEMORY);
+    if (!ptr)
+        throw exception("new failed", ERR_NO_MEMORY);
     return ptr;
 }
 
