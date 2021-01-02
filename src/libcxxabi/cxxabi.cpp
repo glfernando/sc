@@ -341,8 +341,11 @@ extern "C" _Unwind_Reason_Code __gxx_personality_v0(int version, _Unwind_Action 
         if (ip > try_end)
             continue;
 
-        if (!cs.action_offset)
+        if (!cs.action_offset) {
+            if (actions == _UA_CLEANUP_PHASE)
+                return install_pad(unwind_exception, context, 0, func_start + cs.lp);
             continue;
+        }
 
         uintptr_t offset = cs.action_offset;
         for (lsda_action action = lsda.get_action(offset); action; action = action.get_next()) {
