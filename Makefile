@@ -37,6 +37,7 @@ include target/$(TARGET).mk
 # include top directories
 include src/Makefile
 include src/$(BOARD_PATH)/Makefile
+include src/arch/$(ARCH)/Makefile
 include external/src/Makefile
 
 # use default linker script if none was set by target makefile
