@@ -10,5 +10,6 @@ srcs += $(LOCAL_DIR)/heap-malloc.cpp
 dirs :=
 dirs += $(LOCAL_DIR)/allocator
 dirs += $(LOCAL_DIR)/lock
+dirs += $(LOCAL_DIR)/timestamp
 
 include $(foreach dir,$(dirs),$(dir)/Makefile)
