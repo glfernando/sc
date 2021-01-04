@@ -102,6 +102,8 @@ src/lib/fmt.pcm : | src/libcxx/string.pcm src/libcxx/concepts.pcm src/board/qemu
 src/lib/lock/lock.pcm : | src/lib/lock/lock_aarch64.pcm
 src/lib/timestamp/timestamp.pcm : | src/lib/timestamp/aarch64.pcm
 src/lib/time.pcm : src/lib/timestamp/timestamp.pcm
+src/device/device.pcm : src/libcxx/string.pcm
+src/libcxx/string.pcm : src/lib/heap.pcm
 
 
 config_file: src/$(CONFIG_FILE)
