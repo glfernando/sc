@@ -24,6 +24,12 @@ SECTIONS
         __init_array_end = .;
     }
 
+    .shell_cmds ALIGN(8): {
+        __shell_cmds_start = .;
+        KEEP(*(SORT_BY_NAME(.shell_cmds*)))
+        __shell_cmds_end = .;
+    }
+
     .eh_frame ALIGN(8): {
         __eh_frame_start = .;
         KEEP(*(.eh_frame))
