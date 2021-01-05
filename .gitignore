@@ -41,5 +41,8 @@
 # Binary module interfaces
 *.pcm
 
+# ctags
+tags
+
 _sc.lds
 src/include/config.h
