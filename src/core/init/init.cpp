@@ -7,8 +7,9 @@
 import board.init;
 import board.debug;
 import lib.heap;
+import lib.fmt;
 
-using sc::board::debug::uart::puts;
+using sc::lib::fmt::println;
 
 extern void (*__init_array_start[])();
 extern void (*__init_array_end[])();
@@ -21,12 +22,15 @@ void init_array()
 
 extern "C" [[noreturn]] void init()
 {
-    sc::board::init();
+    sc::board::early_init();
 
     sc::lib::heap::init();
 
     init_array();
 
-    puts("Welcome to SC\n");
+    sc::board::init();
+
+    println("Welcome to SC");
+
     for (;;) {}
 }
