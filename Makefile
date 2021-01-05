@@ -66,6 +66,10 @@ mod_objs := $(patsubst %.cppm, $(BUILD_DIR)/%.o, $(mod_srcs))
 objs := $(cpp_objs) $(asm_objs) $(c_objs) $(mod_objs)
 deps := $(objs:.o=.d)
 
+# this needs to be executed before any file is build
+BUILD_MOD_DEP_RESUL := $(shell mkdir -p $(BUILD_DIR))
+BUILD_MOD_DEP_RESUL := $(shell ./scripts/moddeps.py $(MOD_PREBUILT_DIR) . $(BUILD_DIR) > $(BUILD_DIR)/module-order-deps.d)
+
 .PHONY: clean modules config_file
 
 all: $(BUILD_DIR)/sc.bin
@@ -101,23 +105,6 @@ $(BUILD_DIR)/%.pcm : %.cppm | config_file
 $(BUILD_DIR)/%.o : $(BUILD_DIR)/%.pcm | config_file
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
 
-# module order dependencies
-# TODO: find a better way
-$(BUILD_DIR)/src/board/qemu/aarch64/debug/debug.pcm : | $(BUILD_DIR)/src/board/qemu/aarch64/debug/uart.pcm
-$(BUILD_DIR)/src/board/qemu/aarch64/debug/uart.pcm : | $(BUILD_DIR)/src/lib/reg.pcm
-$(BUILD_DIR)/src/board/qemu/aarch64/init/init.pcm : | $(BUILD_DIR)/src/board/qemu/aarch64/debug/debug.pcm
-$(BUILD_DIR)/src/lib/heap.pcm : | $(BUILD_DIR)/src/lib/allocator/simple.pcm
-$(BUILD_DIR)/src/lib/exception.pcm : | $(BUILD_DIR)/src/libcxx/string.pcm
-$(BUILD_DIR)/src/libcxx/concepts.pcm : | $(BUILD_DIR)/src/libcxx/type_traits.pcm
-$(BUILD_DIR)/src/lib/fmt.pcm : | $(BUILD_DIR)/src/libcxx/string.pcm $(BUILD_DIR)/src/libcxx/concepts.pcm $(BUILD_DIR)/src/board/qemu/aarch64/debug/uart.pcm
-$(BUILD_DIR)/src/lib/lock/lock.pcm : | $(BUILD_DIR)/src/lib/lock/lock_aarch64.pcm
-$(BUILD_DIR)/src/lib/timestamp/timestamp.pcm : | $(BUILD_DIR)/src/lib/timestamp/aarch64.pcm
-$(BUILD_DIR)/src/lib/time.pcm : | $(BUILD_DIR)/src/lib/timestamp/timestamp.pcm
-$(BUILD_DIR)/src/device/device.pcm : | $(BUILD_DIR)/src/libcxx/string.pcm
-$(BUILD_DIR)/src/libcxx/string.pcm : | $(BUILD_DIR)/src/lib/heap.pcm
-$(BUILD_DIR)/src/device/uart/pl011.pcm : | $(BUILD_DIR)/src/lib/reg.pcm $(BUILD_DIR)/src/lib/fmt.pcm
-
-
 config_file: src/$(CONFIG_FILE)
 	$(Q)mkdir -p $(MOD_PREBUILT_DIR)
 	$(Q)mkdir -p $(BUILD_DIR)/include/
@@ -130,3 +117,4 @@ clean:
 	$(Q)rm -f $(BUILD_DIR)/sc.elf $(BUILD_DIR)/sc.bin $(BUILD_DIR)/*.map $(BUILD_DIR)/_sc.lds
 
 -include $(deps)
+-include build-qemu-aarch64/module-order-deps.d
