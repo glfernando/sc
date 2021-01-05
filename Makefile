@@ -22,7 +22,12 @@ OBJCPYFLAGS = -O binary --strip-all
 LDFLAGS = --gc-sections --pie
 
 TARGET ?= qemu-aarch64
-MOD_PREBUILT_DIR ?= prebuilts
+MOD_PREBUILT_DIR ?= $(BUILD_DIR)/prebuilts
+
+BUILD_DIR ?= ./build-$(TARGET)
+SRC_DIR := ./src
+
+CPPFLAGS += -I$(BUILD_DIR)/include
 
 srcs :=
 mod_srcs :=
@@ -49,71 +54,75 @@ CFLAGS += $(GLOBAL_CFLAGS)
 CXXFLAGS += $(GLOBAL_CXXFLAGS)
 CXXFLAGS += $(CFLAGS)
 
-cpp_srcs = $(filter %.cpp, $(srcs))
-asm_srcs = $(filter %.S, $(srcs))
-c_srcs = $(filter %.c, $(srcs))
-cpp_objs = $(patsubst %.cpp, %.o, $(cpp_srcs))
-asm_objs = $(patsubst %.S, %.o, $(asm_srcs))
-c_objs = $(patsubst %.c, %.o, $(c_srcs))
-mod_pcms = $(patsubst %.cppm, %.pcm, $(mod_srcs))
-mod_objs = $(patsubst %.cppm, %.o, $(mod_srcs))
+cpp_srcs := $(filter %.cpp, $(srcs))
+asm_srcs := $(filter %.S, $(srcs))
+c_srcs := $(filter %.c, $(srcs))
+cpp_objs := $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(cpp_srcs))
+asm_objs := $(patsubst %.S, $(BUILD_DIR)/%.o, $(asm_srcs))
+c_objs := $(patsubst %.c, $(BUILD_DIR)/%.o, $(c_srcs))
+mod_pcms := $(patsubst %.cppm, $(BUILD_DIR)/%.pcm, $(mod_srcs))
+mod_objs := $(patsubst %.cppm, $(BUILD_DIR)/%.o, $(mod_srcs))
 
-objs = $(cpp_objs) $(asm_objs) $(c_objs) $(mod_objs)
+objs := $(cpp_objs) $(asm_objs) $(c_objs) $(mod_objs)
 
 .PHONY: clean modules config_file
 
-all: sc.bin
+all: $(BUILD_DIR)/sc.bin
 
-sc.bin: sc.elf | modules
+$(BUILD_DIR)/sc.bin: $(BUILD_DIR)/sc.elf | modules
 	$(Q)$(OBJCOPY) $(OBJCPYFLAGS) $< $@
 
-sc.elf : $(objs) | _sc.lds
-	$(Q)$(LD) $(LDFLAGS) -T _sc.lds -o $@ $^
+$(BUILD_DIR)/sc.elf : $(objs) | $(BUILD_DIR)/_sc.lds
+	$(Q)$(LD) $(LDFLAGS) -T $(BUILD_DIR)/_sc.lds -o $@ $^
 
-_sc.lds : $(LINKER_SCRIPT)
+$(BUILD_DIR)/_sc.lds : $(LINKER_SCRIPT)
 	$(Q)$(CC) $(CPPFLAGS) -E -x assembler-with-cpp -P -o $@ $<
 
-%.o : %.S | config_file
+$(BUILD_DIR)/%.o : %.S | config_file
+	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-%.o : %.c | config_file
+$(BUILD_DIR)/%.o : %.c | config_file
+	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -x c -c $< -o $@
 
-%.o : %.cpp | modules config_file
+$(BUILD_DIR)/%.o : %.cpp | modules config_file
+	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -c $< -o $@
 
 modules: $(mod_pcms)
 
-%.pcm : %.cppm | config_file
+$(BUILD_DIR)/%.pcm : %.cppm | config_file
+	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fmodules -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ --precompile $< -o $@
 	$(Q)cp $@ $(MOD_PREBUILT_DIR)/$(shell grep "^export module" $< | awk '{print $$3}' | sed 's/;//').pcm
 
-%.o : %.pcm | config_file
+$(BUILD_DIR)/%.o : $(BUILD_DIR)/%.pcm | config_file
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
 
 # module order dependencies
 # TODO: find a better way
-src/board/qemu/aarch64/debug/debug.pcm : | src/board/qemu/aarch64/debug/uart.pcm
-src/board/qemu/aarch64/debug/uart.pcm : | src/lib/reg.pcm
-src/board/qemu/aarch64/init/init.pcm : | src/board/qemu/aarch64/debug/debug.pcm
-src/lib/heap.pcm : | src/lib/allocator/simple.pcm
-src/lib/exception.pcm : | src/libcxx/string.pcm
-src/libcxx/concepts.pcm : | src/libcxx/type_traits.pcm
-src/lib/fmt.pcm : | src/libcxx/string.pcm src/libcxx/concepts.pcm src/board/qemu/aarch64/debug/uart.pcm
-src/lib/lock/lock.pcm : | src/lib/lock/lock_aarch64.pcm
-src/lib/timestamp/timestamp.pcm : | src/lib/timestamp/aarch64.pcm
-src/lib/time.pcm : | src/lib/timestamp/timestamp.pcm
-src/device/device.pcm : | src/libcxx/string.pcm
-src/libcxx/string.pcm : | src/lib/heap.pcm
-src/device/uart/pl011.cppm : | src/lib/reg.pcm src/lib/fmt.pcm
+$(BUILD_DIR)/src/board/qemu/aarch64/debug/debug.pcm : | $(BUILD_DIR)/src/board/qemu/aarch64/debug/uart.pcm
+$(BUILD_DIR)/src/board/qemu/aarch64/debug/uart.pcm : | $(BUILD_DIR)/src/lib/reg.pcm
+$(BUILD_DIR)/src/board/qemu/aarch64/init/init.pcm : | $(BUILD_DIR)/src/board/qemu/aarch64/debug/debug.pcm
+$(BUILD_DIR)/src/lib/heap.pcm : | $(BUILD_DIR)/src/lib/allocator/simple.pcm
+$(BUILD_DIR)/src/lib/exception.pcm : | $(BUILD_DIR)/src/libcxx/string.pcm
+$(BUILD_DIR)/src/libcxx/concepts.pcm : | $(BUILD_DIR)/src/libcxx/type_traits.pcm
+$(BUILD_DIR)/src/lib/fmt.pcm : | $(BUILD_DIR)/src/libcxx/string.pcm $(BUILD_DIR)/src/libcxx/concepts.pcm $(BUILD_DIR)/src/board/qemu/aarch64/debug/uart.pcm
+$(BUILD_DIR)/src/lib/lock/lock.pcm : | $(BUILD_DIR)/src/lib/lock/lock_aarch64.pcm
+$(BUILD_DIR)/src/lib/timestamp/timestamp.pcm : | $(BUILD_DIR)/src/lib/timestamp/aarch64.pcm
+$(BUILD_DIR)/src/lib/time.pcm : | $(BUILD_DIR)/src/lib/timestamp/timestamp.pcm
+$(BUILD_DIR)/src/device/device.pcm : | $(BUILD_DIR)/src/libcxx/string.pcm
+$(BUILD_DIR)/src/libcxx/string.pcm : | $(BUILD_DIR)/src/lib/heap.pcm
+$(BUILD_DIR)/src/device/uart/pl011.pcm : | $(BUILD_DIR)/src/lib/reg.pcm $(BUILD_DIR)/src/lib/fmt.pcm
 
 
 config_file: src/$(CONFIG_FILE)
 	$(Q)mkdir -p $(MOD_PREBUILT_DIR)
-	$(Q)mkdir -p src/include/
-	$(Q)cp $< src/include/config.h
+	$(Q)mkdir -p $(BUILD_DIR)/include/
+	$(Q)cp $< $(BUILD_DIR)/include/config.h
 
 clean:
-	$(Q)find . -name *.o | xargs rm -f
-	$(Q)find . -name *.pcm | xargs rm -f
-	$(Q)rm -f sc.elf sc.bin *.map _sc.lds
+	$(Q)find $(BUILD_DIR) -name *.o | xargs rm -f
+	$(Q)find $(BUILD_DIR) -name *.pcm | xargs rm -f
+	$(Q)rm -f $(BUILD_DIR)/sc.elf $(BUILD_DIR)/sc.bin $(BUILD_DIR)/*.map $(BUILD_DIR)/_sc.lds

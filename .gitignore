@@ -44,5 +44,8 @@
 # ctags
 tags
 
+# inside build directories
+build-*
+
 _sc.lds
 src/include/config.h
