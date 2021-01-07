@@ -70,51 +70,52 @@ deps := $(objs:.o=.d)
 BUILD_MOD_DEP_RESUL := $(shell mkdir -p $(BUILD_DIR))
 BUILD_MOD_DEP_RESUL := $(shell ./scripts/moddeps.py $(MOD_PREBUILT_DIR) . $(BUILD_DIR) > $(BUILD_DIR)/module-order-deps.d)
 
-.PHONY: clean modules config_file
+CONFIG_FILE = $(BUILD_DIR)/include/config.h
+
+.PHONY: clean
 
 all: $(BUILD_DIR)/sc.bin
 
-$(BUILD_DIR)/sc.bin: $(BUILD_DIR)/sc.elf | modules
+$(BUILD_DIR)/sc.bin: $(BUILD_DIR)/sc.elf
 	$(Q)$(OBJCOPY) $(OBJCPYFLAGS) $< $@
 
-$(BUILD_DIR)/sc.elf : $(objs) | $(BUILD_DIR)/_sc.lds
-	$(Q)$(LD) $(LDFLAGS) -T $(BUILD_DIR)/_sc.lds -o $@ $^
+$(BUILD_DIR)/sc.elf : $(objs) $(BUILD_DIR)/_sc.lds
+	$(Q)$(LD) $(LDFLAGS) -T $(BUILD_DIR)/_sc.lds -o $@ $(objs)
 
 $(BUILD_DIR)/_sc.lds : $(LINKER_SCRIPT)
 	$(Q)$(CC) $(CPPFLAGS) -E -x assembler-with-cpp -P -o $@ $<
 
-$(BUILD_DIR)/%.o : %.S | config_file
+$(BUILD_DIR)/%.o : %.S
 	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o : %.c | config_file
+$(BUILD_DIR)/%.o : %.c
 	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -x c -c $< -o $@
 
-$(BUILD_DIR)/%.o : %.cpp | modules config_file
+$(BUILD_DIR)/%.o : %.cpp
 	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -c $< -o $@
 
-modules: $(mod_pcms)
-
-$(BUILD_DIR)/%.pcm : %.cppm | config_file
+$(BUILD_DIR)/%.pcm : %.cppm
 	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fmodules -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ --precompile $< -o $@
-	$(Q)cp $@ $(MOD_PREBUILT_DIR)/$(shell grep "^export module" $< | awk '{print $$3}' | sed 's/;//').pcm
 
-$(BUILD_DIR)/%.o : $(BUILD_DIR)/%.pcm | config_file
+$(BUILD_DIR)/%.o : $(BUILD_DIR)/%.pcm
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
 
-config_file: src/$(CONFIG_FILE)
-	$(Q)mkdir -p $(MOD_PREBUILT_DIR)
-	$(Q)mkdir -p $(BUILD_DIR)/include/
-	$(Q)cp $< $(BUILD_DIR)/include/config.h
+$(objs) : $(CONFIG_FILE)
+
+$(CONFIG_FILE): src/$(TARGET_CONFIG_FILE)
+	$(Q)mkdir -p $(dir $@)
+	$(Q)cp $< $@
 
 clean:
 	$(Q)find $(BUILD_DIR) -name *.o | xargs rm -f
 	$(Q)find $(BUILD_DIR) -name *.d | xargs rm -f
 	$(Q)find $(BUILD_DIR) -name *.pcm | xargs rm -f
 	$(Q)rm -f $(BUILD_DIR)/sc.elf $(BUILD_DIR)/sc.bin $(BUILD_DIR)/*.map $(BUILD_DIR)/_sc.lds
+	$(Q)rm -f $(CONFIG_FILE)
 
 -include $(deps)
 -include build-qemu-aarch64/module-order-deps.d
