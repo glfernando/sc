@@ -26,6 +26,7 @@ enum fmt_flags {
     FMT_ZEROPAD = 1 << 1,
     FMT_CAPS = 1 << 2,
     FMT_POUND = 1 << 3,
+    FMT_CHAR = 1 << 4,
 };
 
 struct modifiers {
@@ -119,6 +120,11 @@ modifiers parse_modifiers(const std::string& flags)
         break;
     case 'o':
         b = 8;
+        break;
+    case 'c':
+        // force char conversion (only valid for integrals)
+        f |= FMT_CHAR;
+        break;
     }
     return m;
 }
@@ -159,6 +165,12 @@ void fmt_print_string(const char* s, int w, int f, fmt_out fout = {})
 void fmt_print_integer(uint64_t n, bool neg, modifiers& mod, fmt_out fout = {})
 {
     auto& [f, w, b] = mod;
+
+    // check if we are printing an char
+    if (f & FMT_CHAR) {
+        char str[] = {static_cast<char>(n), '\0'};
+        return fmt_print_string(str, w, f, fout);
+    }
 
     if (n == 0)
         return fmt_print_string("0", w, f, fout);
