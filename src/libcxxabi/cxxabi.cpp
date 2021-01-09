@@ -30,8 +30,7 @@ struct __si_class_type_info {
 
 namespace std {
 // TODO: move terminate to a better place
-[[noreturn]] void terminate() noexcept
-{
+[[noreturn]] void terminate() noexcept {
     printf("terminate\n");
     while (1) {}
 }
@@ -39,26 +38,27 @@ namespace std {
 
 static _Unwind_Exception* curr_excep;
 
-extern "C" void* __cxa_begin_catch(void* exceptionObject)
-{
+extern "C" void* __cxa_begin_catch(void* exceptionObject) {
     _Unwind_Exception* ue = static_cast<_Unwind_Exception*>(exceptionObject);
     curr_excep = ue;
     return ue + 1;
 }
 
-extern "C" void __cxa_end_catch() { curr_excep = nullptr; }
+extern "C" void __cxa_end_catch() {
+    curr_excep = nullptr;
+}
 
-extern "C" void __cxa_rethrow()
-{
+extern "C" void __cxa_rethrow() {
     if (curr_excep)
         _Unwind_RaiseException(curr_excep);
     std::terminate();
 }
 
-extern "C" int __cxa_atexit(void (*)(void*), void*, void*) { return 0; }
+extern "C" int __cxa_atexit(void (*)(void*), void*, void*) {
+    return 0;
+}
 
-extern "C" void __cxa_pure_virtual()
-{
+extern "C" void __cxa_pure_virtual() {
     while (true) {}
 }
 
@@ -67,8 +67,7 @@ struct __cxa_exception {
     _Unwind_Exception unwindHeader;
 };
 
-extern "C" void* __cxa_allocate_exception(size_t size)
-{
+extern "C" void* __cxa_allocate_exception(size_t size) {
     size_t total = sizeof(__cxa_exception) + size;
     void* ptr = malloc(total);
     memset(ptr, 0, size);
@@ -76,16 +75,14 @@ extern "C" void* __cxa_allocate_exception(size_t size)
     return ptr;
 }
 
-extern "C" void __cxa_free_exception(void* thrown_exception)
-{
+extern "C" void __cxa_free_exception(void* thrown_exception) {
     __cxa_exception* header = ((__cxa_exception*)thrown_exception - 1);
     free(header);
 }
 
 static const uint64_t EXCEPTION_CLASS_CLANG = 0x434C4E47432B2B00;
 
-extern "C" void __cxa_throw(void* thrown_exception, struct type_info* tinfo, void (*dest)(void*))
-{
+extern "C" void __cxa_throw(void* thrown_exception, struct type_info* tinfo, void (*dest)(void*)) {
     __cxa_exception* header = ((__cxa_exception*)thrown_exception - 1);
     header->exceptionType = tinfo;
     header->unwindHeader.exception_class = EXCEPTION_CLASS_CLANG;
@@ -117,8 +114,7 @@ enum dw_enc : uint8_t {
     DW_EH_PE_omit = 0xFF
 };
 
-static uintptr_t readULEB128(const uint8_t*& p)
-{
+static uintptr_t readULEB128(const uint8_t*& p) {
     uintptr_t result = 0;
     unsigned shift = 0;
     uint8_t byte;
@@ -132,8 +128,7 @@ static uintptr_t readULEB128(const uint8_t*& p)
     return result;
 }
 
-static intptr_t readSLEB128(const uint8_t*& p)
-{
+static intptr_t readSLEB128(const uint8_t*& p) {
     uintptr_t result = 0;
     unsigned shift = 0;
     uint8_t byte;
@@ -150,8 +145,7 @@ static intptr_t readSLEB128(const uint8_t*& p)
     return static_cast<intptr_t>(result);
 }
 
-static uintptr_t read_enc_ptr(const uint8_t*& p, dw_enc enc)
-{
+static uintptr_t read_enc_ptr(const uint8_t*& p, dw_enc enc) {
     if (enc == DW_EH_PE_omit)
         return 0;
 
@@ -213,8 +207,7 @@ struct lsda_action {
     intptr_t next_offset;
     const uint8_t* base;
     operator bool() const { return base != nullptr; }
-    lsda_action get_next()
-    {
+    lsda_action get_next() {
         lsda_action la{};
 
         if (!next_offset)
@@ -232,8 +225,7 @@ struct lsda_action {
 
 class Lsda {
  public:
-    Lsda(const uintptr_t ptr) : curr(reinterpret_cast<const uint8_t*>(ptr))
-    {
+    Lsda(const uintptr_t ptr) : curr(reinterpret_cast<const uint8_t*>(ptr)) {
         lp_start_enc = static_cast<dw_enc>(*curr++);
         lp_start = read_enc_ptr(curr, lp_start_enc);
         ttype_enc = static_cast<dw_enc>(*curr++);
@@ -246,8 +238,7 @@ class Lsda {
         action_table_start = call_site_end = call_site_start + call_site_len;
     }
 
-    call_site read_call_site()
-    {
+    call_site read_call_site() {
         call_site cs{};
         if (call_site_curr < call_site_end) {
             cs.start = read_enc_ptr(call_site_curr, call_site_enc);
@@ -261,8 +252,7 @@ class Lsda {
 
     void call_site_reset() { call_site_curr = call_site_start; }
 
-    lsda_action get_action(uintptr_t offset)
-    {
+    lsda_action get_action(uintptr_t offset) {
         lsda_action la{};
 
         if (!offset)
@@ -276,8 +266,7 @@ class Lsda {
         return la;
     }
 
-    const void* get_type_info(intptr_t ttype_index)
-    {
+    const void* get_type_info(intptr_t ttype_index) {
         switch (ttype_enc & 0x0F) {
         case DW_EH_PE_absptr:
             ttype_index *= sizeof(uintptr_t);
@@ -319,8 +308,8 @@ class Lsda {
 };
 
 static _Unwind_Reason_Code install_pad(_Unwind_Exception* unwind_exception,
-                                       _Unwind_Context* context, int type_index, uintptr_t ip_addr)
-{
+                                       _Unwind_Context* context, int type_index,
+                                       uintptr_t ip_addr) {
     _Unwind_SetGR(context, __builtin_eh_return_data_regno(0),
                   reinterpret_cast<uintptr_t>(unwind_exception));
     _Unwind_SetGR(context, __builtin_eh_return_data_regno(1), type_index);
@@ -331,8 +320,7 @@ static _Unwind_Reason_Code install_pad(_Unwind_Exception* unwind_exception,
 extern "C" _Unwind_Reason_Code __gxx_personality_v0(int version, _Unwind_Action actions,
                                                     uint64_t exceptionClass,
                                                     _Unwind_Exception* unwind_exception,
-                                                    _Unwind_Context* context)
-{
+                                                    _Unwind_Context* context) {
     uintptr_t ip = _Unwind_GetIP(context) - 1;
 
     Lsda lsda(_Unwind_GetLanguageSpecificData(context));

@@ -27,8 +27,7 @@ class console : public device {
 // This can be use to create generic code that does not use vtable
 
 template <typename T>
-concept Console = requires(T t, int c)
-{
+concept Console = requires(T t, int c) {
     c = t.getc();
     t.putc(c);
 };

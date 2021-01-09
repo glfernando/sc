@@ -12,6 +12,8 @@ export namespace core::cpu {
 
 void early_init() {}
 
-void init() { arvm8::exception::init(); }
+void init() {
+    arvm8::exception::init();
+}
 
 }  // namespace core::cpu

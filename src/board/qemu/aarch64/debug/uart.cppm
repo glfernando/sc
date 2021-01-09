@@ -23,26 +23,25 @@ enum reg_offset : unsigned {
 
 constexpr uintptr_t uart_base = CONFIG_DEBUG_UART_BASE;
 
-static inline volatile uint32_t& reg(reg_offset offset) { return reg32(uart_base + offset); }
+static inline volatile uint32_t& reg(reg_offset offset) {
+    return reg32(uart_base + offset);
+}
 
 export namespace sc::board::debug::uart {
 
-void init()
-{
+void init() {
     reg(UART_LCR_H) = 1 << 4;
     reg(UART_CR) = 0x301;
 }
 
-int putchar(int c)
-{
+int putchar(int c) {
     reg(UART_DR) = c;
     if (c == '\n')
         putchar('\r');
     return c;
 }
 
-void puts(char const* str)
-{
+void puts(char const* str) {
     while (int c = *str++)
         putchar(c);
 }

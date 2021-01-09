@@ -2,10 +2,11 @@
 BasedOnStyle: Google
 AccessModifierOffset: '-3'
 AlignConsecutiveMacros: 'true'
-AllowShortBlocksOnASingleLine: 'true'
+AllowShortBlocksOnASingleLine: 'Empty'
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: 'false'
-BreakBeforeBraces: WebKit
+AllowShortFunctionsOnASingleLine: 'Inline'
+BreakBeforeBraces: Attach
 ColumnLimit: '100'
 DerivePointerAlignment: 'false'
 IndentCaseLabels: 'false'

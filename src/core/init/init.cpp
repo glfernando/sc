@@ -17,14 +17,12 @@ using sc::lib::fmt::println;
 extern void (*__init_array_start[])();
 extern void (*__init_array_end[])();
 
-void init_array()
-{
+void init_array() {
     for (void (**f)() = __init_array_start; f < __init_array_end; ++f)
         (*f)();
 }
 
-extern "C" [[noreturn]] void init()
-{
+extern "C" [[noreturn]] void init() {
     core::cpu::early_init();
     sc::board::early_init();
 

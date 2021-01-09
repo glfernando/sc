@@ -13,8 +13,7 @@ export import lib.lock.aarch64;
 export namespace sc::lib {
 
 template <typename T>
-concept Lockable = requires(T t)
-{
+concept Lockable = requires(T t) {
     t.acquire();
     t.release();
 };
@@ -37,8 +36,7 @@ class slock {
 // This helper is most likely to be used with a lambda which includes the code we want to protect.
 // Compiler most likely will inline everything having not extra cost
 template <Lockable L, typename F>
-void lock_for(L& lock, F&& func)
-{
+void lock_for(L& lock, F&& func) {
     slock sl(lock);
     func();
 }

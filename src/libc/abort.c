@@ -6,8 +6,7 @@
 
 #include <stdio.h>
 
-void abort(void)
-{
+void abort(void) {
     printf("abort\n");
     for (;;) {}
 }
