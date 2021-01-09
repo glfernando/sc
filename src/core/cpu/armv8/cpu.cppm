@@ -6,10 +6,12 @@
 
 export module core.cpu.armv8;
 
+import core.cpu.armv8.exception;
+
 export namespace core::cpu {
 
 void early_init() {}
 
-void init() {}
+void init() { arvm8::exception::init(); }
 
 }  // namespace core::cpu
