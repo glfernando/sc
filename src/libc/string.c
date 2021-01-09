@@ -15,8 +15,7 @@
 #define ALIGNP(_p, _a)      ((void*)ALIGN((unsigned long)(_p), _a))
 #define ALIGNP_DOWN(_p, _a) ((void*)ALIGN_DOWN((unsigned long)(_p), _a))
 
-char* strcpy(char* dest, const char* src)
-{
+char* strcpy(char* dest, const char* src) {
     char* d = dest;
 
     while ((*dest++ = *src++)) {}
@@ -24,8 +23,7 @@ char* strcpy(char* dest, const char* src)
     return d;
 }
 
-char* strncpy(char* dest, const char* src, size_t n)
-{
+char* strncpy(char* dest, const char* src, size_t n) {
     char* d = dest;
 
     while (n-- && (*dest++ = *src++)) {}
@@ -33,15 +31,13 @@ char* strncpy(char* dest, const char* src, size_t n)
     return d;
 }
 
-int strcmp(const char* s1, const char* s2)
-{
+int strcmp(const char* s1, const char* s2) {
     for (; *s1 && *s1 == *s2; ++s1, ++s2) {}
 
     return *s1 - *s2;
 }
 
-int strncmp(const char* s1, const char* s2, size_t n)
-{
+int strncmp(const char* s1, const char* s2, size_t n) {
     if (!n)
         return 0;
 
@@ -50,8 +46,7 @@ int strncmp(const char* s1, const char* s2, size_t n)
     return *s1 - *s2;
 }
 
-size_t strlen(const char* s)
-{
+size_t strlen(const char* s) {
     const char* t = s;
 
     while (*t)
@@ -59,8 +54,7 @@ size_t strlen(const char* s)
     return t - s;
 }
 
-size_t strnlen(const char* s, size_t maxlen)
-{
+size_t strnlen(const char* s, size_t maxlen) {
     const char* t = s;
 
     while (maxlen-- && *t)
@@ -68,8 +62,7 @@ size_t strnlen(const char* s, size_t maxlen)
     return t - s;
 }
 
-char* strchr(const char* s, int c)
-{
+char* strchr(const char* s, int c) {
     for (; *s; ++s)
         if (*s == c)
             return (char*)s;
@@ -77,8 +70,7 @@ char* strchr(const char* s, int c)
     return NULL;
 }
 
-char* strrchr(const char* s, int c)
-{
+char* strrchr(const char* s, int c) {
     char* p = NULL;
 
     for (; *s; ++s)
@@ -88,8 +80,7 @@ char* strrchr(const char* s, int c)
     return p;
 }
 
-void* memset(void* s, int c, size_t n)
-{
+void* memset(void* s, int c, size_t n) {
     uint8_t* p1 = s;
     uint8_t* p2;
     uint64_t v;
@@ -123,8 +114,7 @@ last:
     return s;
 }
 
-void* memcpy(void* dest, const void* src, size_t n)
-{
+void* memcpy(void* dest, const void* src, size_t n) {
     uint8_t* d = dest;
     const uint8_t* s = src;
     uint8_t* p;
@@ -154,8 +144,7 @@ last:
     return dest;
 }
 
-int memcmp(const void* src1, const void* src2, size_t n)
-{
+int memcmp(const void* src1, const void* src2, size_t n) {
     const uint8_t* s1 = src1;
     const uint8_t* s2 = src2;
 
@@ -167,8 +156,7 @@ int memcmp(const void* src1, const void* src2, size_t n)
     return *s1 - *s2;
 }
 
-void* memmove(void* dest, const void* src, size_t n)
-{
+void* memmove(void* dest, const void* src, size_t n) {
     if (dest == src || !n)
         return dest;
 
@@ -234,8 +222,7 @@ last:
     return dest;
 }
 
-void* memchr(const void* src, int c, size_t n)
-{
+void* memchr(const void* src, int c, size_t n) {
     unsigned char* s = (unsigned char*)src;
 
     for (; n--; s++)
@@ -245,8 +232,7 @@ void* memchr(const void* src, int c, size_t n)
     return NULL;
 }
 
-int internal_strtoull(const char* nptr, char** endptr, int base, int* neg, unsigned long long* v)
-{
+int internal_strtoull(const char* nptr, char** endptr, int base, int* neg, unsigned long long* v) {
     if (endptr)
         *endptr = (char*)nptr;
 
@@ -318,8 +304,7 @@ int internal_strtoull(const char* nptr, char** endptr, int base, int* neg, unsig
     return 0;
 }
 
-unsigned long long strtoull(const char* nptr, char** endptr, int base)
-{
+unsigned long long strtoull(const char* nptr, char** endptr, int base) {
     unsigned long long v;
     int neg;
 
@@ -336,8 +321,7 @@ overflow:
     return ULLONG_MAX;
 }
 
-long long strtoll(const char* nptr, char** endptr, int base)
-{
+long long strtoll(const char* nptr, char** endptr, int base) {
     unsigned long long v;
     int neg;
 
@@ -356,8 +340,7 @@ overflow:
     return neg ? LLONG_MIN : LLONG_MAX;
 }
 
-unsigned long strtoul(const char* nptr, char** endptr, int base)
-{
+unsigned long strtoul(const char* nptr, char** endptr, int base) {
     unsigned long long v;
     int neg;
 
@@ -374,8 +357,7 @@ overflow:
     return ULONG_MAX;
 }
 
-long strtol(const char* nptr, char** endptr, int base)
-{
+long strtol(const char* nptr, char** endptr, int base) {
     unsigned long long v;
     int neg;
 

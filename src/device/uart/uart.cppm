@@ -29,8 +29,7 @@ class uart : public device {
 // This can be use to create generic code that does not use vtable
 
 template <typename T>
-concept Uart = requires(T t, unsigned baud, int c)
-{
+concept Uart = requires(T t, unsigned baud, int c) {
     t.baudrate(baud);
     c = t.getc();
     t.putc(c);

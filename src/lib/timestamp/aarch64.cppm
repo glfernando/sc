@@ -11,8 +11,12 @@ export module lib.timestamp.aarch64;
 
 export namespace sc::lib::timestamp {
 
-uint64_t ticks() { return sysreg_read(cntpct_el0); }
+uint64_t ticks() {
+    return sysreg_read(cntpct_el0);
+}
 
-uint64_t freq() { return sysreg_read(cntfrq_el0); }
+uint64_t freq() {
+    return sysreg_read(cntfrq_el0);
+}
 
 };  // namespace sc::lib::timestamp

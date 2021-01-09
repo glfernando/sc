@@ -20,8 +20,7 @@ using true_type = bool_constant<true>;
 using false_type = bool_constant<false>;
 
 template <bool, typename T = void>
-struct enable_if {
-};
+struct enable_if {};
 
 template <typename T>
 struct enable_if<true, T> {
@@ -117,14 +116,12 @@ using remove_reference_t = typename remove_reference<T>::type;
 
 // forward
 template <typename T>
-constexpr T&& forward(remove_reference_t<T>& t) noexcept
-{
+constexpr T&& forward(remove_reference_t<T>& t) noexcept {
     return static_cast<T&&>(t);
 }
 
 template <typename T>
-constexpr T&& forward(remove_reference_t<T>&& t) noexcept
-{
+constexpr T&& forward(remove_reference_t<T>&& t) noexcept {
     return static_cast<T&&>(t);
 }
 

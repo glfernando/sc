@@ -39,16 +39,14 @@ class fmt_out {
  public:
     fmt_out(std::string* s = nullptr) : str_p(s) {}
 
-    fmt_out& operator<<(char c)
-    {
+    fmt_out& operator<<(char c) {
         if (str_p)
             *str_p += c;
         else
             putchar(c);
         return *this;
     }
-    fmt_out& operator<<(const char* c_str)
-    {
+    fmt_out& operator<<(const char* c_str) {
         if (str_p)
             *str_p += c_str;
         else
@@ -63,8 +61,7 @@ class fmt_out {
 //
 // Parse format string modifiers. e.g {:<08x}
 //
-modifiers parse_modifiers(const std::string& flags)
-{
+modifiers parse_modifiers(const std::string& flags) {
     modifiers m{0, 0, 10};
 
     if (flags.size() == 0)
@@ -132,8 +129,7 @@ modifiers parse_modifiers(const std::string& flags)
 //
 // Print c-style string to fmt_out
 //
-void fmt_print_string(const char* s, int w, int f, fmt_out fout = {})
-{
+void fmt_print_string(const char* s, int w, int f, fmt_out fout = {}) {
     char pad = f & FMT_ZEROPAD ? '0' : ' ';
     bool hex_prefix = f & FMT_POUND;
 
@@ -162,8 +158,7 @@ void fmt_print_string(const char* s, int w, int f, fmt_out fout = {})
         fout << pad;
 }
 
-void fmt_print_integer(uint64_t n, bool neg, modifiers& mod, fmt_out fout = {})
-{
+void fmt_print_integer(uint64_t n, bool neg, modifiers& mod, fmt_out fout = {}) {
     auto& [f, w, b] = mod;
 
     // check if we are printing an char
@@ -222,14 +217,15 @@ export namespace sc::lib::fmt {
 //
 // Ends print template recursion. This handles the case when only fmt is specified
 //
-void print(const char* fmt) { puts(fmt); }
+void print(const char* fmt) {
+    puts(fmt);
+}
 
 //
 // Format printing to default console output
 //
 template <typename T, typename... Args>
-void print(const char* fmt, T&& val, Args&&... args)
-{
+void print(const char* fmt, T&& val, Args&&... args) {
     // remove reference for doing type comparations
     using U = std::remove_reference_t<T>;
     while (*fmt) {
@@ -274,14 +270,15 @@ void print(const char* fmt, T&& val, Args&&... args)
 //
 // Ends sprint template recursion. This handles the case when only fmt is specified
 //
-void sprint(std::string& str, const char* fmt) { str += fmt; }
+void sprint(std::string& str, const char* fmt) {
+    str += fmt;
+}
 
 //
 // Format printing to std::string
 //
 template <typename T, typename... Args>
-void sprint(std::string& str, const char* fmt, T&& val, Args&&... args)
-{
+void sprint(std::string& str, const char* fmt, T&& val, Args&&... args) {
     // remove reference for doing type comparations
     using U = std::remove_reference_t<T>;
     while (*fmt) {
@@ -322,16 +319,14 @@ void sprint(std::string& str, const char* fmt, T&& val, Args&&... args)
 }
 
 template <typename... Args>
-std::string sprint(const char* fmt, Args&&... args)
-{
+std::string sprint(const char* fmt, Args&&... args) {
     std::string str;
     sprint(str, fmt, std::forward<Args>(args)...);
     return str;
 }
 
 template <typename... Args>
-void println(const char* fmt, Args&&... args)
-{
+void println(const char* fmt, Args&&... args) {
     print(fmt, std::forward<Args>(args)...);
     putchar('\n');
 }

@@ -23,12 +23,13 @@
 /*
  * Lets allow someone to overload putchar for a very early printf support
  */
-__attribute__((weak)) int putchar(int c) { return c; }
+__attribute__((weak)) int putchar(int c) {
+    return c;
+}
 
 static int (*custom_putchar)(int c);
 
-static int print_char(char** pbuf, char* end, char c)
-{
+static int print_char(char** pbuf, char* end, char c) {
     if (pbuf) {
         if (*pbuf != end)
             *(*pbuf)++ = c;
@@ -40,8 +41,7 @@ static int print_char(char** pbuf, char* end, char c)
     return 1;
 }
 
-static int print_str(char** pbuf, char* end, char* s, int w, int f)
-{
+static int print_str(char** pbuf, char* end, char* s, int w, int f) {
     char pad = f & ZEROPAD ? '0' : ' ';
     int len, i, n;
     char* t;
@@ -83,8 +83,7 @@ static int print_str(char** pbuf, char* end, char* s, int w, int f)
     return n;
 }
 
-static int print_num(char** pbuf, char* end, uint64_t n, int b, int w, int f)
-{
+static int print_num(char** pbuf, char* end, uint64_t n, int b, int w, int f) {
     char num_buf[NUM_BUF_MAX];
     int t, neg = 0, pc = 0;
     unsigned mask = 0, shift = 0;
@@ -138,8 +137,7 @@ static int print_num(char** pbuf, char* end, uint64_t n, int b, int w, int f)
     return pc + print_str(pbuf, end, s, w, f);
 }
 
-int vsnprintf(char* buf, size_t size, const char* fmt, va_list va)
-{
+int vsnprintf(char* buf, size_t size, const char* fmt, va_list va) {
     int n = 0;
     char** pbuf = buf ? &buf : NULL;
     char* end = buf + size;
@@ -260,8 +258,7 @@ int vsnprintf(char* buf, size_t size, const char* fmt, va_list va)
     return n;
 }
 
-int printf(const char* fmt, ...)
-{
+int printf(const char* fmt, ...) {
     va_list args;
     int n;
 
@@ -272,8 +269,7 @@ int printf(const char* fmt, ...)
     return n;
 }
 
-int sprintf(char* buf, const char* fmt, ...)
-{
+int sprintf(char* buf, const char* fmt, ...) {
     va_list args;
     int n;
 
@@ -284,8 +280,7 @@ int sprintf(char* buf, const char* fmt, ...)
     return n;
 }
 
-int snprintf(char* buf, size_t size, const char* fmt, ...)
-{
+int snprintf(char* buf, size_t size, const char* fmt, ...) {
     va_list args;
     int n;
 
@@ -303,4 +298,6 @@ int snprintf(char* buf, size_t size, const char* fmt, ...)
  * @func    Custom putchar function pointer
  *
  */
-void printf_set_putchar_func(int (*func)(int c)) { custom_putchar = func; }
+void printf_set_putchar_func(int (*func)(int c)) {
+    custom_putchar = func;
+}
