@@ -88,6 +88,11 @@ modifiers parse_modifiers(const std::string& flags)
             return m;
     }
 
+    if (c == '#') {
+        f |= FMT_POUND;
+        c = flags[index++];
+    }
+
     if (c == '0') {
         f |= FMT_ZEROPAD;
         c = flags[index++];
@@ -102,11 +107,6 @@ modifiers parse_modifiers(const std::string& flags)
 
     if (!c)
         return m;
-
-    if (c == '#') {
-        f |= FMT_POUND;
-        c = flags[index++];
-    }
 
     // check for base modifier
     switch (c) {
