@@ -5,6 +5,7 @@ mod_srcs += $(LOCAL_DIR)/heap.cppm
 mod_srcs += $(LOCAL_DIR)/exception.cppm
 mod_srcs += $(LOCAL_DIR)/fmt.cppm
 mod_srcs += $(LOCAL_DIR)/time.cppm
+mod_srcs += $(LOCAL_DIR)/hexdump.cppm
 
 srcs += $(LOCAL_DIR)/heap-malloc.cpp
 
