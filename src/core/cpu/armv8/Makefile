@@ -2,6 +2,7 @@ LOCAL_DIR = $(GET_LOCAL_DIR)
 
 mod_srcs += $(LOCAL_DIR)/cpu.cppm
 mod_srcs += $(LOCAL_DIR)/exception.cppm
+mod_srcs += $(LOCAL_DIR)/common.cppm
 
 srcs += $(LOCAL_DIR)/loader.S
 srcs += $(LOCAL_DIR)/start.S

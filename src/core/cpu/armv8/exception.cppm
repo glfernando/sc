@@ -14,6 +14,7 @@ module;
 export module core.cpu.armv8.exception;
 
 import lib.fmt;
+import core.cpu.armv8.common;
 
 using sc::lib::fmt::print;
 using sc::lib::fmt::println;
@@ -78,18 +79,6 @@ int default_exception_handler(regs* regs) {
 }  // namespace core::cpu::arvm8::exception
 
 export namespace core::cpu::arvm8::exception {
-
-unsigned cpu_id() {
-    unsigned mpidr = sysreg_read(mpidr_el1);
-    unsigned id = mpidr & 0xffffff;
-
-    if (id >= 0x100) {
-        unsigned cluster = (id >> 8) & 0xff;
-        id = (id & 0xff) + CONFIG_CPU_AFF0_CPU_MAX * cluster;
-    }
-
-    return id;
-}
 
 extern "C" uint8_t exception_base[];
 extern "C" int exception_handler(int type, regs* regs) {
