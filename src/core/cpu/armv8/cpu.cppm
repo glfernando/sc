@@ -6,6 +6,8 @@
 
 export module core.cpu.armv8;
 
+export import core.cpu.armv8.common;
+
 import core.cpu.armv8.exception;
 
 export namespace core::cpu {
