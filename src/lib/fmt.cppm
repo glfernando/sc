@@ -234,8 +234,8 @@ void print(const char* fmt) {
 //
 template <typename T, typename... Args>
 void print(const char* fmt, T&& val, Args&&... args) {
-    // remove reference for doing type comparations
-    using U = std::remove_reference_t<T>;
+    // remove cv and reference for doing type comparations
+    using U = std::remove_cv_t<std::remove_reference_t<T>>;
     while (*fmt) {
         if (*fmt == '{' && *++fmt != '{') {
             std::string flags;
@@ -285,8 +285,8 @@ void sprint(std::string& str, const char* fmt) {
 //
 template <typename T, typename... Args>
 void sprint(std::string& str, const char* fmt, T&& val, Args&&... args) {
-    // remove reference for doing type comparations
-    using U = std::remove_reference_t<T>;
+    // remove cv and reference for doing type comparations
+    using U = std::remove_cv_t<std::remove_reference_t<T>>;
     while (*fmt) {
         if (*fmt == '{' && *++fmt != '{') {
             std::string flags;
