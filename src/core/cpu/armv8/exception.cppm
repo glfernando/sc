@@ -7,6 +7,7 @@
 module;
 
 #include <arch/aarch64/sysreg.h>
+#include <errcodes.h>
 #include <stdint.h>
 
 #include "exception_vector.h"
@@ -92,6 +93,13 @@ extern "C" int exception_handler(int type, regs* regs) {
 void init() {
     // init exception vector
     sysreg_write(vbar_el1, exception_base);
+}
+
+int register_exception_handler(int type, exception_handler_t handler) {
+    if (type >= EXCEPTION_TYPE_MAX)
+        return ERR_INVALID_ARGS;
+    handlers[type] = handler;
+    return 0;
 }
 
 }  // namespace core::cpu::arvm8::exception
