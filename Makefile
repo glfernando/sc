@@ -67,8 +67,8 @@ objs := $(cpp_objs) $(asm_objs) $(c_objs) $(mod_objs)
 deps := $(objs:.o=.d)
 
 # this needs to be executed before any file is build
-BUILD_MOD_DEP_RESUL := $(shell mkdir -p $(BUILD_DIR))
-BUILD_MOD_DEP_RESUL := $(shell ./scripts/moddeps.py $(MOD_PREBUILT_DIR) . $(BUILD_DIR) > $(BUILD_DIR)/module-order-deps.d)
+BUILD_MOD_DEP_RESULT := $(shell mkdir -p $(MOD_PREBUILT_DIR))
+BUILD_MOD_DEP_RESULT := $(shell ./scripts/moddeps.py $(MOD_PREBUILT_DIR) . $(BUILD_DIR) > $(BUILD_DIR)/module-order-deps.d)
 
 CONFIG_FILE = $(BUILD_DIR)/include/config.h
 
