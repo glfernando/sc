@@ -5,5 +5,6 @@ mod_srcs += $(LOCAL_DIR)/device.cppm
 dirs :=
 dirs += $(LOCAL_DIR)/uart
 dirs += $(LOCAL_DIR)/console
+dirs += $(LOCAL_DIR)/intc
 
 include $(foreach dir,$(dirs),$(dir)/Makefile)
