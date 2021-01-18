@@ -36,8 +36,6 @@ void init() {
 
 int putchar(int c) {
     reg(UART_DR) = c;
-    if (c == '\n')
-        putchar('\r');
     return c;
 }
 
