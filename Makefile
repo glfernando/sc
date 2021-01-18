@@ -35,6 +35,7 @@ dirs :=
 GLOBAL_CPPFLAGS :=
 GLOBAL_CFLAGS :=
 GLOBAL_CXXFLAGS :=
+GLOBAL_LDFLAGS :=
 
 include make/utils.mk
 include target/$(TARGET).mk
@@ -53,6 +54,7 @@ CPPFLAGS += $(GLOBAL_CPPFLAGS)
 CFLAGS += $(GLOBAL_CFLAGS)
 CXXFLAGS += $(GLOBAL_CXXFLAGS)
 CXXFLAGS += $(CFLAGS)
+LDFLAGS += $(GLOBAL_LDFLAGS)
 
 cpp_srcs := $(filter %.cpp, $(srcs))
 asm_srcs := $(filter %.S, $(srcs))
