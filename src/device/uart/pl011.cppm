@@ -11,9 +11,7 @@ export module device.uart.pl011;
 export import device.uart;
 import std.string;
 import lib.reg;
-import lib.fmt;
 
-using sc::lib::fmt::println;
 using sc::lib::reg::reg32;
 
 export namespace device {
