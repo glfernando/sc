@@ -14,7 +14,7 @@ template <typename T>
 class initializer_list {
  public:
     inline constexpr initializer_list() noexcept : b(nullptr), s(0) {}
-    inline constexpr size_t size() const noexcept { return s; }
+    inline size_t size() const noexcept { return s; }
     inline constexpr const T* begin() const noexcept { return b; }
     inline constexpr const T* end() const noexcept { return b + s; }
 
