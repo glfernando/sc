@@ -127,3 +127,4 @@ clean:
 
 -include $(deps)
 -include $(BUILD_DIR)/module-order-deps.d
+-include src/$(BOARD_PATH)/rules.mk
