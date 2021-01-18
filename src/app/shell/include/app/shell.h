@@ -28,3 +28,4 @@ extern struct shell_cmd __shell_cmds_start[];
 extern struct shell_cmd __shell_cmds_end[];
 
 void shell_run();
+int shell_exec_cmd(char const* str);
