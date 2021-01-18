@@ -8,6 +8,7 @@
 
 import board.init;
 import board.debug;
+import board.power;
 import lib.heap;
 import lib.fmt;
 import core.cpu;
@@ -38,5 +39,6 @@ extern "C" [[noreturn]] void init() {
     // just run the shell, there is nothing else to do
     shell_run();
 
+    sc::board::poweroff();
     for (;;) {}
 }
