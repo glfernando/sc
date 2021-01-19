@@ -13,17 +13,19 @@ export module lib.fmt;
 
 export import std.string;
 export import std.concepts;
-import board.peripherals;
+import device.console;
+
+static device::console* con;
 
 static inline void putchar(int c) {
-    auto& con = sc::board::peripherals::default_console();
-    return con.putc(c);
+    if (con)
+        con->putc(c);
 }
 
 static inline void puts(char const* str) {
-    auto& con = sc::board::peripherals::default_console();
-    while (int c = *str++)
-        con.putc(c);
+    if (con)
+        while (int c = *str++)
+            con->putc(c);
 }
 
 // module private data
@@ -335,6 +337,10 @@ template <typename... Args>
 void println(const char* fmt, Args&&... args) {
     print(fmt, std::forward<Args>(args)...);
     putchar('\n');
+}
+
+void register_console(device::console* console) {
+    con = console;
 }
 
 }  // namespace sc::lib::fmt
