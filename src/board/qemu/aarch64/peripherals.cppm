@@ -6,6 +6,7 @@
 
 export module board.peripherals;
 export import device.uart.pl011;
+export import device.console.uart;
 
 import std.string;
 
@@ -16,7 +17,8 @@ static constexpr device::pl011::platform_data uart0_pdata{
 };
 
 static device::pl011 uart0("uart0", uart0_pdata);
-bool uart_init = false;
+
+static device::uart_console con0("con0", uart0);
 
 export namespace sc::board::peripherals {
 
@@ -24,8 +26,8 @@ void init() {
     uart0.init();
 }
 
-device::pl011& default_console() {
-    return uart0;
+auto& default_console() {
+    return con0;
 }
 
 }  // namespace sc::board::peripherals
