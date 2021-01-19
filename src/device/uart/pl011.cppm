@@ -52,14 +52,15 @@ enum pl011_reg_offset : uint32_t {
     UART_CR     = 0x30,
 };
 
-enum UART_DR_bits : uint32_t {
-    UART_LCR_H_FEN  = 1 << 4,
-};
-
 enum UART_FR_bits : uint32_t {
     UART_FR_RXEE    = 1 << 4,
     UART_FR_TXFF    = 1 << 5,
     UART_FR_TXFE    = 1 << 7,
+};
+
+enum UART_LCR_H_bits : uint32_t {
+    UART_LCR_H_FEN	= 1 << 4,
+    UART_LCR_H_WLEN8	= 3 << 5,
 };
 
 enum UART_CR_bits : uint32_t {
@@ -73,7 +74,7 @@ namespace device {
 
 void pl011::init() {
     // enable fifo
-    reg(UART_LCR_H) = UART_LCR_H;
+    reg(UART_LCR_H) = UART_LCR_H_FEN | UART_LCR_H_WLEN8;
 
     // set baudrate
     baudrate(baud);
