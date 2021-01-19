@@ -16,7 +16,7 @@ class lock {
     [[gnu::always_inline]] void release();
 
  public:
-    volatile unsigned val __attribute__((aligned(8)));
+    unsigned val __attribute__((aligned(8)));
 };
 
 class lock_irqsafe : public lock {
