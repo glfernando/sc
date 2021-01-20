@@ -37,7 +37,7 @@ void early_init() {
 
     // enable cache
     unsigned long r = sysreg_read(sctlr_el1);
-    r |= (1 << 12) | 1;
+    r |= (1 << 12) | 0x5;
     r &= ~(1 << 1);
 
     sysreg_write(sctlr_el1, r);
