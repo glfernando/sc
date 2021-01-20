@@ -249,4 +249,13 @@ struct is_trivially_constructible {
 template <class T>
 inline constexpr bool is_trivially_constructible_v = is_trivially_constructible<T>::value;
 
+template <typename T, T v>
+struct integral_constant {
+    static constexpr T value = v;
+    using value_type = T;
+    using type = integral_constant;
+    constexpr operator value_type() const noexcept { return value; }
+    constexpr value_type operator()() const noexcept { return value; }
+};
+
 }  // namespace std
