@@ -6,6 +6,7 @@
 
 export module board.peripherals;
 export import device.uart.pl011;
+export import device.intc.gic;
 export import device.console.uart;
 
 import std.string;
@@ -20,14 +21,25 @@ static device::pl011 uart0("uart0", uart0_pdata);
 
 static device::uart_console con0("con0", uart0);
 
+static constexpr device::gic::platform_data gicv2_pdata{
+    .dbase = 0x0800'0000,
+    .cbase = 0x0801'0000,
+};
+static device::gic gicv2("gic", gicv2_pdata);
+
 export namespace sc::board::peripherals {
 
 void init() {
     uart0.init();
+    gicv2.init();
 }
 
 auto& default_console() {
     return con0;
+}
+
+device::gic& default_intc() {
+    return gicv2;
 }
 
 }  // namespace sc::board::peripherals
