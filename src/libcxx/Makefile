@@ -6,6 +6,7 @@ mod_srcs += $(LOCAL_DIR)/concepts.cppm
 mod_srcs += $(LOCAL_DIR)/initializer_list.cppm
 mod_srcs += $(LOCAL_DIR)/vector.cppm
 mod_srcs += $(LOCAL_DIR)/tuple.cppm
+mod_srcs += $(LOCAL_DIR)/memory.cppm
 
 srcs += $(LOCAL_DIR)/new.cpp
 
