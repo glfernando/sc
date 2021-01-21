@@ -1,9 +1,12 @@
 # sc
 SC is a modem C++ bare metal framework which provides OS type primities and libraries that allow to write code in a similar way you would write a userspace application.
 
+## Build status
+![build status](https://github.com/glfernando/sc/workflows/SC%20CI/badge.svg)
+
 ## Features
 - Written in modem C++
-- Minimal C++ standar is C++20 (-std=c++2a)
+- Minimal C++ standard is C++20 (-std=c++2a)
 - Uses the **Big Four** C++20 features:
   - Modules
   - Concepts
@@ -183,6 +186,7 @@ Then CONFIG_PL011 can be set in a board `config.h` file.
 - [x] Support for Concepts
 - [x] Support for C++ type traits (partial)
 - [x] Support for handling AARCH64 HW exceptions
+- [ ] Support for unique_ptr
 - [ ] Support for interrupts
 - [ ] Support for timers
 - [ ] Support for threads
