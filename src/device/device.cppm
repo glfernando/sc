@@ -27,6 +27,7 @@ enum class class_type {
     UART,
     CONSOLE,
     INTC,
+    TIMER,
 };
 
 class device {
