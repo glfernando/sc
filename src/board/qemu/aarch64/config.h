@@ -7,6 +7,6 @@
 #pragma once
 
 #define CONFIG_TEXT_BASE       0x40080000
-#define CONFIG_STACK_SIZE      (1024 * 16)
-#define CONFIG_HEAP_SIZE       (1024 * 32)
+#define CONFIG_STACK_SIZE      (1024 * 1024)
+#define CONFIG_HEAP_SIZE       (1024 * 1024 * 4)
 #define CONFIG_DEBUG_UART_BASE 0x09000000
