@@ -15,7 +15,6 @@ export module board.init;
 import board.debug;
 import board.peripherals;
 import lib.reg;
-import lib.fmt;
 
 using sc::lib::reg::reg32;
 
@@ -65,7 +64,6 @@ void early_init() {
 void init() {
     // initialize peripherals
     sc::board::peripherals::init();
-    sc::lib::fmt::register_console(&peripherals::default_console());
 }
 
 }  // namespace sc::board
