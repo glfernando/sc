@@ -12,7 +12,6 @@ export module board.init;
 
 import board.debug;
 import board.peripherals;
-import lib.fmt;
 
 export namespace sc::board {
 
@@ -25,7 +24,6 @@ void early_init() {
 void init() {
     // initialize peripherals
     peripherals::init();
-    sc::lib::fmt::register_console(&peripherals::default_console());
 }
 
 }  // namespace sc::board
