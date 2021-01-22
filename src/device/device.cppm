@@ -19,6 +19,11 @@
 export module device;
 
 import std.string;
+import std.vector;
+import lib.exception;
+
+using sc::lib::exception::exception;
+using std::vector;
 
 export namespace device {
 
@@ -49,6 +54,46 @@ class device {
 
  private:
     std::string name_;
+};
+
+}  // namespace device
+
+namespace device {
+static vector<device*> devices;
+}
+
+export namespace device {
+
+class manager {
+ public:
+    static void register_device(device* dev) { devices.push_back(dev); }
+
+    static void unregister_device(device* dev) {
+        for (auto it = devices.begin(); it != devices.end(); ++it) {
+            if (*it == dev) {
+                devices.erase(it);
+                return;
+            }
+        }
+    }
+
+    static device* find(class_type type) {
+        for (auto dev : devices) {
+            if (dev->type() == type)
+                return dev;
+        }
+        return nullptr;
+    }
+
+    // TODO: create Device concept
+    template <typename D>
+    static D* find() {
+        for (auto dev : devices) {
+            if (dev->type() == D::dev_type)
+                return static_cast<D*>(dev);
+        }
+        return nullptr;
+    }
 };
 
 }  // namespace device
