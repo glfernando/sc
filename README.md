@@ -186,9 +186,9 @@ Then CONFIG_PL011 can be set in a board `config.h` file.
 - [x] Support for Concepts
 - [x] Support for C++ type traits (partial)
 - [x] Support for handling AARCH64 HW exceptions
-- [ ] Support for unique_ptr
-- [ ] Support for interrupts
-- [ ] Support for timers
+- [x] Support for unique_ptr
+- [x] Support for interrupts
+- [x] Support for timers
 - [ ] Support for threads
 - [ ] Support for blocking and waking up treads
 - [ ] Support for Events
