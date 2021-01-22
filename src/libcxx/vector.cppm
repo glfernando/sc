@@ -14,10 +14,6 @@ export module std.vector;
 export import std.initializer_list;
 export import std.type_traits;
 
-// debug
-import lib.fmt;
-using sc::lib::fmt::println;
-
 // placement new prototypes
 void* operator new(size_t size, void* ptr);
 void* operator new[](size_t size, void* ptr);
