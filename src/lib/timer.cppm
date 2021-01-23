@@ -12,7 +12,9 @@ export import device.timer;
 import board.peripherals;
 import std.type_traits;
 import lib.fmt;
+import lib.exception;
 
+using sc::lib::exception::exception;
 using sc::lib::fmt::println;
 using sc::lib::time::time_us_t;
 
@@ -54,6 +56,7 @@ class timer {
     timer(type type = type::PERIODIC) : cb(nullptr), e(nullptr), type(type) {}
     template <typename F>
     void start(F&& f, time_us_t period);
+    void start(time_us_t period);
     void stop();
     ~timer();
 
@@ -83,6 +86,13 @@ void timer::start(F&& f, time_us_t period) {
             },
             this);
     }
+    dev.set(e, period);
+}
+
+void timer::start(time_us_t period) {
+    if (cb == nullptr)
+        throw exception::exception("no callback set");
+    auto& dev = sc::board::peripherals::default_timer();
     dev.set(e, period);
 }
 
