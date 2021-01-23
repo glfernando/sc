@@ -55,3 +55,13 @@ TEST(timer, stop) {
     delay(10ms);
     EXPECT(counter == 0)
 }
+
+TEST(timer, reschedule) {
+    timer t(timer::type::ONE_SHOT);
+
+    int counter = 0;
+    t.start([&counter, &t] { t.start(1ms + ++counter); }, 1ms);
+    delay(18ms);
+    t.stop();
+    EXPECT(counter == 5)
+}
