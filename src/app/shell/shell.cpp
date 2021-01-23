@@ -20,7 +20,7 @@ import lib.fmt;
 import board.peripherals;
 import lib.exception;
 
-using sc::lib::exception::exception;
+using sc::lib::exception;
 using sc::lib::fmt::print;
 using sc::lib::fmt::println;
 
