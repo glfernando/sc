@@ -8,6 +8,7 @@ module;
 
 #include <arch/aarch64/sysreg.h>
 #include <errcodes.h>
+#include <libunwind.h>
 #include <stdint.h>
 
 #include "exception_vector.h"
@@ -16,7 +17,9 @@ export module core.cpu.armv8.exception;
 
 import lib.fmt;
 import core.cpu.armv8.common;
+import lib.backtrace;
 
+using sc::lib::backtrace;
 using sc::lib::fmt::print;
 using sc::lib::fmt::println;
 
@@ -39,14 +42,13 @@ namespace core::cpu::arvm8::exception {
 
 static exception_handler_t handlers[EXCEPTION_TYPE_MAX];
 
-struct stack_frame {
-    stack_frame* next;
-    unsigned long lr;
-};
+static void fill_unw_context(unw_context_t& uc, regs* regs) {
+    // copy x0 - x30
+    for (auto i = 0; i < 31; ++i)
+        uc.data[i] = regs->r[i];
 
-void print_backtrace(unsigned long fp) {
-    for (auto f = reinterpret_cast<stack_frame*>(fp); f; f = f->next)
-        println("[<{:016x}>]", f->lr);
+    uc.data[31] = regs->sp;
+    uc.data[32] = sysreg_read(elr_el1);
 }
 
 int default_exception_handler(regs* regs) {
@@ -72,7 +74,9 @@ int default_exception_handler(regs* regs) {
     println("     LR {:#016x}     SP {:#016x}", regs->r[30], regs->sp);
 
     println("\nbacktrace:");
-    print_backtrace(regs->r[29]);
+    unw_context_t uc;
+    fill_unw_context(uc, regs);
+    backtrace(&uc);
 
     asm volatile("b .");
 }
