@@ -10,7 +10,7 @@
 import lib.heap;
 import lib.exception;
 
-using sc::lib::exception::exception;
+using sc::lib::exception;
 using sc::lib::heap::alloc;
 using sc::lib::heap::free;
 

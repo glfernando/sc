@@ -13,7 +13,7 @@ import lib.fmt;
 import std.string;
 import lib.exception;
 
-using sc::lib::exception::exception;
+using sc::lib::exception;
 using sc::lib::fmt::print;
 using sc::lib::fmt::println;
 using std::string;
