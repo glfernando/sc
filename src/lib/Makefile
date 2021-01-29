@@ -1,20 +1,6 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-mod_srcs += $(LOCAL_DIR)/reg.cppm
-mod_srcs += $(LOCAL_DIR)/heap.cppm
-mod_srcs += $(LOCAL_DIR)/exception.cppm
-mod_srcs += $(LOCAL_DIR)/fmt.cppm
-mod_srcs += $(LOCAL_DIR)/time.cppm
-mod_srcs += $(LOCAL_DIR)/hexdump.cppm
-mod_srcs += $(LOCAL_DIR)/utils.cppm
-mod_srcs += $(LOCAL_DIR)/timer.cppm
-mod_srcs += $(LOCAL_DIR)/backtrace.cppm
-
-srcs += $(LOCAL_DIR)/heap-malloc.cpp
-
-dirs :=
-dirs += $(LOCAL_DIR)/allocator
-dirs += $(LOCAL_DIR)/lock
-dirs += $(LOCAL_DIR)/timestamp
-
-include $(foreach dir,$(dirs),$(dir)/Makefile)
+src-y += reg.cppm heap.cppm exception.cppm fmt.cppm time.cppm hexdump.cppm utils.cppm timer.cppm
+src-y += backtrace.cppm heap-malloc.cpp
+src-y += allocator/
+src-y += lock/
+src-y += timestamp/

@@ -38,13 +38,15 @@ else
 CFLAGS += -Oz -flto
 endif
 
-srcs :=
-mod_srcs :=
-dirs :=
 GLOBAL_CPPFLAGS :=
 GLOBAL_CFLAGS :=
 GLOBAL_CXXFLAGS :=
 GLOBAL_LDFLAGS :=
+
+c_srcs :=
+asm_srcs :=
+cpp_srcs :=
+mod_srcs :=
 
 include make/utils.mk
 include target/$(TARGET).mk
@@ -56,10 +58,12 @@ CXXFLAGS += -DRUN_ALL_TESTS
 endif
 
 # include top directories
-include src/Makefile
-include src/$(BOARD_PATH)/Makefile
-include src/arch/$(ARCH)/Makefile
-include external/src/Makefile
+default_makefiles = src/Makefile
+default_makefiles += src/$(BOARD_PATH)/Makefile
+default_makefiles += src/arch/$(ARCH)/Makefile
+default_makefiles += external/src/Makefile
+
+$(foreach file,$(default_makefiles),$(eval $(call include_module,$(file))))
 
 # use default linker script if none was set by target makefile
 LINKER_SCRIPT ?= sc_linker.lds
@@ -70,9 +74,6 @@ CXXFLAGS += $(GLOBAL_CXXFLAGS)
 CXXFLAGS += $(CFLAGS)
 LDFLAGS += $(GLOBAL_LDFLAGS)
 
-cpp_srcs := $(filter %.cpp, $(srcs))
-asm_srcs := $(filter %.S, $(srcs))
-c_srcs := $(filter %.c, $(srcs))
 cpp_objs := $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(cpp_srcs))
 asm_objs := $(patsubst %.S, $(BUILD_DIR)/%.o, $(asm_srcs))
 c_objs := $(patsubst %.c, $(BUILD_DIR)/%.o, $(c_srcs))

@@ -1,7 +1,6 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-srcs += $(LOCAL_DIR)/mem.cpp
+src-y += mem.cpp
 
 ifeq ($(ARCH), aarch64)
-srcs += $(LOCAL_DIR)/sysreg.cpp
+src-y += sysreg.cpp
 endif

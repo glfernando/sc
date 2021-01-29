@@ -1,11 +1,6 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-mod_srcs += $(LOCAL_DIR)/cpu.cppm
-
-dirs :=
+src-y += cpu.cppm
 
 ifeq ($(CPU), armv8)
-dirs += $(LOCAL_DIR)/armv8
+src-y += armv8/
 endif
-
-include $(foreach dir,$(dirs),$(dir)/Makefile)
