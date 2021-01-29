@@ -25,9 +25,9 @@ def create_dep(file_name, args):
         m = re.search(r'^export\s*module\s*(\S*);', line)
         if m is not None:
             dep.mod_name = m.group(1)
-        m = re.search(r'import\s*(\S*);', line)
+        m = re.search(r'^(export )?import\s*(\S*);', line)
         if m is not None:
-            dep.mod_deps.append(m.group(1))
+            dep.mod_deps.append(m.group(2))
 
     return dep
 
