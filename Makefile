@@ -28,6 +28,7 @@ DEBUGGABLE ?= 0
 
 BUILD_DIR ?= ./build-$(TARGET)
 SRC_DIR := ./src
+SCRIPTS_DIR := ./scripts
 
 CPPFLAGS += -I$(BUILD_DIR)/include
 
@@ -82,8 +83,8 @@ objs := $(cpp_objs) $(asm_objs) $(c_objs) $(mod_objs)
 deps := $(objs:.o=.d)
 
 # this needs to be executed before any file is build
-BUILD_MOD_DEP_RESULT := $(shell mkdir -p $(MOD_PREBUILT_DIR))
-BUILD_MOD_DEP_RESULT := $(shell ./scripts/moddeps.py $(MOD_PREBUILT_DIR) $(BUILD_DIR) $(cpp_srcs) $(mod_srcs) > $(BUILD_DIR)/module-order-deps.d)
+#BUILD_MOD_DEP_RESULT := $(shell mkdir -p $(MOD_PREBUILT_DIR))
+#BUILD_MOD_DEP_RESULT := $(shell ./scripts/moddeps.py $(MOD_PREBUILT_DIR) $(BUILD_DIR) $(cpp_srcs) $(mod_srcs) > $(BUILD_DIR)/module-order-deps.d)
 
 CONFIG_FILE = $(BUILD_DIR)/include/config.h
 
@@ -119,7 +120,7 @@ $(BUILD_DIR)/%.pcm : %.cppm
 $(BUILD_DIR)/%.o : $(BUILD_DIR)/%.pcm
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
 
-$(objs) : $(CONFIG_FILE)
+$(objs) : $(CONFIG_FILE) $(BUILD_DIR)/module-order-deps.d
 
 $(CONFIG_FILE): src/$(TARGET_CONFIG_FILE)
 	$(Q)mkdir -p $(dir $@)
@@ -131,6 +132,10 @@ clean:
 	$(Q)find $(BUILD_DIR) -name *.pcm | xargs rm -f
 	$(Q)rm -f $(BUILD_DIR)/sc.elf $(BUILD_DIR)/sc.bin $(BUILD_DIR)/*.map $(BUILD_DIR)/_sc.lds
 	$(Q)rm -f $(CONFIG_FILE)
+
+$(BUILD_DIR)/module-order-deps.d: $(cpp_srcs) $(mod_srcs)
+	$(Q)mkdir -p $(MOD_PREBUILT_DIR)
+	$(Q)$(SCRIPTS_DIR)/moddeps.py $(MOD_PREBUILT_DIR) $(BUILD_DIR) $^ > $@
 
 -include $(deps)
 -include $(BUILD_DIR)/module-order-deps.d
