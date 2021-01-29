@@ -1,8 +1,4 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-dirs :=
-dirs += $(LOCAL_DIR)/src
+GLOBAL_CFLAGS += -I$(MODULE_PATH)/include
 
-GLOBAL_CFLAGS += -I$(LOCAL_DIR)/include
-
-include $(foreach dir,$(dirs),$(dir)/Makefile)
+src-y += src/

@@ -1,7 +1,6 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-mod_srcs += $(LOCAL_DIR)/lock.cppm
+src-y += lock.cppm
 
 ifeq ($(ARCH), aarch64)
-mod_srcs += $(LOCAL_DIR)/lock_aarch64.cppm
+src-y += lock_aarch64.cppm
 endif

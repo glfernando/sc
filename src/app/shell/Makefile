@@ -1,5 +1,4 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-GLOBAL_CFLAGS += -I$(LOCAL_DIR)/include
+GLOBAL_CFLAGS += -I$(MODULE_PATH)/include
 
-srcs += $(LOCAL_DIR)/shell.cpp
+src-y += shell.cpp

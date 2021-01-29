@@ -1,13 +1,5 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-mod_srcs += $(LOCAL_DIR)/string.cppm
-mod_srcs += $(LOCAL_DIR)/type_traits.cppm
-mod_srcs += $(LOCAL_DIR)/concepts.cppm
-mod_srcs += $(LOCAL_DIR)/initializer_list.cppm
-mod_srcs += $(LOCAL_DIR)/vector.cppm
-mod_srcs += $(LOCAL_DIR)/tuple.cppm
-mod_srcs += $(LOCAL_DIR)/memory.cppm
+src-y = string.cppm type_traits.cppm concepts.cppm initializer_list.cppm initializer_list.cppm
+src-y += vector.cppm tuple.cppm memory.cppm new.cpp
 
-srcs += $(LOCAL_DIR)/new.cpp
-
-GLOBAL_CFLAGS += -I$(LOCAL_DIR)/include
+GLOBAL_CFLAGS += -I$(MODULE_PATH)/include

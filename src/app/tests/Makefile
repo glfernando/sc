@@ -1,9 +1,5 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-srcs += $(LOCAL_DIR)/test.cpp
-srcs += $(LOCAL_DIR)/vector.cpp
-srcs += $(LOCAL_DIR)/tuple.cpp
-srcs += $(LOCAL_DIR)/timer.cpp
+GLOBAL_CFLAGS += -I$(MODULE_PATH)/include
+GLOBAL_LDFLAGS += -T$(MODULE_PATH)/test.lds
 
-GLOBAL_CFLAGS += -I$(LOCAL_DIR)/include
-GLOBAL_LDFLAGS += -T$(LOCAL_DIR)/test.lds
+src-y += test.cpp vector.cpp tuple.cpp timer.cpp
