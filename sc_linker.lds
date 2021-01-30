@@ -47,11 +47,13 @@ SECTIONS
         *(.data*)
     }
 
+#ifdef RELOCABLE
     .rela.dyn ALIGN(8): {
         __rela_dyn_start = .;
         *(.rela_dyn)
     }
     __rela_dyn_end = .;
+#endif
 
     .bss ALIGN(4096) : {
         __bss_start = .;
@@ -79,5 +81,8 @@ SECTIONS
         *(.hash)
         *(.dynamic)
         *(.plt*)
+#ifndef RELOCABLE
+        *(.rela_dyn*)
+#endif
     }
 }

@@ -28,6 +28,7 @@ _loader_start:
         str     xzr, [x5], 8
         b       1b
 2:
+#ifdef RELOCABLE
         /*
          * Runtime relocation
          */
@@ -69,6 +70,7 @@ _reloc_next:
         cmp     x5, x6
         bne     _reloc_loop
 _reloc_done:
+#endif
 
         // jump to the entry point
         adrp    x5, _start
