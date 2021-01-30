@@ -14,12 +14,12 @@ Q = @
 endif
 
 CPPFLAGS = -Isrc/include -include config.h -MMD -MP
-CFLAGS = -fno-builtin -nodefaultlibs -fpie -Wall -Wextra -Werror
+CFLAGS = -fno-builtin -nodefaultlibs -Wall -Wextra -Werror
 CFLAGS += -g -ffunction-sections -fdata-sections
 CXXFLAGS = -std=c++2a -fno-rtti -nostdinc++ -Wno-deprecated-volatile -Wno-c99-designator
 CXXFLAGS += -Wno-user-defined-literals
 OBJCPYFLAGS = -O binary --strip-all
-LDFLAGS = --gc-sections --pie
+LDFLAGS = --gc-sections
 
 TARGET ?= qemu-aarch64
 MOD_PREBUILT_DIR ?= $(BUILD_DIR)/prebuilts
@@ -51,6 +51,13 @@ mod_srcs :=
 include make/utils.mk
 include target/$(TARGET).mk
 -include make/$(ARCH).mk
+
+RELOCABLE ?= 0
+
+ifeq ($(RELOCABLE), 1)
+CPPFLAGS += -fpie -DRELOCABLE
+LDFLAGS += --pie
+endif
 
 ifeq ($(RUN_ALL_TESTS), 1)
 CONFIG_INCLUDE_TESTS := y
