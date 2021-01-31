@@ -34,40 +34,21 @@ class lock_irqsafe : public lock {
 namespace sc::lib {
 
 void lock::acquire() {
-    unsigned fail;
-
-    asm volatile("sevl");
-    while (1) {
-        unsigned x;
-        unsigned one = 1;
-        asm volatile(
-            "wfe\n"
-            "ldaxr    %w0, [%1]"
-            : "=r"(x)
-            : "r"(&val));
-        if (x)
-            continue;
-        asm volatile("stxr     %w0, %w1, [%2]" : "=r"(fail) : "r"(one), "r"(&val));
-        if (!fail)
-            break;
-    }
+    val = 1;
 }
 
 void lock::release() {
-    asm volatile("stlr wzr, [%0]" ::"r"(&val));
+    val = 0;
 }
 
 void lock_irqsafe::acquire() {
-    asm volatile(
-        "mrs %0, daif\n"
-        "msr daifset, #3\n"
-        : "=r"(flags));
-    lock::acquire();
+    flags = 1;
+    val = 1;
 }
 
 void lock_irqsafe::release() {
     lock::release();
-    asm volatile("msr daif, %0" ::"r"(flags));
+    flags = 0;
 }
 
 }  // namespace sc::lib

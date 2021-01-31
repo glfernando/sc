@@ -1,6 +1,6 @@
 
 src-y += timer.cppm
 
-ifeq ($(ARCH), aarch64)
+#ifeq ($(ARCH), aarch64)
 src-y += arm.cppm
-endif
+#endif

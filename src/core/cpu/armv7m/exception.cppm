@@ -4,6 +4,11 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module core.cpu;
+export module core.cpu.armv7m.exception;
 
-export import core.cpu.arch;
+namespace core::cpu::armv7m::exception {
+
+void init() {
+}
+
+}

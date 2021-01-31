@@ -14,14 +14,14 @@ Q = @
 endif
 
 CPPFLAGS = -Isrc/include -include config.h -MMD -MP
-CFLAGS = -fno-builtin -nodefaultlibs -Wall -Wextra -Werror
+CFLAGS = -fno-builtin -nodefaultlibs -Wall -Wextra -Werror -Wno-unused-function -Wno-unused-variable
 CFLAGS += -g -ffunction-sections -fdata-sections
 CXXFLAGS = -std=c++2a -fno-rtti -nostdinc++ -Wno-deprecated-volatile -Wno-c99-designator
 CXXFLAGS += -Wno-user-defined-literals
 OBJCPYFLAGS = -O binary --strip-all
 LDFLAGS = --gc-sections
 
-TARGET ?= qemu-aarch64
+TARGET ?= stm32f4
 MOD_PREBUILT_DIR ?= $(BUILD_DIR)/prebuilts
 RUN_ALL_TESTS ?= 0
 DEBUGGABLE ?= 0

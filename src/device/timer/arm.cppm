@@ -6,7 +6,6 @@
 
 module;
 
-#include <arch/aarch64/sysreg.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -144,8 +143,8 @@ void timer_arm::init() {
         irq, intc::FLAG_START_ENABLED,
         [](unsigned, void* data) { reinterpret_cast<timer_arm*>(data)->isr(); }, this);
 
-    sysreg_write(cntp_cval_el0, -1L);
-    sysreg_write(cntp_ctl_el0, 1L);
+    //sysreg_write(cntp_cval_el0, -1L);
+    //sysreg_write(cntp_ctl_el0, 1L);
 }
 
 timer::event* timer_arm::create(enum type type, callback cb, void* data) {
@@ -163,8 +162,8 @@ void timer_arm::set(timer::event* event, time_us_t period) {
 
     slock guard(lock);
     queue.insert(e);
-    if (e == queue.front())
-        sysreg_write(cntp_cval_el0, e->exp);
+    //if (e == queue.front())
+        //sysreg_write(cntp_cval_el0, e->exp);
 }
 
 void timer_arm::cancel(timer::event* event) {
@@ -201,11 +200,11 @@ void timer_arm::isr() {
             queue.insert(e);
         }
     }
-    auto e = queue.front();
-    if (e)
-        sysreg_write(cntp_cval_el0, e->exp);
-    else
-        sysreg_write(cntp_cval_el0, -1L);
+    //auto e = queue.front();
+    //if (e)
+        //sysreg_write(cntp_cval_el0, e->exp);
+    //else
+        //sysreg_write(cntp_cval_el0, -1L);
     lock.release();
 }
 

@@ -10,7 +10,7 @@ module;
 
 #include "exception_vector.h"
 
-export module core.cpu.armv8;
+export module core.cpu.arch;
 
 export import core.cpu.armv8.common;
 
