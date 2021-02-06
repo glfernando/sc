@@ -118,4 +118,4 @@ clean:
 	$(Q)rm -f $(CONFIG_FILE)
 
 -include $(deps)
--include build-qemu-aarch64/module-order-deps.d
+-include $(BUILD_DIR)/module-order-deps.d
