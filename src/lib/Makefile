@@ -8,6 +8,7 @@ mod_srcs += $(LOCAL_DIR)/time.cppm
 mod_srcs += $(LOCAL_DIR)/hexdump.cppm
 mod_srcs += $(LOCAL_DIR)/utils.cppm
 mod_srcs += $(LOCAL_DIR)/timer.cppm
+mod_srcs += $(LOCAL_DIR)/backtrace.cppm
 
 srcs += $(LOCAL_DIR)/heap-malloc.cpp
 
