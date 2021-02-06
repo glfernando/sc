@@ -41,8 +41,6 @@ constexpr char ESC          = '\e';
 // cursor movements
 constexpr auto CUR_BACK     = "\e[D";
 constexpr auto CUR_FWD      = "\e[C";
-constexpr auto CUR_SAVE     = "\e[s";
-constexpr auto CUR_UNSAVE   = "\e[u";
 
 // erase cores
 constexpr auto ERASE_EOL    = "\e[K";
@@ -226,7 +224,6 @@ static char* get_line(char* line)
                 break;
             }
             puts(CUR_BACK);
-            puts(CUR_SAVE);
             pos--;
             size--;
             for (i = pos; i < size; ++i) {
@@ -235,7 +232,7 @@ static char* get_line(char* line)
                 putc(c);
             }
             puts(ERASE_EOL);
-            puts(CUR_UNSAVE);
+            set_cursor_pos(pos);
             break;
         case ESC:
             switch (get_esc_seq()) {
@@ -301,14 +298,13 @@ static char* get_line(char* line)
                     break;
                 }
                 size--;
-                puts(CUR_SAVE);
                 for (i = pos; i < size; ++i) {
                     int c = line[i + 1];
                     line[i] = c;
                     putc(c);
                 }
                 puts(ERASE_EOL);
-                puts(CUR_UNSAVE);
+                set_cursor_pos(pos);
                 break;
             default:
                 break;
@@ -385,10 +381,9 @@ static char* get_line(char* line)
             putc(c);
             line[pos++] = c;
             size++;
-            puts(CUR_SAVE);
             for (i = pos; i < size; ++i)
                 putc(line[i]);
-            puts(CUR_UNSAVE);
+            set_cursor_pos(pos);
         };
     }
 
