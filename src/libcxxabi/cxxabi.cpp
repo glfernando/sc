@@ -82,7 +82,7 @@ extern "C" void __cxa_free_exception(void* thrown_exception) {
 
 static const uint64_t EXCEPTION_CLASS_CLANG = 0x434C4E47432B2B00;
 
-extern "C" void __cxa_throw(void* thrown_exception, struct type_info* tinfo, void (*dest)(void*)) {
+extern "C" void __cxa_throw(void* thrown_exception, struct type_info* tinfo, void (*)(void*)) {
     __cxa_exception* header = ((__cxa_exception*)thrown_exception - 1);
     header->exceptionType = tinfo;
     header->unwindHeader.exception_class = EXCEPTION_CLASS_CLANG;
@@ -317,8 +317,8 @@ static _Unwind_Reason_Code install_pad(_Unwind_Exception* unwind_exception,
     return _URC_INSTALL_CONTEXT;
 }
 
-extern "C" _Unwind_Reason_Code __gxx_personality_v0(int version, _Unwind_Action actions,
-                                                    uint64_t exceptionClass,
+extern "C" _Unwind_Reason_Code __gxx_personality_v0(int, _Unwind_Action actions,
+                                                    uint64_t /* exceptionClass */,
                                                     _Unwind_Exception* unwind_exception,
                                                     _Unwind_Context* context) {
     uintptr_t ip = _Unwind_GetIP(context) - 1;

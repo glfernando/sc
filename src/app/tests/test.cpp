@@ -173,7 +173,7 @@ static int cmd_test(int argc, char const* argv[]) {
 
     if (res.total == 0) {
         println("no tests found for group {}", group);
-        return;
+        return 0;
     }
 
     show_results(res);

@@ -45,8 +45,6 @@ TEST(vector, lifetime) {
     }
 
     EXPECT(foo::counter == 0);
-
-    return 0;
 }
 
 TEST(vector, size) {
