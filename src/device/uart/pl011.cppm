@@ -97,7 +97,7 @@ void pl011::baudrate(unsigned baudrate) {
 
 void pl011::putc(int c, bool wait) {
     if ((reg(UART_FR) & UART_FR_TXFF) && !wait)
-        return 0;
+        return;
 
     // wait for room in tx fifo
     // TODO: add spin lock

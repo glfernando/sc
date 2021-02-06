@@ -54,10 +54,10 @@ void* operator new[](size_t size, std::align_val_t align) {
     return operator new(size, align);
 }
 
-void operator delete(void* p, std::align_val_t align) noexcept {
+void operator delete(void* p, std::align_val_t) noexcept {
     free(p);
 }
 
-void operator delete[](void* p, std::align_val_t align) noexcept {
+void operator delete[](void* p, std::align_val_t) noexcept {
     free(p);
 }
