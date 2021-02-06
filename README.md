@@ -145,30 +145,23 @@ The long tearm plan is to migrate to one of the major build system once they ful
 This is an example of a module makefile:
 `src/board/qemu/aarch64/Makefile`
 ```
-LOCAL_DIR = $(GET_LOCAL_DIR)
-
-mod_srcs += $(LOCAL_DIR)/peripherals.cppm
-mod_srcs += $(LOCAL_DIR)/power.cppm
-
-dirs := $(LOCAL_DIR)/init
-dirs += $(LOCAL_DIR)/debug
-
-include $(foreach dir,$(dirs),$(dir)/Makefile
+src-y += peripherals.cppm power.cppm
+src-y += init/
+src-y += debug/
 ```
-Use `mod_srcs` to specified C++ module interface source files (we only support module interface units and not module implementation units), use `dirs` to add more directories to the current compilation, you need to call those directories manually by doing `include $(foreach dir,$(dirs),$(dir)/Makefile`. You can also add C/C++ or assembly files (.S files) but you need to use `srcs` variable.
+Use `src-y` to specify any source files, C++ modules uses .cppm extension. You can add any `.c` `.S` `.cpp` or `.cppm` files, you can even add a directory which the build system will recursively include, but it should have `/` suffix, e.g.  `src-y += debug/`
+
 
 If a source file should condionally added based on the arch you can do something like this:
 ```
 ifeq ($(ARCH), aarch64)
-mod_srcs += $(LOCAL_DIR)/lock_aarch64.cppm
+src-y += lock_aarch64.cppm
 endif
 ```
 
-Device driver code should be under a config name
+Device driver code should be under a config name, which should have value `y` when enabled, so you can use
 ```
-ifeq ($(CONFIG_PL011), y)
-mod_srcs += $(LOCAL_DIR)/pl011.cppm
-endif
+src-$(CONFIG_PL011) += pl011.cppm
 ```
 Then CONFIG_PL011 can be set in a board `config.h` file.
 
@@ -189,6 +182,7 @@ Then CONFIG_PL011 can be set in a board `config.h` file.
 - [x] Support for unique_ptr
 - [x] Support for interrupts
 - [x] Support for timers
+- [x] Improve build system
 - [ ] Support for threads
 - [ ] Support for blocking and waking up treads
 - [ ] Support for Events
