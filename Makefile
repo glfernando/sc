@@ -13,12 +13,11 @@ else
 Q = @
 endif
 
+CPPFLAGS = -Isrc/include -include config.h
 CFLAGS = -fno-builtin -nodefaultlibs -fpie -Oz -Wall -Wextra -Werror -flto
 CFLAGS += -g -ffunction-sections -fdata-sections
-CFLAGS += -Isrc/include
-CFLAGS += -include config.h
-CPPFLAGS = -std=c++2a -fno-rtti -nostdinc++ -Wno-deprecated-volatile
-CPPFLAGS += -Wno-user-defined-literals
+CXXFLAGS = -std=c++2a -fno-rtti -nostdinc++ -Wno-deprecated-volatile
+CXXFLAGS += -Wno-user-defined-literals
 OBJCPYFLAGS = -O binary --strip-all
 LDFLAGS = --gc-sections --pie
 
@@ -30,6 +29,7 @@ mod_srcs :=
 dirs :=
 GLOBAL_CPPFLAGS :=
 GLOBAL_CFLAGS :=
+GLOBAL_CXXFLAGS :=
 
 include make/utils.mk
 include target/$(TARGET).mk
@@ -44,9 +44,10 @@ include external/src/Makefile
 # use default linker script if none was set by target makefile
 LINKER_SCRIPT ?= sc_linker.lds
 
-CFLAGS += $(GLOBAL_CFLAGS)
 CPPFLAGS += $(GLOBAL_CPPFLAGS)
-CPPFLAGS += $(CFLAGS)
+CFLAGS += $(GLOBAL_CFLAGS)
+CXXFLAGS += $(GLOBAL_CXXFLAGS)
+CXXFLAGS += $(CFLAGS)
 
 cpp_srcs = $(filter %.cpp, $(srcs))
 asm_srcs = $(filter %.S, $(srcs))
@@ -73,22 +74,22 @@ _sc.lds : $(LINKER_SCRIPT)
 	$(Q)$(CC) $(CPPFLAGS) -E -x assembler-with-cpp -P -o $@ $<
 
 %.o : %.S | config_file
-	$(Q)$(CC) $(CPPFLAGS) -c $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 %.o : %.c | config_file
-	$(Q)$(CC) $(CFLAGS) -x c -c $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -x c -c $< -o $@
 
 %.o : %.cpp | modules config_file
-	$(Q)$(CC) $(CPPFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -c $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -c $< -o $@
 
 modules: $(mod_pcms)
 
 %.pcm : %.cppm | config_file
-	$(Q)$(CC) $(CPPFLAGS) -fimplicit-modules -fimplicit-module-maps -fmodules -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ --precompile $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fmodules -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ --precompile $< -o $@
 	$(Q)cp $@ $(MOD_PREBUILT_DIR)/$(shell grep "^export module" $< | awk '{print $$3}' | sed 's/;//').pcm
 
 %.o : %.pcm | config_file
-	$(Q)$(CC) $(CPPFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
 
 # module order dependencies
 # TODO: find a better way
