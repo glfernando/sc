@@ -11,3 +11,7 @@ MODULE_PATH = $(GET_LOCAL_DIR)
 src-y =
 dir-y =
 module_dirs =
+
+MODULE_CPPFLAGS =
+MODULE_CFLAGS =
+MODULE_CXXFLAGS =
