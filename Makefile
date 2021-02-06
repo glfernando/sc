@@ -99,6 +99,7 @@ src/lib/exception.pcm : | src/libcxx/string.pcm
 src/libcxx/concepts.pcm : | src/libcxx/type_traits.pcm
 src/lib/fmt.pcm : | src/libcxx/string.pcm src/libcxx/concepts.pcm src/board/qemu/aarch64/debug/uart.pcm
 src/lib/lock/lock.pcm : | src/lib/lock/lock_aarch64.pcm
+src/lib/timestamp/timestamp.pcm : | src/lib/timestamp/aarch64.pcm
 
 
 config_file: src/$(CONFIG_FILE)
