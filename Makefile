@@ -18,6 +18,7 @@ CFLAGS += -g -ffunction-sections -fdata-sections
 CFLAGS += -Isrc/include
 CFLAGS += -include config.h
 CPPFLAGS = -std=c++2a -fno-rtti -nostdinc++ -Wno-deprecated-volatile
+CPPFLAGS += -Wno-user-defined-literals
 OBJCPYFLAGS = -O binary --strip-all
 LDFLAGS = --gc-sections --pie
 
@@ -100,6 +101,7 @@ src/libcxx/concepts.pcm : | src/libcxx/type_traits.pcm
 src/lib/fmt.pcm : | src/libcxx/string.pcm src/libcxx/concepts.pcm src/board/qemu/aarch64/debug/uart.pcm
 src/lib/lock/lock.pcm : | src/lib/lock/lock_aarch64.pcm
 src/lib/timestamp/timestamp.pcm : | src/lib/timestamp/aarch64.pcm
+src/lib/time.pcm : src/lib/timestamp/timestamp.pcm
 
 
 config_file: src/$(CONFIG_FILE)
