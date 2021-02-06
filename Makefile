@@ -13,7 +13,7 @@ else
 Q = @
 endif
 
-CPPFLAGS = -Isrc/include -include config.h
+CPPFLAGS = -Isrc/include -include config.h -MMD -MP
 CFLAGS = -fno-builtin -nodefaultlibs -fpie -Oz -Wall -Wextra -Werror -flto
 CFLAGS += -g -ffunction-sections -fdata-sections
 CXXFLAGS = -std=c++2a -fno-rtti -nostdinc++ -Wno-deprecated-volatile
@@ -64,6 +64,7 @@ mod_pcms := $(patsubst %.cppm, $(BUILD_DIR)/%.pcm, $(mod_srcs))
 mod_objs := $(patsubst %.cppm, $(BUILD_DIR)/%.o, $(mod_srcs))
 
 objs := $(cpp_objs) $(asm_objs) $(c_objs) $(mod_objs)
+deps := $(objs:.o=.d)
 
 .PHONY: clean modules config_file
 
@@ -124,5 +125,8 @@ config_file: src/$(CONFIG_FILE)
 
 clean:
 	$(Q)find $(BUILD_DIR) -name *.o | xargs rm -f
+	$(Q)find $(BUILD_DIR) -name *.d | xargs rm -f
 	$(Q)find $(BUILD_DIR) -name *.pcm | xargs rm -f
 	$(Q)rm -f $(BUILD_DIR)/sc.elf $(BUILD_DIR)/sc.bin $(BUILD_DIR)/*.map $(BUILD_DIR)/_sc.lds
+
+-include $(deps)
