@@ -5,11 +5,10 @@
  */
 
 #include <errcodes.h>
+#include <stddef.h>
 
 import lib.heap;
 import lib.exception;
-
-#include <stddef.h>
 
 using sc::lib::exception::exception;
 using sc::lib::heap::alloc;
