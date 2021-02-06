@@ -14,7 +14,7 @@ SECTIONS
         KEEP(*(.text*))
     }
 
-    .rodata ALIGN(8) : {
+    .rodata ALIGN(16) : {
         *(.rodata*);
     }
 
