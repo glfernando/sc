@@ -8,6 +8,7 @@ export module lib.time;
 
 import lib.timestamp;
 import std.string;
+import std.concepts;
 
 using sc::lib::timestamp::freq;
 
@@ -45,6 +46,14 @@ class time_t {
     template <typename F>
     time_t operator+(time_t<F> const& t) const {
         return time_t(val + t.count() * Factor::den * F::num / Factor::num / F::den);
+    }
+    template <std::integral I>
+    time_t operator+(I x) const {
+        return time_t(val + x);
+    }
+    template <std::integral I>
+    time_t operator*(I x) const {
+        return time_t(val * x);
     }
 
     // helper operator to easy printing
