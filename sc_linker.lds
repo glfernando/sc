@@ -36,6 +36,11 @@ SECTIONS
     }
 
     . = ALIGN(16);
+    __heap_start = .;
+    . = . + CONFIG_HEAP_SIZE;
+    __heap_end = .;
+
+    . = ALIGN(16);
     __stack_start = .;
     . = . + CONFIG_STACK_SIZE;
     __stack_end = .;
