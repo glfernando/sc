@@ -169,9 +169,9 @@ void* simple::alloc(size_t const size, size_t align) noexcept
 
     auto nc = c->split_at(actual_size);
     if (nc) {
-	nc->state = FREE;
-	// update free chunk pointer
-	free_chunk = nc;
+        nc->state = FREE;
+        // update free chunk pointer
+        free_chunk = nc;
     }
 
     c->state = USED;
