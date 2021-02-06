@@ -13,10 +13,18 @@ export module lib.fmt;
 
 export import std.string;
 export import std.concepts;
-import board.debug.uart;
+import board.peripherals;
 
-using sc::board::debug::uart::putchar;
-using sc::board::debug::uart::puts;
+static inline void putchar(int c) {
+    auto& con = sc::board::peripherals::default_console();
+    return con.putc(c);
+}
+
+static inline void puts(char const* str) {
+    auto& con = sc::board::peripherals::default_console();
+    while (int c = *str++)
+        con.putc(c);
+}
 
 // module private data
 namespace sc::lib::fmt {

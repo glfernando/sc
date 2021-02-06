@@ -8,9 +8,6 @@ export module board.peripherals;
 export import device.uart.pl011;
 
 import std.string;
-import lib.fmt;
-
-using sc::lib::fmt::println;
 
 static constexpr device::pl011::platform_data uart0_pdata{
     .base = 0x0900'0000,
