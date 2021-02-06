@@ -17,7 +17,7 @@ CFLAGS = -fno-builtin -nodefaultlibs -fpie -Oz -Wall -Wextra -Werror
 # TODO: fix libunwind when LTO is enabled
 # CFLAGS += -flto
 CFLAGS += -g -ffunction-sections -fdata-sections
-CFLAGS += -Iinclude
+CFLAGS += -Isrc/include
 CFLAGS += -include config.h
 CPPFLAGS = -std=c++2a -fno-rtti -nostdinc++ -Wno-deprecated-volatile
 OBJCPYFLAGS = -O binary --strip-all
@@ -99,8 +99,8 @@ src/lib/heap.pcm : | src/lib/allocator/simple.pcm
 
 config_file: src/$(CONFIG_FILE)
 	$(Q)mkdir -p $(MOD_PREBUILT_DIR)
-	$(Q)mkdir -p include/
-	$(Q)cp $< include/config.h
+	$(Q)mkdir -p src/include/
+	$(Q)cp $< src/include/config.h
 
 clean:
 	$(Q)find . -name *.o | xargs rm -f

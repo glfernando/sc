@@ -42,4 +42,4 @@
 *.pcm
 
 _sc.lds
-include/config.h
+src/include/config.h
