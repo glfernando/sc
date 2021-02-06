@@ -19,7 +19,7 @@ struct sh_sys_exit_params {
     long subcode;
 };
 
-static __attribute__((naked)) long semihost(unsigned long op, unsigned long param) {
+static __attribute__((naked)) long semihost(unsigned long, unsigned long) {
     asm volatile(
         "hlt 0xf000\n"
         "ret");

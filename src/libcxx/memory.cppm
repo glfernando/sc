@@ -55,7 +55,10 @@ class unique_ptr {
         return tmp;
     }
 
-    void reset(std::nullptr_t p = nullptr) noexcept { delete release(); }
+    void reset(std::nullptr_t ptr = nullptr) noexcept {
+        delete release();
+        p = ptr;
+    }
 
     void reset(T* ptr) noexcept {
         delete release();
@@ -109,7 +112,10 @@ class unique_ptr<T[]> {
         return tmp;
     }
 
-    void reset(std::nullptr_t p = nullptr) noexcept { delete[] release(); }
+    void reset(std::nullptr_t ptr = nullptr) noexcept {
+        delete[] release();
+        p = ptr;
+    }
 
     void reset(T* ptr) noexcept {
         delete[] release();

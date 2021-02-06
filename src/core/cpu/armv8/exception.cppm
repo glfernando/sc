@@ -79,6 +79,7 @@ int default_exception_handler(regs* regs) {
     backtrace(&uc);
 
     asm volatile("b .");
+    return 0;
 }
 
 }  // namespace core::cpu::arvm8::exception
