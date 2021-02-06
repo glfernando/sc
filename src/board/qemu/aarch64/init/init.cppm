@@ -15,15 +15,13 @@ import board.peripherals;
 
 export namespace sc::board {
 
-void early_init()
-{
+void early_init() {
     // initialize debug console
     sc::board::debug::uart::init();
     printf_set_putchar_func(sc::board::debug::uart::putchar);
 }
 
-void init()
-{
+void init() {
     // initialize peripherals
     sc::board::peripherals::init();
 }

@@ -27,9 +27,7 @@ class pl011 : public uart {
     };
 
     pl011(std::string const& name, platform_data const& pdata)
-        : uart(name), base(pdata.base), freq(pdata.freq), baud(pdata.baudrate)
-    {
-    }
+        : uart(name), base(pdata.base), freq(pdata.freq), baud(pdata.baudrate) {}
 
     inline void init() override;
     inline void baudrate(unsigned baud) override;
@@ -75,8 +73,7 @@ enum UART_CR_bits : uint32_t {
 
 namespace device {
 
-void pl011::init()
-{
+void pl011::init() {
     // enable fifo
     reg(UART_LCR_H) = UART_LCR_H;
 
@@ -87,8 +84,7 @@ void pl011::init()
     reg(UART_CR) = UART_CR_UARTEN | UART_CR_TXE | UART_CR_RXE;
 }
 
-void pl011::baudrate(unsigned baudrate)
-{
+void pl011::baudrate(unsigned baudrate) {
     // baud rate divisor = BAUDDIV = (FUARTCLK/(16x BaudRate))
     uint32_t ibrd = freq / (16 * baudrate);
     uint32_t fbrd = 64 * (freq % (16 * baudrate)) / (16 * baudrate);
@@ -100,8 +96,7 @@ void pl011::baudrate(unsigned baudrate)
     baud = baudrate;
 }
 
-void pl011::putc(int c, bool wait)
-{
+void pl011::putc(int c, bool wait) {
     if ((reg(UART_FR) & UART_FR_TXFF) && !wait)
         return 0;
 
@@ -114,8 +109,7 @@ void pl011::putc(int c, bool wait)
         putc('\r');
 }
 
-int pl011::getc(bool wait)
-{
+int pl011::getc(bool wait) {
     if ((reg(UART_FR) & UART_FR_RXEE) && !wait)
         return 0;
 
@@ -125,8 +119,7 @@ int pl011::getc(bool wait)
     return reg(UART_DR);
 }
 
-void pl011::flush()
-{
+void pl011::flush() {
     while (!(reg(UART_FR) & UART_FR_TXFE)) {}
 }
 

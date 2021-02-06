@@ -42,14 +42,12 @@ struct stack_frame {
     unsigned long lr;
 };
 
-void print_backtrace(unsigned long fp)
-{
+void print_backtrace(unsigned long fp) {
     for (auto f = reinterpret_cast<stack_frame*>(fp); f; f = f->next)
         println("[<{:016x}>]", f->lr);
 }
 
-int default_exception_handler(regs* regs)
-{
+int default_exception_handler(regs* regs) {
     println("ESR         {:#08x}    FAR {:#016x}    ELR {:#016x}\n", sysreg_read(esr_el1),
             sysreg_read(far_el1), sysreg_read(elr_el1));
 
@@ -81,8 +79,7 @@ int default_exception_handler(regs* regs)
 
 export namespace core::cpu::arvm8::exception {
 
-unsigned cpu_id()
-{
+unsigned cpu_id() {
     unsigned mpidr = sysreg_read(mpidr_el1);
     unsigned id = mpidr & 0xffffff;
 
@@ -95,8 +92,7 @@ unsigned cpu_id()
 }
 
 extern "C" uint8_t exception_base[];
-extern "C" int exception_handler(int type, regs* regs)
-{
+extern "C" int exception_handler(int type, regs* regs) {
     if (handlers[type])
         return handlers[type](regs);
 
@@ -104,8 +100,7 @@ extern "C" int exception_handler(int type, regs* regs)
     return default_exception_handler(regs);
 }
 
-void init()
-{
+void init() {
     // init exception vector
     sysreg_write(vbar_el1, exception_base);
 }

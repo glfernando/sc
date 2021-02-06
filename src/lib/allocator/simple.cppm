@@ -33,8 +33,7 @@ struct chunk {
 
     chunk* next() { return reinterpret_cast<chunk*>(mem_ptr() + size); }
 
-    chunk* split_at(size_t offset)
-    {
+    chunk* split_at(size_t offset) {
         if (size <= CHUNK_SIZE)
             return nullptr;
 
@@ -49,8 +48,7 @@ struct chunk {
 
     static chunk* from_ptr(void* ptr) { return reinterpret_cast<chunk*>(ptr); }
 
-    static chunk* from_mem_ptr(void* ptr)
-    {
+    static chunk* from_mem_ptr(void* ptr) {
         return reinterpret_cast<chunk*>(reinterpret_cast<uintptr_t>(ptr) - CHUNK_SIZE);
     }
 };
@@ -79,8 +77,7 @@ class simple {
 
             chunk& operator*() const { return *ptr; }
 
-            iterator& operator++()
-            {
+            iterator& operator++() {
                 ptr = ptr->next();
                 // sanity check
                 if (ptr > last) {
@@ -115,15 +112,13 @@ class simple {
 namespace {
 
 template <typename T>
-constexpr T align_up(T v, size_t a)
-{
+constexpr T align_up(T v, size_t a) {
     size_t mask = a - 1;
     return (v + mask) & ~mask;
 }
 
 // computes the offset that needs to be appiled to the pinter in order to make it aligned to @align
-size_t align_offset(void* ptr, size_t align)
-{
+size_t align_offset(void* ptr, size_t align) {
     uintptr_t ptr_val = reinterpret_cast<uintptr_t>(ptr);
     size_t mask = align - 1;
 
@@ -134,8 +129,7 @@ size_t align_offset(void* ptr, size_t align)
 
 namespace sc::lib::allocator {
 
-void simple::init() noexcept
-{
+void simple::init() noexcept {
     // TODO: assert valid parameters
 
     chunks.first = reinterpret_cast<chunk*>(start);
@@ -146,8 +140,7 @@ void simple::init() noexcept
     free_chunk->size = end - start - CHUNK_SIZE;
 }
 
-void* simple::alloc(size_t const size, size_t align) noexcept
-{
+void* simple::alloc(size_t const size, size_t align) noexcept {
     // only power of 2 alignment is allowed
     if (align & (align - 1))
         return nullptr;
@@ -178,8 +171,7 @@ void* simple::alloc(size_t const size, size_t align) noexcept
     return c->mem_ptr();
 }
 
-void simple::free(void* p) noexcept
-{
+void simple::free(void* p) noexcept {
     if (!p)
         return;
 
@@ -198,8 +190,7 @@ void simple::free(void* p) noexcept
     }
 }
 
-chunk* simple::find_free(size_t size, size_t align) noexcept
-{
+chunk* simple::find_free(size_t size, size_t align) noexcept {
     // check if cached free is enough
     auto c = free_chunk;
     auto aligned_size = align_offset(c->mem_ptr(), align) + size;
@@ -224,8 +215,7 @@ chunk* simple::find_free(size_t size, size_t align) noexcept
     return nullptr;
 }
 
-void simple::dump() noexcept
-{
+void simple::dump() noexcept {
     for (auto& c : chunks) {
         printf("chunk=%p state = %x, size %u\n", &c, c.state, c.size);
     }

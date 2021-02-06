@@ -23,8 +23,12 @@ bool uart_init = false;
 
 export namespace sc::board::peripherals {
 
-void init() { uart0.init(); }
+void init() {
+    uart0.init();
+}
 
-device::pl011& default_console() { return uart0; }
+device::pl011& default_console() {
+    return uart0;
+}
 
 }  // namespace sc::board::peripherals
