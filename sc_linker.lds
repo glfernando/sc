@@ -24,6 +24,19 @@ SECTIONS
         __init_array_end = .;
     }
 
+    .eh_frame ALIGN(8): {
+        __eh_frame_start = .;
+        KEEP(*(.eh_frame))
+        __eh_frame_end = .;
+    }
+
+    .eh_frame_hdr ALIGN(8): {
+        KEEP(*(.eh_frame_hdr))
+    }
+
+    __eh_frame_hdr_start = SIZEOF(.eh_frame_hdr) > 0 ? ADDR(.eh_frame_hdr) : 0;
+    __eh_frame_hdr_end = SIZEOF(.eh_frame_hdr) > 0 ? . : 0;
+
     .data ALIGN(8) : {
         *(.data*)
     }
@@ -52,7 +65,6 @@ SECTIONS
     __stack_end = .;
 
     /DISCARD/ : {
-        *(.eh_frame*)
         *(.comment)
         *(.note*)
         *(.dynsym)
