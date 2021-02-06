@@ -105,8 +105,6 @@ void pl011::putc(int c, bool wait) {
     while (reg(UART_FR) & UART_FR_TXFF) {}
 
     reg(UART_DR) = c;
-    if (c == '\n')
-        putc('\r');
 }
 
 int pl011::getc(bool wait) {
