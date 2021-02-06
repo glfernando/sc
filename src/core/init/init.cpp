@@ -10,6 +10,7 @@ import board.init;
 import board.debug;
 import lib.heap;
 import lib.fmt;
+import core.cpu;
 
 using sc::lib::fmt::println;
 
@@ -24,12 +25,14 @@ void init_array()
 
 extern "C" [[noreturn]] void init()
 {
+    core::cpu::early_init();
     sc::board::early_init();
 
     sc::lib::heap::init();
 
     init_array();
 
+    core::cpu::init();
     sc::board::init();
 
     println("Welcome to SC");
