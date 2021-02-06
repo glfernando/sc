@@ -37,7 +37,7 @@ SECTIONS
     __eh_frame_hdr_start = SIZEOF(.eh_frame_hdr) > 0 ? ADDR(.eh_frame_hdr) : 0;
     __eh_frame_hdr_end = SIZEOF(.eh_frame_hdr) > 0 ? . : 0;
 
-    .data ALIGN(8) : {
+    .data ALIGN(4096) : {
         *(.data*)
     }
 
