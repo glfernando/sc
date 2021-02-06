@@ -1,3 +1,2 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-mod_srcs += $(LOCAL_DIR)/init.cppm
+src-y += init.cppm

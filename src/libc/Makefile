@@ -1,7 +1,6 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-srcs += $(LOCAL_DIR)/stdio.c
-srcs += $(LOCAL_DIR)/string.c
-srcs += $(LOCAL_DIR)/abort.c
+src-y += stdio.c
+src-y += string.c
+src-y += abort.c
 
-GLOBAL_CFLAGS += -I$(LOCAL_DIR)/include
+GLOBAL_CFLAGS += -I$(MODULE_PATH)/include

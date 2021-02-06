@@ -1,7 +1,6 @@
-LOCAL_DIR = $(GET_LOCAL_DIR)
 
-mod_srcs += $(LOCAL_DIR)/intc.cppm
+src-y += intc.cppm
 
 ifeq ($(ARCH), aarch64)
-mod_srcs += $(LOCAL_DIR)/gic.cppm
+src-y += gic.cppm
 endif
