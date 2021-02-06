@@ -14,9 +14,10 @@ import board.debug;
 
 export namespace sc::board {
 
-void init() {
+void init()
+{
     sc::board::debug::uart::init();
     printf_set_putchar_func(sc::board::debug::uart::putchar);
 }
 
-}
+}  // namespace sc::board
