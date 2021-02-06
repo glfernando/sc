@@ -68,11 +68,18 @@ _sc.lds : $(LINKER_SCRIPT)
 modules: $(mod_pcms)
 
 %.pcm : %.cppm | config_file
-	$(Q)$(CC) $(CPPFLAGS) -fimplicit-modules -fimplicit-module-maps -fmodules --precompile $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) -fimplicit-modules -fimplicit-module-maps -fmodules -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ --precompile $< -o $@
 	$(Q)cp $@ $(MOD_PREBUILT_DIR)/$(shell grep "^export module" $< | awk '{print $$3}' | sed 's/;//').pcm
 
 %.o : %.pcm | config_file
 	$(Q)$(CC) $(CPPFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
+
+# module order dependencies
+# TODO: find a better way
+src/board/qemu/aarch64/debug/debug.pcm : | src/board/qemu/aarch64/debug/uart.pcm
+src/board/qemu/aarch64/debug/uart.pcm : | src/lib/reg.pcm
+src/board/qemu/aarch64/init/init.pcm : | src/board/qemu/aarch64/debug/debug.pcm
+
 
 config_file: src/$(CONFIG_FILE)
 	$(Q)mkdir -p $(MOD_PREBUILT_DIR)

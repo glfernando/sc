@@ -1,0 +1,4 @@
+LOCAL_DIR = $(GET_LOCAL_DIR)
+
+mod_srcs += $(LOCAL_DIR)/debug.cppm
+mod_srcs += $(LOCAL_DIR)/uart.cppm
