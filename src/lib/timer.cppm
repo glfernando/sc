@@ -14,7 +14,7 @@ import std.type_traits;
 import lib.fmt;
 import lib.exception;
 
-using sc::lib::exception::exception;
+using sc::lib::exception;
 using sc::lib::fmt::println;
 using sc::lib::time::time_us_t;
 
@@ -91,7 +91,7 @@ void timer::start(F&& f, time_us_t period) {
 
 void timer::start(time_us_t period) {
     if (cb == nullptr)
-        throw exception::exception("no callback set");
+        throw exception("no callback set");
     auto& dev = sc::board::peripherals::default_timer();
     dev.set(e, period);
 }
