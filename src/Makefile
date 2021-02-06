@@ -1,6 +1,7 @@
 LOCAL_DIR = $(GET_LOCAL_DIR)
 
 dirs :=
+dirs += $(LOCAL_DIR)/app
 dirs += $(LOCAL_DIR)/core
 dirs += $(LOCAL_DIR)/device
 dirs += $(LOCAL_DIR)/lib
