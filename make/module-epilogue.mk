@@ -14,6 +14,14 @@ mod_srcs += $(filter %.cppm, $(src-y))
 #test_dirs += $(filter %/, $(src-y))
 dir-y := $(filter %/, $(src-y))
 
+# create module flags using ouput path
+out_dir := $(addprefix $(BUILD_DIR)/,$(MODULE_PATH))
+out_dir_var_prefix := $(subst /,_,$(out_dir))
+
+CPPFLAGS_$(out_dir_var_prefix) := $(MODULE_CPPFLAGS)
+CFLAGS_$(out_dir_var_prefix) := $(MODULE_CFLAGS)
+CXXFLAGS_$(out_dir_var_prefix) := $(MODULE_CXXFLAGS)
+
 # include all other directores
 module_dirs += $(addsuffix Makefile,$(dir-y))
 $(foreach file,$(module_dirs),$(eval $(call include_module,$(file))))

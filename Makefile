@@ -26,9 +26,9 @@ MOD_PREBUILT_DIR ?= $(BUILD_DIR)/prebuilts
 RUN_ALL_TESTS ?= 0
 DEBUGGABLE ?= 0
 
-BUILD_DIR ?= ./build-$(TARGET)
-SRC_DIR := ./src
-SCRIPTS_DIR := ./scripts
+BUILD_DIR ?= build-$(TARGET)
+SRC_DIR := src
+SCRIPTS_DIR := scripts
 
 CPPFLAGS += -I$(BUILD_DIR)/include
 
@@ -42,6 +42,10 @@ GLOBAL_CPPFLAGS :=
 GLOBAL_CFLAGS :=
 GLOBAL_CXXFLAGS :=
 GLOBAL_LDFLAGS :=
+
+MODULE_CPPFLAGS :=
+MODULE_CFLAGS :=
+MODULE_CXXFLAGS :=
 
 c_srcs :=
 asm_srcs :=
@@ -114,16 +118,22 @@ $(BUILD_DIR)/%.o : %.S
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/%.o : %.c
+	$(eval OBJ_PATH_VAR = $(subst /,_,$(patsubst %/,%,$(dir $@))))
+	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
 	$(Q)mkdir -p $(dir $@)
-	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -x c -c $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) $(FLAGS_EXTRA) -x c -c $< -o $@
 
 $(BUILD_DIR)/%.o : %.cpp
+	$(eval OBJ_PATH_VAR = $(subst /,_,$(patsubst %/,%,$(dir $@))))
+	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CXXFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
 	$(Q)mkdir -p $(dir $@)
-	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -c $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) $(FLAGS_EXTRA) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -c $< -o $@
 
 $(BUILD_DIR)/%.pcm : %.cppm
+	$(eval OBJ_PATH_VAR = $(subst /,_,$(patsubst %/,%,$(dir $@))))
+	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CXXFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
 	$(Q)mkdir -p $(dir $@)
-	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fmodules -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ --precompile $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) $(FLAGS_EXTRA) -fimplicit-modules -fimplicit-module-maps -fmodules -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ --precompile $< -o $@
 
 $(BUILD_DIR)/%.o : $(BUILD_DIR)/%.pcm
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
