@@ -13,10 +13,10 @@ else
 Q = @
 endif
 
-CPPFLAGS = -std=c++2a -fno-rtti -nodefaultlibs -nostdinc++ -fno-builtin -flto -fpie -Oz -Wall -g
-CPPFLAGS += -ffunction-sections -fdata-sections -Wno-deprecated-volatile
-CPPFLAGS += -Iinclude
-CPPFLAGS += -include config.h
+CFLAGS = -fno-builtin -nodefaultlibs -flto -fpie -Oz -Wall -g -ffunction-sections -fdata-sections
+CFLAGS += -Iinclude
+CFLAGS += -include config.h
+CPPFLAGS = -std=c++2a -fno-rtti -nostdinc++ -Wno-deprecated-volatile
 OBJCPYFLAGS = -O binary --strip-all
 LDFLAGS = --gc-sections --pie
 
@@ -27,6 +27,7 @@ srcs :=
 mod_srcs :=
 dirs :=
 GLOBAL_CPPFLAGS :=
+GLOBAL_CFLAGS :=
 
 include make/utils.mk
 include target/$(TARGET).mk
@@ -38,16 +39,20 @@ include src/$(BOARD_PATH)/Makefile
 # use default linker script if none was set by target makefile
 LINKER_SCRIPT ?= sc_linker.lds
 
+CFLAGS += $(GLOBAL_CFLAGS)
 CPPFLAGS += $(GLOBAL_CPPFLAGS)
+CPPFLAGS += $(CFLAGS)
 
 cpp_srcs = $(filter %.cpp, $(srcs))
 asm_srcs = $(filter %.S, $(srcs))
+c_srcs = $(filter %.c, $(srcs))
 cpp_objs = $(patsubst %.cpp, %.o, $(cpp_srcs))
 asm_objs = $(patsubst %.S, %.o, $(asm_srcs))
+c_objs = $(patsubst %.c, %.o, $(c_srcs))
 mod_pcms = $(patsubst %.cppm, %.pcm, $(mod_srcs))
 mod_objs = $(patsubst %.cppm, %.o, $(mod_srcs))
 
-objs = $(cpp_objs) $(asm_objs) $(mod_objs)
+objs = $(cpp_objs) $(asm_objs) $(c_objs) $(mod_objs)
 
 .PHONY: clean modules config_file
 
@@ -64,6 +69,9 @@ _sc.lds : $(LINKER_SCRIPT)
 
 %.o : %.S | config_file
 	$(Q)$(CC) $(CPPFLAGS) -c $< -o $@
+
+%.o : %.c | config_file
+	$(Q)$(CC) $(CFLAGS) -x c -c $< -o $@
 
 %.o : %.cpp | modules config_file
 	$(Q)$(CC) $(CPPFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -c $< -o $@

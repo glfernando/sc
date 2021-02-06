@@ -1,6 +1,6 @@
 
 
-CPPFLAGS += -target aarch64-unknown-none
+CFLAGS += -target aarch64-unknown-none
 
 BOARD_PATH := board/qemu/aarch64
 ARCH := aarch64
