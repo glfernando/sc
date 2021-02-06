@@ -23,6 +23,7 @@ LDFLAGS = --gc-sections --pie
 
 TARGET ?= qemu-aarch64
 MOD_PREBUILT_DIR ?= $(BUILD_DIR)/prebuilts
+RUN_ALL_TESTS ?= 0
 
 BUILD_DIR ?= ./build-$(TARGET)
 SRC_DIR := ./src
@@ -40,6 +41,11 @@ GLOBAL_LDFLAGS :=
 include make/utils.mk
 include target/$(TARGET).mk
 -include make/$(ARCH).mk
+
+ifeq ($(RUN_ALL_TESTS), 1)
+CONFIG_INCLUDE_TESTS := y
+CXXFLAGS += -DRUN_ALL_TESTS
+endif
 
 # include top directories
 include src/Makefile

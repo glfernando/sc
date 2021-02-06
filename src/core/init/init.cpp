@@ -36,6 +36,11 @@ extern "C" [[noreturn]] void init() {
 
     println("Welcome to SC");
 
+#ifdef RUN_ALL_TESTS
+    auto ret = shell_exec_cmd("test all");
+    sc::board::poweroff(ret);
+#endif
+
     // just run the shell, there is nothing else to do
     shell_run();
 
