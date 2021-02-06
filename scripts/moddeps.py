@@ -12,8 +12,10 @@ class mod_dep:
 def create_dep(file_name, args):
     dep = mod_dep()
     dep.src = file_name
-    dep.pcm = os.path.splitext(file_name)[0] + '.pcm'
-    dep.pcm = os.path.join(args.out_obj_dir, dep.pcm)
+    dep.is_mod = file_name.endswith('.cppm')
+    dep.target = os.path.splitext(file_name)[0] + ('.pcm' if dep.is_mod else '.o')
+    dep.target = os.path.join(args.out_obj_dir, dep.target)
+    dep.target = os.path.normpath(dep.target)
 
     with open(file_name, 'r') as f:
         lines = f.readlines()
@@ -32,23 +34,23 @@ def create_dep(file_name, args):
 
 def dump_copy_dep(dst, src):
     print(f'{dst}: {src}')
-    print(f'\t$(Q)cp $@ $<\n')
+    print(f'\t$(Q)cp $< $@\n')
 
 
 def dump_module_deps(dep, args):
     if dep.mod_deps:
-        print(f'{dep.pcm}: |', end='')
+        print(f'{dep.target}:', end='')
         for mod_dep in dep.mod_deps:
             print(f' {os.path.join(args.pcm_dir, mod_dep)}.pcm', end='')
         print('\n')
 
 
 def dump_dep(dep, args):
-    # create final pcm file location
-    final_pcm = os.path.join(args.pcm_dir, dep.mod_name + '.pcm')
-    final_pcm = os.path.normpath(final_pcm)
-    dep.pcm = os.path.normpath(dep.pcm)
-    dump_copy_dep(final_pcm, dep.pcm)
+    # create final pcm file 
+    if dep.is_mod:
+        final_pcm = os.path.join(args.pcm_dir, dep.mod_name + '.pcm')
+        final_pcm = os.path.normpath(final_pcm)
+        dump_copy_dep(final_pcm, dep.target)
 
     dump_module_deps(dep, args)
 
@@ -62,11 +64,11 @@ def main():
     args = parser.parse_args()
 
     # create list with all module files (*.cppm)
-    mods = [os.path.join(root, file) for root, dir, files in os.walk(args.src_dir)
-            for file in files if file.endswith('.cppm')]
+    files = [os.path.join(root, file) for root, dir, files in os.walk(args.src_dir)
+            for file in files if file.endswith('.cppm') or file.endswith('.cpp')]
 
     # per each file create an object describing the depencies
-    deps = [create_dep(file, args) for file in mods]
+    deps = [create_dep(file, args) for file in files]
 
     for dep in deps:
         dump_dep(dep, args)
