@@ -22,6 +22,10 @@ struct __pointer_type_info {
     virtual void foo() {}
 } pti;
 
+struct __si_class_type_info {
+    virtual void foo() {}
+} scti;
+
 }  // namespace __cxxabiv1
 
 namespace std {
@@ -49,6 +53,13 @@ extern "C" void __cxa_rethrow()
     if (curr_excep)
         _Unwind_RaiseException(curr_excep);
     std::terminate();
+}
+
+extern "C" int __cxa_atexit(void (*)(void*), void*, void*) { return 0; }
+
+extern "C" void __cxa_pure_virtual()
+{
+    while (true) {}
 }
 
 struct __cxa_exception {
