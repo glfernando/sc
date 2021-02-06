@@ -16,7 +16,7 @@ jobs:
 
     - name: Setup dependencies
       run: |
-        sudo apt-get install -y llvm-10 clang-10 lld-10
+        sudo apt-get install -y llvm-10 clang-10 lld-10 qemu-system-arm
         sudo update-alternatives \
             --install /usr/bin/llvm-objcopy llvm-objcopy /usr/bin/llvm-objcopy-10 100
         sudo update-alternatives \
@@ -24,3 +24,6 @@ jobs:
 
     - name: make
       run: make V=1
+
+    - name: Run all test
+      run: make clean qemu RUN_ALL_TESTS=1 TARGET=qemu-aarch64
