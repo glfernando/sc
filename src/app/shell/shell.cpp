@@ -422,6 +422,32 @@ static int shell_run_cmd(int argc, char const* argv[])
 static char data[MAX_LINE_SIZE];
 static char* argv[MAX_LINE_SIZE / 2];
 
+int shell_exec_cmd(char const* str) {
+    char *line = data;
+    strncpy(line, str, MAX_LINE_SIZE);
+    line[MAX_LINE_SIZE - 1] = '\0';
+
+    // remove all leading spaces
+    while (*line == ' ')
+        line++;
+
+    if (!*line)
+        return ERR_NOT_FOUND;
+
+    int argc = 0;
+    // get number of args
+    do {
+        argv[argc++] = line;
+        while (*line && *line != ' ')
+            line++;
+        while (*line == ' ')
+            *line++ = '\0';
+
+    } while (*line);
+
+    return shell_run_cmd(argc, (char const**)argv);
+}
+
 void shell_run()
 {
     while (true) {
