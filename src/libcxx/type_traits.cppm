@@ -222,4 +222,31 @@ struct decay {
 template <typename T>
 using decay_t = typename decay<T>::type;
 
+// is_trivial
+template <typename T>
+struct is_trivial {
+    static const bool value = __is_trivial(T);
+};
+
+template <class T>
+inline constexpr bool is_trivial_v = is_trivial<T>::value;
+
+// __is_standard_layout
+template <typename T>
+struct is_standard_layout {
+    static const bool value = __is_standard_layout(T);
+};
+
+template <class T>
+inline constexpr bool is_standard_layout_v = is_standard_layout<T>::value;
+
+// is_trivially_constructible
+template <typename T>
+struct is_trivially_constructible {
+    static const bool value = __is_trivially_constructible(T);
+};
+
+template <class T>
+inline constexpr bool is_trivially_constructible_v = is_trivially_constructible<T>::value;
+
 }  // namespace std
