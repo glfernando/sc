@@ -24,6 +24,7 @@ export namespace device {
 
 enum class class_type {
     NONE,
+    UART,
 };
 
 class device {
