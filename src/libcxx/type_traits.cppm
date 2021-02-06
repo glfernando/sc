@@ -4,6 +4,10 @@
  * Copyright (c) 2020 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
+module;
+
+#include <stddef.h>
+
 export module std.type_traits;
 
 export namespace std {
@@ -124,5 +128,92 @@ template <typename T>
 constexpr T&& forward(remove_reference_t<T>&& t) noexcept {
     return static_cast<T&&>(t);
 }
+
+// remove extent
+template <typename T>
+struct remove_extent {
+    using type = T;
+};
+
+template <typename T>
+struct remove_extent<T[]> {
+    using type = T;
+};
+
+template <typename T, size_t N>
+struct remove_extent<T[N]> {
+    using type = T;
+};
+
+template <class T>
+using remove_extent_t = typename remove_extent<T>::type;
+
+// conditional
+template <bool B, typename T, typename F>
+struct conditional {
+    using type = T;
+};
+
+template <typename T, typename F>
+struct conditional<false, T, F> {
+    using type = F;
+};
+
+template <bool B, typename T, typename F>
+using conditional_t = typename conditional<B, T, F>::type;
+
+// is array
+template <typename T>
+struct is_array {
+    static const bool value = __is_array(T);
+};
+
+template <class T>
+inline constexpr bool is_array_v = is_array<T>::value;
+
+// is function
+template <typename T>
+struct is_function {
+    static const bool value = __is_function(T);
+};
+
+template <class T>
+inline constexpr bool is_function_v = is_function<T>::value;
+
+// add pointer
+namespace detail {
+template <typename T>
+struct type_identity {
+    using type = T;
+};  // or use std::type_identity (since C++20)
+
+template <typename T>
+auto try_add_pointer(int) -> type_identity<typename std::remove_reference<T>::type*>;
+template <typename T>
+auto try_add_pointer(...) -> type_identity<T>;
+
+}  // namespace detail
+
+template <typename T>
+struct add_pointer : decltype(detail::try_add_pointer<T>(0)) {};
+
+template <class T>
+using add_pointer_t = typename add_pointer<T>::type;
+
+// decay
+template <typename T>
+struct decay {
+ private:
+    using U = remove_reference_t<T>;
+
+ public:
+    typedef std::conditional_t<
+        std::is_array_v<U>, std::remove_extent_t<U>*,
+        std::conditional_t<std::is_function_v<U>, std::add_pointer_t<U>, std::remove_cv_t<U>>>
+        type;
+};
+
+template <typename T>
+using decay_t = typename decay<T>::type;
 
 }  // namespace std
