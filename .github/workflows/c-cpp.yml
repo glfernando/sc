@@ -17,14 +17,16 @@ jobs:
     - name: Setup dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y llvm-10 clang-10 lld-10 qemu-system-arm
+        sudo apt-get install -y llvm-10 clang-11 lld-11 qemu-system-arm
         sudo update-alternatives \
-            --install /usr/bin/llvm-objcopy llvm-objcopy /usr/bin/llvm-objcopy-10 100
+            --install /usr/bin/llvm-objcopy llvm-objcopy /usr/bin/llvm-objcopy-11 100
         sudo update-alternatives \
-            --install /usr/bin/ld.lld ld.lld /usr/bin/ld.lld-10 100
+            --install /usr/bin/ld.lld ld.lld /usr/bin/ld.lld-11 100
 
     - name: make
       run: make V=1
 
     - name: Run all test
-      run: make clean qemu RUN_ALL_TESTS=1 TARGET=qemu-aarch64
+      run: |
+        make clean
+        make qemu RUN_ALL_TESTS=1 TARGET=qemu-aarch64
