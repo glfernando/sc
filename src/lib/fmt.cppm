@@ -239,11 +239,9 @@ void print(const char* fmt, T&& val, Args&&... args) {
             auto mod = parse_modifiers(flags);
 
             if constexpr (std::integral<U>) {
-                bool neg = mod.base == 10 && std::signed_integral<T> && val < 0;
-                if (neg)
-                    val = -static_cast<int64_t>(val);
-
-                fmt_print_integer(val, neg, mod);
+                bool neg = mod.base == 10 && std::signed_integral<U> && val < 0;
+                auto num = neg ? -static_cast<int64_t>(val) : val;
+                fmt_print_integer(num, neg, mod);
             } else if constexpr (std::same_as<U, const char*> || std::same_as<U, char*>) {
                 fmt_print_string(val ?: "(nullptr)", mod.width, mod.flags);
             } else if constexpr (std::pointer<U>) {
