@@ -46,7 +46,7 @@ def dump_module_deps(dep, args):
 
 
 def dump_dep(dep, args):
-    # create final pcm file 
+    # create final pcm file
     if dep.is_mod:
         final_pcm = os.path.join(args.pcm_dir, dep.mod_name + '.pcm')
         final_pcm = os.path.normpath(final_pcm)
@@ -58,14 +58,13 @@ def dump_dep(dep, args):
 def main():
     parser = argparse.ArgumentParser(description="create module order dependencies for C++ modules")
     parser.add_argument('pcm_dir', help="Directory for PCM files")
-    parser.add_argument('src_dir', help="Code source directory")
     parser.add_argument('out_obj_dir', help="Object output directory")
+    parser.add_argument('files', nargs='*', help="files to look up for dependendies")
 
     args = parser.parse_args()
 
-    # create list with all module files (*.cppm)
-    files = [os.path.join(root, file) for root, dir, files in os.walk(args.src_dir)
-            for file in files if file.endswith('.cppm') or file.endswith('.cpp')]
+    # let's do a sanity check, we are only interested on .cpp and .cppm files
+    files = [file for file in args.files if file.endswith('.cppm') or file.endswith('.cpp')]
 
     # per each file create an object describing the depencies
     deps = [create_dep(file, args) for file in files]
