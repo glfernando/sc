@@ -26,6 +26,7 @@ enum class class_type {
     NONE,
     UART,
     CONSOLE,
+    INTC,
 };
 
 class device {
