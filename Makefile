@@ -85,11 +85,11 @@ CXXFLAGS += $(GLOBAL_CXXFLAGS)
 CXXFLAGS += $(CFLAGS)
 LDFLAGS += $(GLOBAL_LDFLAGS)
 
-cpp_objs := $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(cpp_srcs))
-asm_objs := $(patsubst %.S, $(BUILD_DIR)/%.o, $(asm_srcs))
-c_objs := $(patsubst %.c, $(BUILD_DIR)/%.o, $(c_srcs))
+cpp_objs := $(patsubst %.cpp, $(BUILD_DIR)/%.cpp.o, $(cpp_srcs))
+asm_objs := $(patsubst %.S, $(BUILD_DIR)/%.S.o, $(asm_srcs))
+c_objs := $(patsubst %.c, $(BUILD_DIR)/%.c.o, $(c_srcs))
 mod_pcms := $(patsubst %.cppm, $(BUILD_DIR)/%.pcm, $(mod_srcs))
-mod_objs := $(patsubst %.cppm, $(BUILD_DIR)/%.o, $(mod_srcs))
+mod_objs := $(patsubst %.cppm, $(BUILD_DIR)/%.cppm.o, $(mod_srcs))
 
 objs := $(cpp_objs) $(asm_objs) $(c_objs) $(mod_objs)
 deps := $(objs:.o=.d)
@@ -113,35 +113,35 @@ $(BUILD_DIR)/sc.elf : $(objs) $(BUILD_DIR)/_sc.lds
 $(BUILD_DIR)/_sc.lds : $(LINKER_SCRIPT)
 	$(Q)$(CC) $(CPPFLAGS) -E -x assembler-with-cpp -P -o $@ $<
 
-$(BUILD_DIR)/%.o : %.S
-	$(Q)mkdir -p $(dir $@)
+$(BUILD_DIR)/%.S.o : %.S
+	$(Q)mkdir -p $(@D)
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o : %.c
-	$(eval OBJ_PATH_VAR = $(subst /,_,$(patsubst %/,%,$(dir $@))))
+$(BUILD_DIR)/%.c.o : %.c
+	$(eval OBJ_PATH_VAR = $(subst /,_,$(@D)))
 	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
-	$(Q)mkdir -p $(dir $@)
+	$(Q)mkdir -p $(@D)
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) $(FLAGS_EXTRA) -x c -c $< -o $@
 
-$(BUILD_DIR)/%.o : %.cpp
-	$(eval OBJ_PATH_VAR = $(subst /,_,$(patsubst %/,%,$(dir $@))))
+$(BUILD_DIR)/%.cpp.o : %.cpp
+	$(eval OBJ_PATH_VAR = $(subst /,_,$(@D)))
 	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CXXFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
 	$(Q)mkdir -p $(dir $@)
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) $(FLAGS_EXTRA) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -c $< -o $@
 
 $(BUILD_DIR)/%.pcm : %.cppm
-	$(eval OBJ_PATH_VAR = $(subst /,_,$(patsubst %/,%,$(dir $@))))
+	$(eval OBJ_PATH_VAR = $(subst /,_,$(@D)))
 	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CXXFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
-	$(Q)mkdir -p $(dir $@)
+	$(Q)mkdir -p $(@D)
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) $(FLAGS_EXTRA) -fimplicit-modules -fimplicit-module-maps -fmodules -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ --precompile $< -o $@
 
-$(BUILD_DIR)/%.o : $(BUILD_DIR)/%.pcm
+$(BUILD_DIR)/%.cppm.o : $(BUILD_DIR)/%.pcm
 	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
 
 $(objs) : $(CONFIG_FILE) $(BUILD_DIR)/module-order-deps.d
 
 $(CONFIG_FILE): src/$(TARGET_CONFIG_FILE)
-	$(Q)mkdir -p $(dir $@)
+	$(Q)mkdir -p $(@D)
 	$(Q)cp $< $@
 
 clean:

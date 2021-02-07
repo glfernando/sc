@@ -13,7 +13,7 @@ def create_dep(file_name, args):
     dep = mod_dep()
     dep.src = file_name
     dep.is_mod = file_name.endswith('.cppm')
-    dep.target = os.path.splitext(file_name)[0] + ('.pcm' if dep.is_mod else '.o')
+    dep.target = os.path.splitext(file_name)[0] + ('.pcm' if dep.is_mod else '.cpp.o')
     dep.target = os.path.join(args.out_obj_dir, dep.target)
     dep.target = os.path.normpath(dep.target)
 
