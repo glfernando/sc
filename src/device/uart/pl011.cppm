@@ -73,11 +73,11 @@ enum UART_CR_bits : uint32_t {
 namespace device {
 
 void pl011::init() {
-    // enable fifo
-    reg(UART_LCR_H) = UART_LCR_H_FEN | UART_LCR_H_WLEN8;
-
     // set baudrate
     baudrate(baud);
+
+    // enable fifo
+    reg(UART_LCR_H) = UART_LCR_H_FEN | UART_LCR_H_WLEN8;
 
     // enable uart
     reg(UART_CR) = UART_CR_UARTEN | UART_CR_TXE | UART_CR_RXE;
