@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <unwind.h>
 
+#define UINTPTR_MAX     __UINTPTR_MAX__
+
 #ifdef _WIN32
   #include <windows.h>
   #include <ntverp.h>
