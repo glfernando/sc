@@ -59,6 +59,7 @@ SECTIONS
 
     .data : AT (__fdata) {
         __data_start = .;
+        KEEP(*(.vector_table))
         *(.data*)
         . = ALIGN(16);
         __data_end = .;

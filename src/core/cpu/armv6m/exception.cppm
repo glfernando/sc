@@ -6,9 +6,24 @@
 
 module;
 
+#include <arch/arm/sysreg.h>
+#include <libunwind.h>
 #include <stdint.h>
 
 export module core.cpu.armv6m.exception;
+
+import core.cpu.armv6m.start;
+import lib.fmt;
+import lib.reg;
+import lib.backtrace;
+import lib.exception;
+import std.string;
+
+using sc::lib::backtrace;
+using sc::lib::fmt::println;
+using sc::lib::fmt::sprint;
+using sc::lib::reg::reg32;
+using std::string;
 
 namespace core::cpu::armv6m::exception {
 
@@ -33,29 +48,143 @@ struct vector_table_t {
     handler_t ext_int[EXT_INT_MAX];
 };
 
+enum class type {
+    NMI,
+    HARD_FAULT,
+    MEM_MANAGE,
+    BUS_FAULT,
+    USAGE_FAULT,
+};
+
+static char const* type_to_str(type type) {
+    switch (type) {
+    case type::NMI:
+        return "nmi";
+    case type::HARD_FAULT:
+        return "hard fault";
+    case type::MEM_MANAGE:
+        return "mem manage";
+    case type::BUS_FAULT:
+        return "bus fault";
+    case type::USAGE_FAULT:
+        return "usage fault";
+    default:
+        return "unknown";
+    }
+}
+
 export extern "C" uint8_t __stack_end[];
-export extern "C" void _start(void);
 
-void nmi_handler() {
-    asm volatile("b .");
+struct excep_frame {
+    unsigned r8;
+    unsigned r9;
+    unsigned r10;
+    unsigned r11;
+    unsigned r4;
+    unsigned r5;
+    unsigned r6;
+    unsigned r7;
+    unsigned r0;
+    unsigned r1;
+    unsigned r2;
+    unsigned r3;
+    unsigned r12;
+    unsigned lr;
+    unsigned pc;
+    unsigned xpsr;
+};
+
+static void fill_unw_context(unw_context_t& uc, excep_frame& regs) {
+    auto data = reinterpret_cast<uint32_t*>(uc.data);
+    data[7] = regs.r7;
+    data[13] = reinterpret_cast<unsigned>(&regs) + sizeof regs;
+    // consider SP aligment
+    if (regs.xpsr & (1 << 9))
+        data[13] += 4;
+    data[14] = regs.lr;
+    data[15] = regs.pc;
 }
 
-void hard_fault_handler() {
-    asm volatile("b .");
+static void unhandled_excep(excep_frame& regs, unsigned exc_return) {
+    println("unhandled exception number {}", sysreg_read(ipsr));
+
+    unsigned sp = reinterpret_cast<unsigned>(&regs) + sizeof regs;
+    println("\nregisters:");
+    println(" r0: {:#08x}    r1: {:#08x}    r2: {:#08x}    r3: {:#08x}", regs.r0, regs.r1, regs.r2,
+            regs.r4);
+    println(" r4: {:#08x}    r5: {:#08x}    r6: {:#08x}    r7: {:#08x}", regs.r4, regs.r5, regs.r6,
+            regs.r7);
+    println(" r8: {:#08x}    r9: {:#08x}   r10: {:#08x}   r11: {:#08x}", regs.r8, regs.r9, regs.r10,
+            regs.r11);
+    println("r12: {:#08x}    sp: {:#08x}    lr: {:#08x}    pc: {:#08x}", regs.r12, sp, regs.lr,
+            regs.pc);
+
+    println("\nxpsr: {:#08x}   exc_return: {:#08x}", regs.xpsr, exc_return);
+
+    println("\nbacktrace:");
+    unw_context_t uc;
+    fill_unw_context(uc, regs);
+    backtrace(&uc);
+
+    for (;;)
+        asm volatile("wfe");
 }
 
-export const vector_table_t vector_table __attribute__((section(".vector_table")))
+// clang-format off
+__attribute__((naked)) static void default_handler() {
+    asm volatile(
+        "mov    r0, r8\n"
+        "mov    r1, r9\n"
+        "mov    r2, r10\n"
+        "mov    r3, r11\n"
+        "push   {r0-r7}\n");
+    asm volatile(
+        "mov    r0, sp\n"
+        "mov    r1, lr\n"
+        "bx     %0\n"
+        :: "r"(unhandled_excep) : "r0", "r1");
+}
+// clang-format on
+
+static vector_table_t vector_table __attribute__((section(".vector_table")))
 __attribute__((used)) = {
     .sp_main = __stack_end,
     .reset = _start,
-    .nmi = nmi_handler,
-    .hard_fault = hard_fault_handler,
+    .nmi = default_handler,
+    .hard_fault = default_handler,
 };
 
 }  // namespace core::cpu::armv6m::exception
 
 export namespace core::cpu::armv6m::exception {
 
-void init() {}
+void init() {
+    // set VTOR address
+    reg32(0xe0000000 + 0xed08) = reinterpret_cast<uintptr_t>(&vector_table);
+}
+
+void register_handler(unsigned num, handler_t handler) {
+    switch (num) {
+    case 2:
+        vector_table.nmi = handler;
+        break;
+    case 3:
+        vector_table.hard_fault = handler;
+        break;
+    case 11:
+        vector_table.svc = handler;
+        break;
+    case 14:
+        vector_table.pend_sv = handler;
+        break;
+    case 15:
+        vector_table.systick = handler;
+        break;
+    case 16 ...(16 + EXT_INT_MAX):
+        vector_table.ext_int[num - 16] = handler;
+        break;
+    }
+    throw sc::lib::exception(sprint("invalid vector number {}", num));
+}
 
 }  // namespace core::cpu::armv6m::exception
