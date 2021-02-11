@@ -6,6 +6,4 @@
 
 export module core.cpu;
 
-#ifdef ARMV8
-export import core.cpu.armv8;
-#endif
+export import core.cpu.arch;
