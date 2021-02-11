@@ -10,9 +10,7 @@ module;
 
 export module lib.timestamp;
 
-#ifdef AARCH64
-export import lib.timestamp.aarch64;
-#endif
+export import lib.timestamp.arch;
 
 export namespace sc::lib::timestamp {
 
