@@ -1,18 +1,6 @@
-AS=arm-none-eabi-as -mthumb
-
-SRC_FILES=$(wildcard *.S) 
-
-%.o: %.S
-	$(AS) $< -o $@
-
-libaeabi-cortexm0.a: $(SRC_FILES:%.S=%.o)
-	ar rcs libaeabi-cortexm0.a $(SRC_FILES:%.S=%.o)
-
-
-
-.PHONY: all clean
-
-all: libaeabi-cortexm0.a
-
-clean:
-	-rm -f *.o *.a
+src-y += memmove.S
+src-y += ldivmod.S
+src-y += crt.S
+src-y += idivmod.S
+src-y += llsr.S
+src-y += lmul.S
