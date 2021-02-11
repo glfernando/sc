@@ -7,7 +7,6 @@
 #include <app/shell.h>
 
 import board.init;
-import board.debug;
 import board.power;
 import lib.heap;
 import lib.fmt;
