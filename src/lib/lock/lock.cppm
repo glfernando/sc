@@ -6,9 +6,7 @@
 
 export module lib.lock;
 
-#ifdef AARCH64
-export import lib.lock.aarch64;
-#endif
+export import lib.lock.arch;
 
 export namespace sc::lib {
 

@@ -4,7 +4,7 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module lib.lock.aarch64;
+export module lib.lock.arch;
 
 export namespace sc::lib {
 
