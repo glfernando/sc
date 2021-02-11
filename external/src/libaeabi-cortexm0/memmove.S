@@ -18,7 +18,7 @@
 
 
 
-	.syntax unified
+	@ .syntax unified
 	.text
 	.thumb
 	.cpu cortex-m0
@@ -48,11 +48,14 @@ __aeabi_memmove4:
 
 
 	cmp	r0, r1
-	bls	__aeabi_memcpy4
+	bhi	1f
+	b	__aeabi_memcpy4
+1:
 	adds	r3, r1, r2
 	cmp	r0, r3
-	bhs	__aeabi_memcpy4
-
+	blo	2f
+	b	__aeabi_memcpy4
+2:
 	b	.Lbackward_entry
 
 .Lbackward_loop:
@@ -79,7 +82,9 @@ __aeabi_memmove:
 
 
 	cmp	r0, r1
-	bls	__aeabi_memcpy
+	bhi	1f
+	b	__aeabi_memcpy
+1:
 	adds	r3, r1, r2
 	cmp	r0, r3
 	blo	.Lbackward_entry
