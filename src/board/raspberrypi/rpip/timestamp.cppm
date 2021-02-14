@@ -14,7 +14,7 @@ import lib.reg;
 
 using sc::lib::reg::reg32;
 
-constexpr uintptr_t TIMER_BASE = 0x4005'0000;
+constexpr uintptr_t TIMER_BASE = 0x4005'4000;
 
 constexpr uintptr_t TIMERHR = TIMER_BASE + 0x08;
 constexpr uintptr_t TIMERLR = TIMER_BASE + 0x0c;
@@ -23,7 +23,7 @@ export namespace sc::lib::timestamp {
 
 uint64_t ticks() {
     uint32_t lo = reg32(TIMERLR);
-    uint32_t hi = reg32(TIMERLR);
+    uint32_t hi = reg32(TIMERHR);
     return (static_cast<uint64_t>(hi) << 32) | lo;
 }
 
