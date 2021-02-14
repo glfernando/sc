@@ -25,6 +25,7 @@ TARGET ?= qemu-aarch64
 MOD_PREBUILT_DIR ?= $(BUILD_DIR)/prebuilts
 RUN_ALL_TESTS ?= 0
 DEBUGGABLE ?= 0
+EXTRA_MOD ?=
 
 BUILD_DIR ?= build-$(TARGET)
 SRC_DIR := src
@@ -73,6 +74,10 @@ default_makefiles = src/Makefile
 default_makefiles += src/$(BOARD_PATH)/Makefile
 default_makefiles += src/arch/$(ARCH)/Makefile
 default_makefiles += external/src/Makefile
+
+ifneq ($(EXTRA_MOD),)
+default_makefiles += $(EXTRA_MOD)/Makefile
+endif
 
 $(foreach file,$(default_makefiles),$(eval $(call include_module,$(file))))
 
