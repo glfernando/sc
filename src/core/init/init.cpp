@@ -16,6 +16,7 @@ using sc::lib::fmt::println;
 
 extern void (*__init_array_start[])();
 extern void (*__init_array_end[])();
+extern int main();
 
 void init_array() {
     for (void (**f)() = __init_array_start; f < __init_array_end; ++f)
@@ -40,8 +41,7 @@ extern "C" [[noreturn]] void init() {
     sc::board::poweroff(ret);
 #endif
 
-    // just run the shell, there is nothing else to do
-    shell_run();
+    main();
 
     sc::board::poweroff();
     for (;;) {}
