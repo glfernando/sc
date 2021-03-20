@@ -29,7 +29,7 @@ namespace core::cpu::armv6m::exception {
 
 constexpr unsigned EXT_INT_MAX = 32;
 
-using handler_t = void (*)(void);
+export using handler_t = void(*)(void);
 
 struct vector_table_t {
     void* sp_main;
@@ -45,7 +45,7 @@ struct vector_table_t {
     handler_t reserved1;
     handler_t pend_sv;
     handler_t systick;
-    handler_t ext_int[EXT_INT_MAX];
+    volatile handler_t ext_int[EXT_INT_MAX];
 };
 
 enum class type {
@@ -146,8 +146,8 @@ __attribute__((naked)) static void default_handler() {
 }
 // clang-format on
 
-static vector_table_t vector_table __attribute__((section(".vector_table")))
-__attribute__((used)) = {
+static vector_table_t vector_table __attribute__((section(".vector_table"))) __attribute__((used))
+__attribute__((aligned(256))) = {
     .sp_main = __stack_end,
     .reset = _start,
     .nmi = default_handler,
@@ -183,8 +183,9 @@ void register_handler(unsigned num, handler_t handler) {
     case 16 ...(16 + EXT_INT_MAX):
         vector_table.ext_int[num - 16] = handler;
         break;
+    default:
+        throw sc::lib::exception(sprint("invalid vector number {}", num));
     }
-    throw sc::lib::exception(sprint("invalid vector number {}", num));
 }
 
 }  // namespace core::cpu::armv6m::exception
