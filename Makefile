@@ -82,7 +82,7 @@ endif
 $(foreach file,$(default_makefiles),$(eval $(call include_module,$(file))))
 
 # use default linker script if none was set by target makefile
-LINKER_SCRIPT ?= sc_linker.lds
+LINKER_SCRIPT ?= sc_linker.ld
 
 CPPFLAGS += $(GLOBAL_CPPFLAGS)
 CFLAGS += $(GLOBAL_CFLAGS)

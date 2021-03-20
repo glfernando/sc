@@ -106,7 +106,7 @@ This is the current directory structure
 ├── README.md
 ├── external
 ├── make
-├── sc_linker.lds
+├── sc_linker.ld
 ├── scripts
 ├── src
 │   ├── app
