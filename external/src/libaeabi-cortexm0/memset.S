@@ -60,14 +60,17 @@ __aeabi_memset:
 L_align2:
 	movs	r3, #2		@ set one halfword if address is not 32 bit aligned
 	tst	r0, r3
-	beq	__aeabi_memset4
+	bne	1f
+	b	__aeabi_memset4
+1:
 	strb	r2, [r0]
 	cmp	r1, #1		@ if length is 1 copy only 1 byte
 	beq	L_return1
 	strb	r2, [r0, #1]
 	adds	r0, #2
 	subs	r1, #2
-	bne	__aeabi_memset4
+	beq	L_return1
+	b	__aeabi_memset4
 
 L_return1:
 	bx	lr
