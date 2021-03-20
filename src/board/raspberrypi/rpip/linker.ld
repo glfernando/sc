@@ -12,27 +12,37 @@ MEMORY
     SCRATCH_Y(rwx) : ORIGIN = 0x20041000, LENGTH = 4k
 }
 
+REGION_ALIAS("REGION_TESTS", RAM);
 
 ENTRY(_board_entry)
 SECTIONS
 {
     .boot2 ORIGIN(FLASH) : {
         __boot2_start= .;
-        KEEP (*(.boot2))
+        KEEP(*(.boot2))
         __boot2_end = .;
     } > FLASH
 
     .text : {
         KEEP(*(.reset))
-        KEEP(*(.text*))
+        *(.text*)
+        *(.gnu.linkonce.t.*)
     } > FLASH
 
     .rodata ALIGN(16) : {
         *(.rodata*);
+        *(.gnu.linkonce.r.*);
+    } > FLASH
+
+    .preinit.array ALIGN(8) : {
+        __preinit_array_start = .;
+        KEEP(*(.preinit_array))
+        __preinit_array_end = .;
     } > FLASH
 
     .init.array ALIGN(8) : {
         __init_array_start = .;
+        KEEP(*(SORT(.init_array.*)))
         KEEP(*(.init_array))
         __init_array_end = .;
     } > FLASH
@@ -54,16 +64,15 @@ SECTIONS
     } > FLASH
     __exidx_end = .;
 
-    . = ALIGN(8);
-    __fdata = .;
-
-    .data : AT (__fdata) {
+    .data ALIGN(256): {
         __data_start = .;
         KEEP(*(.vector_table))
         *(.data*)
         . = ALIGN(16);
         __data_end = .;
-    } > RAM
+    } > RAM AT> FLASH
+
+    __fdata = LOADADDR(.data);
 
     .got (NOLOAD) : {
         KEEP(*(.got .got.*));
