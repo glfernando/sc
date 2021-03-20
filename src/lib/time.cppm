@@ -62,6 +62,8 @@ class time_t {
         return std::to_string(val);
     }
 
+    unsigned long get_val() const noexcept { return val; }
+
  private:
     unsigned long val;
 };
