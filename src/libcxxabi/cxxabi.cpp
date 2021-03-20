@@ -62,6 +62,12 @@ extern "C" void __cxa_pure_virtual() {
     while (true) {}
 }
 
+extern "C" int __cxa_guard_acquire(int*) {
+    return 0;
+}
+
+extern "C" void __cxa_guard_release(int*) {}
+
 struct __cxa_exception {
     struct type_info* exceptionType;
     _Unwind_Exception unwindHeader;
