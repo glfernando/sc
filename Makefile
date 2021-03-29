@@ -105,7 +105,7 @@ deps := $(objs:.o=.d)
 
 CONFIG_FILE = $(BUILD_DIR)/include/config.h
 
-.PHONY: clean
+.PHONY: clean tags
 
 all: $(BUILD_DIR)/sc.bin
 
@@ -149,12 +149,16 @@ $(CONFIG_FILE): src/$(TARGET_CONFIG_FILE)
 	$(Q)mkdir -p $(@D)
 	$(Q)cp $< $@
 
+tags: $(c_srcs) $(asm_srcs) $(cpp_srcs) $(mod_srcs)
+	$(Q)ctags --langmap=c++:.cpp.cppm $^
+
 clean:
 	$(Q)find $(BUILD_DIR) -name *.o | xargs rm -f
 	$(Q)find $(BUILD_DIR) -name *.d | xargs rm -f
 	$(Q)find $(BUILD_DIR) -name *.pcm | xargs rm -f
 	$(Q)rm -f $(BUILD_DIR)/sc.elf $(BUILD_DIR)/sc.bin $(BUILD_DIR)/*.map $(BUILD_DIR)/_sc.lds
 	$(Q)rm -f $(CONFIG_FILE)
+	$(Q)rm -f tags
 
 $(BUILD_DIR)/module-order-deps.d: $(cpp_srcs) $(mod_srcs)
 	$(Q)mkdir -p $(MOD_PREBUILT_DIR)
