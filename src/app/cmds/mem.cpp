@@ -19,8 +19,8 @@ import lib.fmt;
 import lib.hexdump;
 import std.string;
 
-using sc::lib::hexdump;
-using sc::lib::fmt::println;
+using lib::hexdump;
+using lib::fmt::println;
 using std::string;
 
 void cmd_mem_usage() {

@@ -17,10 +17,10 @@ import lib.reg;
 import lib.fmt;
 import lib.exception;
 
-using sc::lib::exception;
-using sc::lib::fmt::println;
-using sc::lib::fmt::sprint;
-using sc::lib::reg::reg32;
+using lib::exception;
+using lib::fmt::println;
+using lib::fmt::sprint;
+using lib::reg::reg32;
 using std::string;
 
 export namespace device {

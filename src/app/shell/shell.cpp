@@ -20,9 +20,9 @@ import lib.fmt;
 import board.peripherals;
 import lib.exception;
 
-using sc::lib::exception;
-using sc::lib::fmt::print;
-using sc::lib::fmt::println;
+using lib::exception;
+using lib::fmt::print;
+using lib::fmt::println;
 
 constexpr unsigned HISTORY_SIZE = 32;  // needs to be at least 1
 constexpr unsigned MAX_LINE_SIZE = 128;
@@ -51,19 +51,19 @@ static unsigned hi;
 
 static inline int getc(void)
 {
-    auto& con = sc::board::peripherals::default_console();
+    auto& con = board::peripherals::default_console();
     return con.getc();
 }
 
 static inline void putc(int c)
 {
-    auto& con = sc::board::peripherals::default_console();
+    auto& con = board::peripherals::default_console();
     return con.putc(c);
 }
 
 static inline void puts(char const* str)
 {
-    auto& con = sc::board::peripherals::default_console();
+    auto& con = board::peripherals::default_console();
     while (int c = *str++)
         con.putc(c);
 }

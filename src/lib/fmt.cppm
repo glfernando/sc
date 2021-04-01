@@ -29,7 +29,7 @@ static inline void puts(char const* str) {
 }
 
 // module private data
-namespace sc::lib::fmt {
+namespace lib::fmt {
 
 enum fmt_flags {
     FMT_LEFT = 1 << 0,
@@ -219,10 +219,10 @@ void fmt_print_integer(uint64_t n, bool neg, modifiers& mod, fmt_out fout = {}) 
     fmt_print_string(s, w, f, fout);
 }
 
-}  // namespace sc::lib::fmt
+}  // namespace lib::fmt
 
 // public (exported) part
-export namespace sc::lib::fmt {
+export namespace lib::fmt {
 
 //
 // Ends print template recursion. This handles the case when only fmt is specified
@@ -343,4 +343,4 @@ void register_console(device::console* console) {
     con = console;
 }
 
-}  // namespace sc::lib::fmt
+}  // namespace lib::fmt

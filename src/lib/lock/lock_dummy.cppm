@@ -6,7 +6,7 @@
 
 export module lib.lock.arch;
 
-export namespace sc::lib {
+export namespace lib {
 
 class lock {
  public:
@@ -21,9 +21,9 @@ class lock {
 
 class lock_irqsafe : public lock {};
 
-}  // namespace sc::lib
+}  // namespace lib
 
-namespace sc::lib {
+namespace lib {
 
 void lock::acquire() {
     val = 1;
@@ -33,4 +33,4 @@ void lock::release() {
     val = 0;
 }
 
-}  // namespace sc::lib
+}  // namespace lib

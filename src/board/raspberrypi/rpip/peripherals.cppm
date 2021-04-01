@@ -38,11 +38,11 @@ static device::timer_rp2040 timer0("timer0", timer0_pdata);
 
 static device::nvic nvic("nvic", nvic_pdata);
 
-export namespace sc::board::peripherals {
+export namespace board::peripherals {
 
 void init() {
     uart0.init();
-    sc::lib::fmt::register_console(&con0);
+    lib::fmt::register_console(&con0);
     nvic.init();
     // register GIC
     device::manager::register_device(&nvic);
@@ -62,4 +62,4 @@ auto& default_intc() {
     return nvic;
 }
 
-}  // namespace sc::board::peripherals
+}  // namespace board::peripherals

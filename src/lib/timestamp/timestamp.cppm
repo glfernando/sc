@@ -12,7 +12,7 @@ export module lib.timestamp;
 
 export import lib.timestamp.arch;
 
-export namespace sc::lib::timestamp {
+export namespace lib::timestamp {
 
 uint64_t ticks_to_xs(uint64_t ticks, uint64_t factor) {
     return ticks * factor / freq();
@@ -42,4 +42,4 @@ uint64_t ns() {
     return ticks_to_ns(ticks());
 }
 
-}  // namespace sc::lib::timestamp
+}  // namespace lib::timestamp

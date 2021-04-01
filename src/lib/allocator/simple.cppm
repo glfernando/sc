@@ -13,7 +13,7 @@ module;
 export module lib.allocator.simple;
 import lib.lock;
 
-export namespace sc::lib::allocator {
+export namespace lib::allocator {
 
 enum chunk_state : uint32_t {
     FREE = 0xA110F7EE,
@@ -107,7 +107,7 @@ class simple {
     lock_irqsafe lock;
 };
 
-}  // namespace sc::lib::allocator
+}  // namespace lib::allocator
 
 // implementation
 
@@ -129,7 +129,7 @@ size_t align_offset(void* ptr, size_t align) {
 
 }  // namespace
 
-namespace sc::lib::allocator {
+namespace lib::allocator {
 
 void simple::init() noexcept {
     // TODO: assert valid parameters
@@ -224,4 +224,4 @@ void simple::dump() noexcept {
     }
 }
 
-}  // namespace sc::lib::allocator
+}  // namespace lib::allocator

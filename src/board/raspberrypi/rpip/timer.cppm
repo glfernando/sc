@@ -20,11 +20,11 @@ import lib.fmt;
 import lib.reg;
 import lib.lock;
 
-using sc::lib::lock_irqsafe;
-using sc::lib::slock;
-using sc::lib::fmt::println;
-using sc::lib::reg::reg32;
-using sc::lib::time::time_us_t;
+using lib::lock_irqsafe;
+using lib::slock;
+using lib::fmt::println;
+using lib::reg::reg32;
+using lib::time::time_us_t;
 using std::string;
 
 namespace device {

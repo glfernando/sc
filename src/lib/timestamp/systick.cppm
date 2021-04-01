@@ -8,7 +8,7 @@ export module lib.timestamp.arch;
 
 #include <stdint.h>
 
-export namespace sc::lib::timestamp {
+export namespace lib::timestamp {
 
 uint64_t ticks() {
     return 0;
@@ -18,4 +18,4 @@ uint64_t freq() {
     return 1;
 }
 
-};  // namespace sc::lib::timestamp
+};  // namespace lib::timestamp

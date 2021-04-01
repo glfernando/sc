@@ -6,7 +6,7 @@
 
 export module lib.lock.arch;
 
-export namespace sc::lib {
+export namespace lib {
 
 class lock {
  public:
@@ -29,9 +29,9 @@ class lock_irqsafe : public lock {
     unsigned long flags;
 };
 
-}  // namespace sc::lib
+}  // namespace lib
 
-namespace sc::lib {
+namespace lib {
 
 void lock::acquire() {
     unsigned fail;
@@ -70,4 +70,4 @@ void lock_irqsafe::release() {
     asm volatile("msr daif, %0" ::"r"(flags));
 }
 
-}  // namespace sc::lib
+}  // namespace lib

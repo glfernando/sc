@@ -6,7 +6,7 @@
 
 export module lib.utils;
 
-export namespace sc::lib::utils {
+export namespace lib::utils {
 
 template <typename T, typename U>
 constexpr auto min(T a, U b) -> decltype(a + b) {
@@ -19,4 +19,4 @@ constexpr T align_up(T v, U a) {
     return (v + mask) & ~mask;
 }
 
-}  // namespace sc::lib::utils
+}  // namespace lib::utils

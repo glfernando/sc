@@ -10,7 +10,7 @@
 import lib.heap;
 
 extern "C" void* malloc(size_t size) {
-    return sc::lib::heap::alloc(size);
+    return lib::heap::alloc(size);
 }
 
 extern "C" void* calloc(size_t nmemb, size_t size) {
@@ -21,5 +21,5 @@ extern "C" void* calloc(size_t nmemb, size_t size) {
 }
 
 extern "C" void free(void* p) {
-    return sc::lib::heap::free(p);
+    return lib::heap::free(p);
 }

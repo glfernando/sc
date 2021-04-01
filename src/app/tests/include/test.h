@@ -35,14 +35,14 @@ extern test_data __tests_end[];
 
 #define EXPECT(expr)                                                                             \
     if (!(expr)) {                                                                               \
-        using sc::lib::fmt::sprint;                                                              \
+        using lib::fmt::sprint;                                                                  \
         std::string msg = sprint("{}:{}: except \"{}\" failed", __FILE_NAME__, __LINE__, #expr); \
-        throw sc::lib::exception(msg, ERR_TEST_EXPECT);                                          \
+        throw lib::exception(msg, ERR_TEST_EXPECT);                                              \
     }
 
 #define ASSERT(expr)                                                                             \
     if (!(expr)) {                                                                               \
-        using sc::lib::fmt::sprint;                                                              \
+        using lib::fmt::sprint;                                                                  \
         std::string msg = sprint("{}:{}: assert \"{}\" failed", __FILE_NAME__, __LINE__, #expr); \
-        throw sc::lib::exception(msg, ERR_TEST_ASSERT);                                          \
+        throw lib::exception(msg, ERR_TEST_ASSERT);                                              \
     }

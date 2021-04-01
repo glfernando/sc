@@ -15,9 +15,9 @@ export module lib.hexdump;
 import lib.fmt;
 import lib.utils;
 
-using namespace sc::lib::utils;
-using sc::lib::fmt::print;
-using sc::lib::fmt::println;
+using namespace lib::utils;
+using lib::fmt::print;
+using lib::fmt::println;
 
 namespace {
 
@@ -31,7 +31,7 @@ void ascii_dump(void const* data, size_t size) {
 
 }  // namespace
 
-export namespace sc::lib {
+export namespace lib {
 
 void hexdump(void const* data, size_t size, size_t group = 4, bool offset = false,
              bool ascii = false) {
@@ -103,4 +103,4 @@ void hexdump(void const* data, size_t size, size_t group = 4, bool offset = fals
     }
 }
 
-}  // namespace sc::lib
+}  // namespace lib

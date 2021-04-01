@@ -8,7 +8,7 @@ export module lib.lock;
 
 export import lib.lock.arch;
 
-export namespace sc::lib {
+export namespace lib {
 
 template <typename T>
 concept Lockable = requires(T t) {
@@ -39,4 +39,4 @@ void lock_for(L& lock, F&& func) {
     func();
 }
 
-}  // namespace sc::lib
+}  // namespace lib

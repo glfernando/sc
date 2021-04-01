@@ -13,7 +13,7 @@ import std.vector;
 using std::vector;
 
 import lib.fmt;
-using sc::lib::fmt::println;
+using lib::fmt::println;
 
 struct foo {
     foo(int x = 0) : val(x) {

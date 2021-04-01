@@ -19,7 +19,7 @@ export module lib.exception;
 
 export import std.string;
 
-export namespace sc::lib {
+export namespace lib {
 
 class exception {
  public:
@@ -32,4 +32,4 @@ class exception {
     int code;
 };
 
-}  // namespace sc::lib
+}  // namespace lib

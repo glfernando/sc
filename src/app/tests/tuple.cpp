@@ -11,7 +11,7 @@ import std.string;
 import lib.fmt;
 import lib.exception;
 
-using sc::lib::fmt::println;
+using lib::fmt::println;
 using std::string;
 using std::tuple;
 

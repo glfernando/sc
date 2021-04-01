@@ -12,7 +12,7 @@ export module board.debug.uart;
 
 import lib.reg;
 
-using namespace sc::lib::reg;
+using namespace lib::reg;
 
 enum reg_offset : unsigned {
     UART_DR = 0x00,
@@ -27,7 +27,7 @@ static inline volatile uint32_t& reg(reg_offset offset) {
     return reg32(uart_base + offset);
 }
 
-export namespace sc::board::debug::uart {
+export namespace board::debug::uart {
 
 void init() {
     reg(UART_LCR_H) = 1 << 4;
@@ -44,4 +44,4 @@ void puts(char const* str) {
         putchar(c);
 }
 
-}  // namespace sc::board::debug::uart
+}  // namespace board::debug::uart

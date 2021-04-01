@@ -10,9 +10,9 @@ import lib.timestamp;
 import std.string;
 import std.concepts;
 
-using sc::lib::timestamp::freq;
+using lib::timestamp::freq;
 
-namespace sc::lib::time {
+namespace lib::time {
 
 template <unsigned long Num, unsigned long Denom = 1>
 class ratio {
@@ -27,9 +27,9 @@ using milli = ratio<1, 1000>;
 using minute = ratio<60>;
 using hour = ratio<60 * 60>;
 
-}  // namespace sc::lib::time
+}  // namespace lib::time
 
-export namespace sc::lib::time {
+export namespace lib::time {
 
 template <typename Factor = ratio<1>>
 class time_t {
@@ -101,13 +101,13 @@ constexpr time_h_t operator""h(unsigned long long t) {
 }
 
 void delay(auto t) {
-    auto to = sc::lib::timestamp::ticks() + t.ticks();
-    while (to > sc::lib::timestamp::ticks()) {}
+    auto to = lib::timestamp::ticks() + t.ticks();
+    while (to > lib::timestamp::ticks()) {}
 }
 
 time_ns_t now() {
     // return in nano seconds so we don't lose accuracy
-    return sc::lib::timestamp::ns();
+    return lib::timestamp::ns();
 }
 
 template <typename T>
@@ -197,4 +197,4 @@ bool operator>=(time_t<T> const& t1, time_t<U> const& t2) {
     return !(t1 < t2);
 }
 
-}  // namespace sc::lib::time
+}  // namespace lib::time
