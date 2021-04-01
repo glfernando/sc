@@ -16,9 +16,9 @@ export module lib.heap;
 
 import lib.allocator.simple;
 
-static sc::lib::allocator::simple heap(__heap_start, __heap_end);
+static lib::allocator::simple heap(__heap_start, __heap_end);
 
-export namespace sc::lib::heap {
+export namespace lib::heap {
 
 void init() {
     ::heap.init();
@@ -32,4 +32,4 @@ void free(void* p) {
     return ::heap.free(p);
 }
 
-}  // namespace sc::lib::heap
+}  // namespace lib::heap

@@ -6,7 +6,7 @@
 
 export module board.power;
 
-export namespace sc::board {
+export namespace board {
 
 [[noreturn]] void reboot(int) {
     // TODO: implement
@@ -20,4 +20,4 @@ export namespace sc::board {
         asm volatile("wfi");
 }
 
-}  // namespace sc::board
+}  // namespace board

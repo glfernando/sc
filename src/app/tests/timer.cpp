@@ -8,10 +8,10 @@
 import lib.timer;
 import lib.time;
 
-using sc::lib::timer;
+using lib::timer;
 
-using namespace sc::lib;
-using namespace sc::lib::time;
+using namespace lib;
+using namespace lib::time;
 
 TEST(timer, oneshot) {
     timer t(timer::type::ONE_SHOT);

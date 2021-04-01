@@ -16,8 +16,8 @@
 import lib.fmt;
 import std.string;
 
-using sc::lib::fmt::println;
-using sc::lib::fmt::sprint;
+using lib::fmt::println;
+using lib::fmt::sprint;
 using std::string;
 
 struct sysreg_data {

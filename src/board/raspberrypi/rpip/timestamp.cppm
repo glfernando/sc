@@ -12,14 +12,14 @@ export module lib.timestamp.arch;
 
 import lib.reg;
 
-using sc::lib::reg::reg32;
+using lib::reg::reg32;
 
 constexpr uintptr_t TIMER_BASE = 0x4005'4000;
 
 constexpr uintptr_t TIMERHR = TIMER_BASE + 0x08;
 constexpr uintptr_t TIMERLR = TIMER_BASE + 0x0c;
 
-export namespace sc::lib::timestamp {
+export namespace lib::timestamp {
 
 uint64_t ticks() {
     uint32_t lo = reg32(TIMERLR);
@@ -31,4 +31,4 @@ uint64_t freq() {
     return 1'000'000;
 }
 
-};  // namespace sc::lib::timestamp
+};  // namespace lib::timestamp

@@ -13,8 +13,8 @@ export module std.string;
 
 import lib.heap;
 
-using sc::lib::heap::alloc;
-using sc::lib::heap::free;
+using lib::heap::alloc;
+using lib::heap::free;
 
 export namespace std {
 

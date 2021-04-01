@@ -12,7 +12,7 @@ export import device.uart;
 import std.string;
 import lib.reg;
 
-using sc::lib::reg::reg32;
+using lib::reg::reg32;
 
 export namespace device {
 

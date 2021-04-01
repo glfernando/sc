@@ -19,10 +19,10 @@ import lib.backtrace;
 import lib.exception;
 import std.string;
 
-using sc::lib::backtrace;
-using sc::lib::fmt::println;
-using sc::lib::fmt::sprint;
-using sc::lib::reg::reg32;
+using lib::backtrace;
+using lib::fmt::println;
+using lib::fmt::sprint;
+using lib::reg::reg32;
 using std::string;
 
 namespace core::cpu::armv6m::exception {
@@ -184,7 +184,7 @@ void register_handler(unsigned num, handler_t handler) {
         vector_table.ext_int[num - 16] = handler;
         break;
     default:
-        throw sc::lib::exception(sprint("invalid vector number {}", num));
+        throw lib::exception(sprint("invalid vector number {}", num));
     }
 }
 

@@ -35,11 +35,11 @@ static device::timer_arm::platform_data timer_pdata{
 
 static device::timer_arm timer0("timer0", timer_pdata);
 
-export namespace sc::board::peripherals {
+export namespace board::peripherals {
 
 void init() {
     uart0.init();
-    sc::lib::fmt::register_console(&con0);
+    lib::fmt::register_console(&con0);
 
     gicv2.init();
     // register GIC
@@ -60,4 +60,4 @@ auto& default_timer() {
     return timer0;
 }
 
-}  // namespace sc::board::peripherals
+}  // namespace board::peripherals

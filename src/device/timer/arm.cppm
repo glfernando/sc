@@ -21,12 +21,12 @@ import std.string;
 import lib.lock;
 import lib.fmt;
 
-using sc::lib::lock_for;
-using sc::lib::lock_irqsafe;
-using sc::lib::slock;
-using sc::lib::fmt::println;
-using sc::lib::time::now;
-using sc::lib::time::time_us_t;
+using lib::lock_for;
+using lib::lock_irqsafe;
+using lib::slock;
+using lib::fmt::println;
+using lib::time::now;
+using lib::time::time_us_t;
 using std::string;
 
 namespace device {

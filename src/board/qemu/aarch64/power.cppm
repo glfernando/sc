@@ -25,7 +25,7 @@ static __attribute__((naked)) long semihost(unsigned long, unsigned long) {
         "ret");
 }
 
-export namespace sc::board {
+export namespace board {
 
 [[noreturn]] void reboot(int) {
     // TODO: implement
@@ -41,4 +41,4 @@ export namespace sc::board {
         asm volatile("wfi");
 }
 
-}  // namespace sc::board
+}  // namespace board

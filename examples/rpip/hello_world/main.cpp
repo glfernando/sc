@@ -7,8 +7,8 @@
 import lib.fmt;
 import lib.time;
 
-using sc::lib::fmt::println;
-using namespace sc::lib::time;
+using lib::fmt::println;
+using namespace lib::time;
 
 int main() {
 

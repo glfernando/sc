@@ -22,7 +22,7 @@ import std.string;
 import std.vector;
 import lib.exception;
 
-using sc::lib::exception;
+using lib::exception;
 using std::vector;
 
 export namespace device {

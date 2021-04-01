@@ -10,7 +10,7 @@ module;
 
 export module lib.reg;
 
-export namespace sc::lib::reg {
+export namespace lib::reg {
 
 volatile uint8_t& reg8(uintptr_t addr) {
     return *reinterpret_cast<uint8_t*>(addr);
@@ -28,4 +28,4 @@ volatile uint64_t& reg64(uintptr_t addr) {
     return *reinterpret_cast<uint64_t*>(addr);
 }
 
-}  // namespace sc::lib::reg
+}  // namespace lib::reg

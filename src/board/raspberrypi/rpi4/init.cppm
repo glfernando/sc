@@ -16,7 +16,7 @@ import board.debug;
 import board.peripherals;
 import lib.reg;
 
-using sc::lib::reg::reg32;
+using lib::reg::reg32;
 
 static uint64_t xlate_table[4096 / 8] __attribute__((aligned(4096))) = {
     [0] = 0x0000'070D,
@@ -25,7 +25,7 @@ static uint64_t xlate_table[4096 / 8] __attribute__((aligned(4096))) = {
     [3] = 0xC000'0421,
 };
 
-export namespace sc::board {
+export namespace board {
 
 void early_init() {
     // init MMU, do that spin locks work
@@ -57,13 +57,13 @@ void early_init() {
     reg32(GPIO_START + 0xe4) = 0;
 
     // initialize debug console
-    sc::board::debug::uart::init();
-    printf_set_putchar_func(sc::board::debug::uart::putchar);
+    board::debug::uart::init();
+    printf_set_putchar_func(board::debug::uart::putchar);
 }
 
 void init() {
     // initialize peripherals
-    sc::board::peripherals::init();
+    board::peripherals::init();
 }
 
-}  // namespace sc::board
+}  // namespace board

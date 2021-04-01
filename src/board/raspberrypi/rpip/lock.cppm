@@ -10,7 +10,7 @@ module;
 
 export module lib.lock.arch;
 
-export namespace sc::lib {
+export namespace lib {
 
 class lock {
  public:
@@ -33,9 +33,9 @@ class lock_irqsafe : public lock {
     unsigned long flags;
 };
 
-}  // namespace sc::lib
+}  // namespace lib
 
-namespace sc::lib {
+namespace lib {
 
 void lock::acquire() {
     val = 1;
@@ -56,4 +56,4 @@ void lock_irqsafe::release() {
     sysreg_write(primask, flags);
 }
 
-}  // namespace sc::lib
+}  // namespace lib

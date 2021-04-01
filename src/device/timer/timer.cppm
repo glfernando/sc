@@ -31,14 +31,14 @@ class timer : public device {
     using callback = void (*)(void*);
 
     virtual event* create(enum type, callback cb, void* data) = 0;
-    virtual void set(event* e, sc::lib::time::time_us_t period) = 0;
+    virtual void set(event* e, lib::time::time_us_t period) = 0;
     virtual void cancel(event* e) = 0;
     virtual void destroy(event* e) = 0;
 };
 
 template <typename T>
 concept Timer = requires(T t, timer::callback cb, void* data, enum timer::type type,
-                         timer::event* e, sc::lib::time::time_us_t period) {
+                         timer::event* e, lib::time::time_us_t period) {
     e = t.create(type, cb, data);
     t.set(e, period);
     t.cancel(e);

@@ -17,7 +17,7 @@ export import core.cpu.armv8.common;
 import core.cpu.armv8.exception;
 import lib.fmt;
 
-using sc::lib::fmt::println;
+using lib::fmt::println;
 
 export using cpu_irq_handler = void(*)(int vec, void* data);
 

@@ -13,12 +13,12 @@ export module board.init;
 import board.debug;
 import board.peripherals;
 
-export namespace sc::board {
+export namespace board {
 
 void early_init() {
     // initialize debug console
-    sc::board::debug::uart::init();
-    printf_set_putchar_func(sc::board::debug::uart::putchar);
+    board::debug::uart::init();
+    printf_set_putchar_func(board::debug::uart::putchar);
 }
 
 void init() {
@@ -26,4 +26,4 @@ void init() {
     peripherals::init();
 }
 
-}  // namespace sc::board
+}  // namespace board

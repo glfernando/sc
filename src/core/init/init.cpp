@@ -12,7 +12,7 @@ import lib.heap;
 import lib.fmt;
 import core.cpu;
 
-using sc::lib::fmt::println;
+using lib::fmt::println;
 
 extern void (*__init_array_start[])();
 extern void (*__init_array_end[])();
@@ -25,24 +25,24 @@ void init_array() {
 
 extern "C" [[noreturn]] void init() {
     core::cpu::early_init();
-    sc::board::early_init();
+    board::early_init();
 
-    sc::lib::heap::init();
+    lib::heap::init();
 
     init_array();
 
     core::cpu::init();
-    sc::board::init();
+    board::init();
 
     println("Welcome to SC");
 
 #ifdef RUN_ALL_TESTS
     auto ret = shell_exec_cmd("test all");
-    sc::board::poweroff(ret);
+    board::poweroff(ret);
 #endif
 
     main();
 
-    sc::board::poweroff();
+    board::poweroff();
     for (;;) {}
 }

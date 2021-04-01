@@ -10,9 +10,9 @@
 import lib.heap;
 import lib.exception;
 
-using sc::lib::exception;
-using sc::lib::heap::alloc;
-using sc::lib::heap::free;
+using lib::exception;
+using lib::heap::alloc;
+using lib::heap::free;
 
 namespace std {
 

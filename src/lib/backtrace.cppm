@@ -12,9 +12,9 @@ export module lib.backtrace;
 
 import lib.fmt;
 
-using sc::lib::fmt::println;
+using lib::fmt::println;
 
-export namespace sc::lib {
+export namespace lib {
 
 void backtrace(unw_context_t* uc = nullptr) {
     unw_cursor_t cursor;
@@ -35,4 +35,4 @@ void backtrace(unw_context_t* uc = nullptr) {
     } while (unw_step(&cursor) > 0);
 }
 
-}  // namespace sc::lib
+}  // namespace lib

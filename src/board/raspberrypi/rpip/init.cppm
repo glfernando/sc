@@ -18,7 +18,7 @@ import board.peripherals;
 #define RESET       (RESETS_BASE + 0x00)
 #define RESET_DONE  (RESETS_BASE + 0x08)
 
-using sc::lib::reg::reg32;
+using lib::reg::reg32;
 
 volatile uint32_t& reg_clr(uintptr_t addr) {
     return reg32(addr + 0x3000);
@@ -95,7 +95,7 @@ static void soc_init() {
     reg32(0x4001400c) = 2;
 }
 
-export namespace sc::board {
+export namespace board {
 
 void early_init() {}
 
@@ -104,4 +104,4 @@ void init() {
     peripherals::init();
 }
 
-}  // namespace sc::board
+}  // namespace board

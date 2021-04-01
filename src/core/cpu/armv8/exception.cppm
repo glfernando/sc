@@ -19,9 +19,9 @@ import lib.fmt;
 import core.cpu.armv8.common;
 import lib.backtrace;
 
-using sc::lib::backtrace;
-using sc::lib::fmt::print;
-using sc::lib::fmt::println;
+using lib::backtrace;
+using lib::fmt::print;
+using lib::fmt::println;
 
 export namespace core::cpu::arvm8::exception {
 

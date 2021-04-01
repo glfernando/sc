@@ -14,9 +14,9 @@ import std.type_traits;
 import lib.fmt;
 import lib.exception;
 
-using sc::lib::exception;
-using sc::lib::fmt::println;
-using sc::lib::time::time_us_t;
+using lib::exception;
+using lib::fmt::println;
+using lib::time::time_us_t;
 
 namespace {
 
@@ -44,7 +44,7 @@ class timer_cb_wrapper : public timer_cb {
 
 }  // namespace
 
-export namespace sc::lib {
+export namespace lib {
 
 class timer {
  public:
@@ -66,13 +66,13 @@ class timer {
     type type;
 };
 
-}  // namespace sc::lib
+}  // namespace lib
 
-export namespace sc::lib {
+export namespace lib {
 
 template <typename F>
 void timer::start(F&& f, time_us_t period) {
-    auto& dev = sc::board::peripherals::default_timer();
+    auto& dev = board::peripherals::default_timer();
     cb = new timer_cb_wrapper(std::forward<F>(f));
     auto dev_type =
         type == type::ONE_SHOT ? device::timer::type::ONE_SHOT : device::timer::type::PERIODIC;
@@ -92,21 +92,21 @@ void timer::start(F&& f, time_us_t period) {
 void timer::start(time_us_t period) {
     if (cb == nullptr)
         throw exception("no callback set");
-    auto& dev = sc::board::peripherals::default_timer();
+    auto& dev = board::peripherals::default_timer();
     dev.set(e, period);
 }
 
 void timer::stop() {
-    auto& dev = sc::board::peripherals::default_timer();
+    auto& dev = board::peripherals::default_timer();
     dev.cancel(e);
 }
 
 timer::~timer() {
     if (e) {
-        auto& dev = sc::board::peripherals::default_timer();
+        auto& dev = board::peripherals::default_timer();
         dev.destroy(e);
         e = nullptr;
     }
 }
 
-}  // namespace sc::lib
+}  // namespace lib
