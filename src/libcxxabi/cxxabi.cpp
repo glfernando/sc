@@ -13,17 +13,17 @@ namespace __cxxabiv1 {
 
 // type info structs
 struct __class_type_info {
-    virtual void foo() {}
+    virtual ~__class_type_info() {}
 } cti;
 struct __fundamental_type_info {
-    virtual void foo() {}
+    virtual ~__fundamental_type_info() {}
 } fti;
 struct __pointer_type_info {
-    virtual void foo() {}
+    virtual ~__pointer_type_info() {}
 } pti;
 
 struct __si_class_type_info {
-    virtual void foo() {}
+    virtual ~__si_class_type_info() {}
 } scti;
 
 }  // namespace __cxxabiv1
@@ -158,6 +158,8 @@ static uintptr_t read_enc_ptr(const uint8_t*& p, dw_enc enc) {
     uintptr_t result = 0;
     switch (enc & 0xf) {
     case DW_EH_PE_absptr:
+        memcpy(&result, p, sizeof result);
+        p += sizeof result;
         break;
     case DW_EH_PE_uleb128:
         result = readULEB128(p);
@@ -295,7 +297,15 @@ class Lsda {
             std::terminate();
         }
         const uint8_t* ptr = ttype_base - ttype_index;
+#if __arm__
+        uintptr_t offset = *reinterpret_cast<const uintptr_t*>(ptr);
+        if (!offset)
+            return nullptr;
+        // EHABI typeinfo points to entry en .got section
+        return *reinterpret_cast<void**>(reinterpret_cast<uintptr_t>(ptr) + offset);
+#else
         return reinterpret_cast<void*>(read_enc_ptr(ptr, ttype_enc));
+#endif
     }
 
  private:
@@ -322,6 +332,8 @@ static _Unwind_Reason_Code install_pad(_Unwind_Exception* unwind_exception,
     _Unwind_SetIP(context, ip_addr);
     return _URC_INSTALL_CONTEXT;
 }
+
+#if !__arm__
 
 extern "C" _Unwind_Reason_Code __gxx_personality_v0(int, _Unwind_Action actions,
                                                     uint64_t /* exceptionClass */,
@@ -377,3 +389,87 @@ extern "C" _Unwind_Reason_Code __gxx_personality_v0(int, _Unwind_Action actions,
     }
     return _URC_CONTINUE_UNWIND;
 }
+
+#else  // __arm__
+
+static const uint32_t REG_SP = 13;
+
+extern "C" _Unwind_Reason_Code __gnu_unwind_frame(_Unwind_Exception*, _Unwind_Context*);
+
+extern "C" _Unwind_Reason_Code __gxx_personality_v0(_Unwind_State state,
+                                                    _Unwind_Exception* unwind_exception,
+                                                    _Unwind_Context* context) {
+    uintptr_t ip = _Unwind_GetIP(context) - 1;
+
+    _Unwind_Action actions;
+    switch (state) {
+    case _US_VIRTUAL_UNWIND_FRAME:
+        actions = _UA_SEARCH_PHASE;
+        break;
+    case _US_UNWIND_FRAME_STARTING:
+        actions = _UA_CLEANUP_PHASE;
+        break;
+    case _US_UNWIND_FRAME_RESUME:
+        if (__gnu_unwind_frame(unwind_exception, context) != _URC_OK)
+            return _URC_FAILURE;
+        return _URC_CONTINUE_UNWIND;
+    default:
+        printf("unknown state %x\n", state);
+    }
+
+    auto lsda_addr = _Unwind_GetLanguageSpecificData(context);
+    Lsda lsda(lsda_addr);
+
+    for (call_site cs = lsda.read_call_site(); cs.len; cs = lsda.read_call_site()) {
+        // if not landing pad skip it
+        if (not cs.lp)
+            continue;
+
+        uintptr_t func_start = _Unwind_GetRegionStart(context);
+        uintptr_t try_start = func_start + cs.start;
+        uintptr_t try_end = func_start + cs.start + cs.len;
+
+        // Check if this is the correct LP for the current try block
+        if (ip < try_start)
+            continue;
+        if (ip > try_end)
+            continue;
+
+        if (!cs.action_offset) {
+            if (actions == _UA_CLEANUP_PHASE) {
+                return install_pad(unwind_exception, context, 0, func_start + cs.lp);
+            }
+            continue;
+        }
+
+        uintptr_t offset = cs.action_offset;
+        for (lsda_action action = lsda.get_action(offset); action; action = action.get_next()) {
+            if (action.ttype_index) {
+                auto ti =
+                    static_cast<const struct type_info*>(lsda.get_type_info(action.ttype_index));
+
+                __cxa_exception* header = (__cxa_exception*)(unwind_exception + 1) - 1;
+                if (ti && header->exceptionType != ti)
+                    continue;
+
+                // if we are in search phase tell we can handle the exception
+                if (actions & _UA_SEARCH_PHASE) {
+                    unwind_exception->barrier_cache.sp = _Unwind_GetGR(context, REG_SP);
+                    return _URC_HANDLER_FOUND;
+                }
+
+                // assume cleanup phase
+                return install_pad(unwind_exception, context, action.ttype_index,
+                                   func_start + cs.lp);
+            } else if (actions & _UA_CLEANUP_PHASE) {  // ttype_index == 0, so it is a cleanup LP
+                return install_pad(unwind_exception, context, action.ttype_index,
+                                   func_start + cs.lp);
+            }
+        }
+    }
+    if (__gnu_unwind_frame(unwind_exception, context) != _URC_OK)
+        return _URC_FAILURE;
+    return _URC_CONTINUE_UNWIND;
+}
+
+#endif
