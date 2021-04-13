@@ -47,6 +47,10 @@ SECTIONS
         __init_array_end = .;
     } > FLASH
 
+    .got : {
+        *(.got*)
+    } > FLASH
+
     .shell_cmds ALIGN(8): {
         __shell_cmds_start = .;
         KEEP(*(SORT_BY_NAME(.shell_cmds*)))
@@ -74,10 +78,6 @@ SECTIONS
 
     __fdata = LOADADDR(.data);
 
-    .got (NOLOAD) : {
-        KEEP(*(.got .got.*));
-    }
-
     .bss : {
         __bss_start = .;
         *(.bss*);
@@ -103,6 +103,5 @@ SECTIONS
         *(.dynamic)
         *(.plt*)
         *(.rela_dyn*)
-        *(.got*)
     }
 }
