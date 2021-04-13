@@ -31,7 +31,11 @@ void backtrace(unw_context_t* uc = nullptr) {
         unw_word_t ip;
         unw_get_reg(&cursor, UNW_REG_IP, &ip);
         // TODO: translate address to symbol name
+#if __UINTPTR_WIDTH__ == 64
         println("[<{#016x}>]", ip);
+#else
+        println("[<{#08x}>]", ip);
+#endif
     } while (unw_step(&cursor) > 0);
 }
 
