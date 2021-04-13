@@ -151,6 +151,7 @@ $(CONFIG_FILE): src/$(TARGET_CONFIG_FILE)
 
 tags: $(c_srcs) $(asm_srcs) $(cpp_srcs) $(mod_srcs)
 	$(Q)ctags --langmap=c++:.cpp.cppm $^
+	$(Q)find src external/src -name "*.h" -o -name "*.hpp" | xargs ctags -a
 
 clean:
 	$(Q)find $(BUILD_DIR) -name *.o | xargs rm -f
