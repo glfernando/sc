@@ -1,0 +1,2 @@
+
+src-$(CONFIG_SOC_RP2040) += rp2040/

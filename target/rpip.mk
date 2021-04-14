@@ -5,6 +5,7 @@ LINKER_SCRIPT := src/board/raspberrypi/rpip/linker.ld
 CONFIG_PL011 := y
 CONFIG_LIBAEABI_CORTEX_M0 := y
 CONFIG_NVIC := y
+CONFIG_SOC_RP2040 := y
 
 CPU := armv6m
 

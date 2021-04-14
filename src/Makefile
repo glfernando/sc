@@ -8,3 +8,4 @@ src-y += lib/
 src-y += libc/
 src-y += libcxx/
 src-y += libcxxabi/
+src-y += soc/
