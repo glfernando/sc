@@ -11,10 +11,10 @@ module;
 export module lib.timestamp.arch;
 
 import lib.reg;
+import soc.rp2040.address_map;
 
 using lib::reg::reg32;
-
-constexpr uintptr_t TIMER_BASE = 0x4005'4000;
+using soc::rp2040::address_map::TIMER_BASE;
 
 constexpr uintptr_t TIMERHR = TIMER_BASE + 0x08;
 constexpr uintptr_t TIMERLR = TIMER_BASE + 0x0c;

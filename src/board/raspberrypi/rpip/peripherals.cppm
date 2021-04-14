@@ -11,22 +11,25 @@ export import device.console.uart;
 export import device.timer.rp2040;
 export import device.intc.nvic;
 
+import soc.rp2040.address_map;
 import std.string;
 import lib.fmt;
 
+using namespace soc::rp2040::address_map;
+
 static constexpr device::pl011::platform_data uart0_pdata{
-    .base = 0x4003'4000,
+    .base = UART0_BASE,
     .freq = 125'000'000,
     .baudrate = 115200,
 };
 
 static constexpr device::nvic::platform_data nvic_pdata{
-    .base = 0xe000'0000,
+    .base = PPB_BASE,
     .irq_num = 16 + 32,
 };
 
 static constexpr device::timer_rp2040::platform_data timer0_pdata{
-    .base = 0x4005'4000,
+    .base = TIMER_BASE,
     .irq = 16,
 };
 
