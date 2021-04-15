@@ -10,6 +10,7 @@ export import device.uart.pl011;
 export import device.console.uart;
 export import device.timer.rp2040;
 export import device.intc.nvic;
+export import soc.rp2040.gpio;
 
 import soc.rp2040.address_map;
 import std.string;
@@ -41,6 +42,8 @@ static device::timer_rp2040 timer0("timer0", timer0_pdata);
 
 static device::nvic nvic("nvic", nvic_pdata);
 
+static soc::rp2040::gpio gpio("gpio");
+
 export namespace board::peripherals {
 
 void init() {
@@ -63,6 +66,10 @@ auto& default_timer() {
 
 auto& default_intc() {
     return nvic;
+}
+
+auto& default_gpio() {
+    return gpio;
 }
 
 }  // namespace board::peripherals
