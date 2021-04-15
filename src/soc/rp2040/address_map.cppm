@@ -50,4 +50,4 @@ enum : uintptr_t {
 };
 // clang-format on
 
-}  // namespace sc::rp2040::address_map
+}  // namespace soc::rp2040::address_map
