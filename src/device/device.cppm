@@ -33,6 +33,7 @@ enum class class_type {
     CONSOLE,
     INTC,
     TIMER,
+    GPIO,
 };
 
 class device {
