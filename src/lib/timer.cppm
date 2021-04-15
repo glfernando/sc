@@ -9,8 +9,8 @@ export module lib.timer;
 export import lib.time;
 
 export import device.timer;
+export import std.type_traits;
 import board.peripherals;
-import std.type_traits;
 import lib.fmt;
 import lib.exception;
 
