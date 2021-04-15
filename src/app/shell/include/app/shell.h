@@ -15,13 +15,13 @@ struct shell_cmd {
 };
 
 // helper macro to declare a static shell command
-#define shell_declare_static_cmd(name_, desc_, cmd_, usage_)                           \
-    struct shell_cmd shell_cmd_##name_ __attribute__((section(".shell_cmds." #name_))) \
-        __attribute__((used)) = {                                                      \
-            .name = #name_,                                                            \
-            .cmd = cmd_,                                                               \
-            .desc = desc_,                                                             \
-            .usage = usage_,                                                           \
+#define shell_declare_static_cmd(name_, desc_, cmd_, usage_)                    \
+    shell_cmd shell_cmd_##name_ __attribute__((section(".shell_cmds." #name_))) \
+        __attribute__((used)) = {                                               \
+            .name = #name_,                                                     \
+            .cmd = cmd_,                                                        \
+            .desc = desc_,                                                      \
+            .usage = usage_,                                                    \
     }
 
 extern struct shell_cmd __shell_cmds_start[];
