@@ -28,6 +28,8 @@ using lib::reg::reg32;
 using std::string;
 using std::vector;
 
+constexpr unsigned EXT_INT_MAX = 32;
+
 export namespace device {
 
 class nvic : public intc {
@@ -76,6 +78,7 @@ enum nvic_reg_offset : uint32_t {
     NVIC_ICER   = 0xe180,
     NVIC_ISPR   = 0xe200,
     NVIC_ICPR   = 0xe280,
+    ICSR        = 0xed04
 };
 
 // clang-format on
@@ -126,11 +129,31 @@ void nvic::disable_irq(unsigned irq) {
 }
 
 void nvic::send_ipi(unsigned cpu_mask, unsigned irq) {
-    println("cpu_mask {}, irq {}", cpu_mask, irq);
+    if (cpu_mask != 0x1)
+        throw exception("ipi only supported for core0");
+
+    switch (irq) {
+    case 2:
+        reg(ICSR) = 1 << 31;
+        break;
+    case 14:
+        reg(ICSR) = 1 << 28;
+        break;
+    case 15:
+        reg(ICSR) = 1 << 26;
+        break;
+    case 16 ...(16 + EXT_INT_MAX):
+        reg(NVIC_ISPR) = 1 << (irq - 16);
+        break;
+    default:
+        exception(lib::fmt::sprint("invalid irq numner {}", irq));
+        break;
+    }
 }
 
 void nvic::send_ipi(ipi_target target, unsigned irq) {
-    println("target {}, irq {}", static_cast<int>(target), irq);
+    if (target == ipi_target::SELF)
+        send_ipi(0x1, irq);
 }
 
 }  // namespace device
