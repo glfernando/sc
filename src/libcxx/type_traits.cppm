@@ -76,6 +76,12 @@ struct is_same {
     static const bool value = __is_same(T, U);
 };
 
+// is_base_of
+template <typename Base, typename Derived>
+struct is_base_of {
+    static const bool value = __is_base_of(Base, Derived);
+};
+
 template <typename T, typename U>
 inline constexpr bool is_same_v = is_same<T, U>::value;
 
@@ -257,5 +263,91 @@ struct integral_constant {
     constexpr operator value_type() const noexcept { return value; }
     constexpr value_type operator()() const noexcept { return value; }
 };
+
+namespace detail {
+
+template <typename T>
+auto try_add_lvalue_reference(int) -> type_identity<T&>;
+template <typename T>
+auto try_add_lvalue_reference(...) -> type_identity<T>;
+
+template <typename T>
+auto try_add_rvalue_reference(int) -> type_identity<T&&>;
+template <typename T>
+auto try_add_rvalue_reference(...) -> type_identity<T>;
+
+}  // namespace detail
+
+template <typename T>
+struct add_lvalue_reference : decltype(detail::try_add_lvalue_reference<T>(0)) {};
+
+template <typename T>
+struct add_rvalue_reference : decltype(detail::try_add_rvalue_reference<T>(0)) {};
+
+template <typename T>
+using add_lvalue_reference_t = typename add_lvalue_reference<T>::type;
+
+template <typename T>
+using add_rvalue_reference_t = typename add_rvalue_reference<T>::type;
+
+template <typename T>
+typename std::add_rvalue_reference<T>::type declval() noexcept;
+
+// result_of, invoke_result
+namespace detail {
+
+template <typename T>
+struct invoke_impl {
+    template <typename F, typename... Args>
+    static auto call(F&& f, Args&&... args)
+        -> decltype(std::forward<F>(f)(std::forward<Args>(args)...));
+};
+
+template <typename B, typename MT>
+struct invoke_impl<MT B::*> {
+    template <typename T, typename Td = typename std::decay<T>::type,
+              typename = typename std::enable_if<std::is_base_of<B, Td>::value>::type>
+    static auto get(T&& t) -> T&&;
+
+    template <typename T, typename Td = typename std::decay<T>::type,
+              typename = typename std::enable_if<!std::is_base_of<B, Td>::value>::type>
+    static auto get(T&& t) -> decltype(*std::forward<T>(t));
+
+    template <typename T, typename... Args, typename MT1,
+              typename = typename std::enable_if<std::is_function<MT1>::value>::type>
+    static auto call(MT1 B::*pmf, T&& t, Args&&... args)
+        -> decltype((invoke_impl::get(std::forward<T>(t)).*pmf)(std::forward<Args>(args)...));
+
+    template <typename T>
+    static auto call(MT B::*pmd, T&& t) -> decltype(invoke_impl::get(std::forward<T>(t)).*pmd);
+};
+
+template <typename F, typename... Args, typename Fd = typename std::decay<F>::type>
+auto INVOKE(F&& f, Args&&... args)
+    -> decltype(invoke_impl<Fd>::call(std::forward<F>(f), std::forward<Args>(args)...));
+
+}  // namespace detail
+
+// Conforming C++14 implementation (is also a valid C++11 implementation):
+namespace detail {
+template <typename AlwaysVoid, typename, typename...>
+struct invoke_result {};
+template <typename F, typename... Args>
+struct invoke_result<decltype(void(detail::INVOKE(std::declval<F>(), std::declval<Args>()...))), F,
+                     Args...> {
+    using type = decltype(detail::INVOKE(std::declval<F>(), std::declval<Args>()...));
+};
+}  // namespace detail
+
+template <class>
+struct result_of;
+template <typename F, typename... ArgTypes>
+struct result_of<F(ArgTypes...)> : detail::invoke_result<void, F, ArgTypes...> {};
+
+template <typename F, typename... ArgTypes>
+struct invoke_result : detail::invoke_result<void, F, ArgTypes...> {};
+
+template <typename F, typename... ArgTypes>
+using invoke_result_t = typename invoke_result<F, ArgTypes...>::type;
 
 }  // namespace std
