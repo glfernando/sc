@@ -146,8 +146,8 @@ __attribute__((naked)) static void default_handler() {
 }
 // clang-format on
 
-static vector_table_t vector_table __attribute__((section(".vector_table"))) __attribute__((used))
-__attribute__((aligned(256))) = {
+volatile static vector_table_t vector_table __attribute__((section(".vector_table")))
+__attribute__((used)) __attribute__((aligned(256))) = {
     .sp_main = __stack_end,
     .reset = _start,
     .nmi = default_handler,
