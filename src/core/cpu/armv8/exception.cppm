@@ -23,7 +23,7 @@ using lib::backtrace;
 using lib::fmt::print;
 using lib::fmt::println;
 
-export namespace core::cpu::arvm8::exception {
+export namespace core::cpu::armv8::exception {
 
 struct regs {
     unsigned long r[31];
@@ -36,9 +36,9 @@ struct regs {
 
 using exception_handler_t = int (*)(regs* regs);
 
-}  // namespace core::cpu::arvm8::exception
+}  // namespace core::cpu::armv8::exception
 
-namespace core::cpu::arvm8::exception {
+namespace core::cpu::armv8::exception {
 
 static exception_handler_t handlers[EXCEPTION_TYPE_MAX];
 
@@ -82,9 +82,9 @@ int default_exception_handler(regs* regs) {
     return 0;
 }
 
-}  // namespace core::cpu::arvm8::exception
+}  // namespace core::cpu::armv8::exception
 
-export namespace core::cpu::arvm8::exception {
+export namespace core::cpu::armv8::exception {
 
 extern "C" uint8_t exception_base[];
 extern "C" int exception_handler(int type, regs* regs) {
@@ -107,4 +107,4 @@ int register_exception_handler(int type, exception_handler_t handler) {
     return 0;
 }
 
-}  // namespace core::cpu::arvm8::exception
+}  // namespace core::cpu::armv8::exception

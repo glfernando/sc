@@ -26,7 +26,7 @@ namespace core::cpu {
 static cpu_irq_handler cpu_handler;
 static void* cpu_handler_data;
 
-static int cpu_exception_handler(arvm8::exception::regs*) {
+static int cpu_exception_handler(armv8::exception::regs*) {
     if (cpu_handler)
         cpu_handler(0, cpu_handler_data);
     else
@@ -41,7 +41,7 @@ export namespace core::cpu {
 void early_init() {}
 
 void init() {
-    arvm8::exception::init();
+    armv8::exception::init();
     register_exception_handler(EXCEPTION_TYPE_SPX_IRQ, cpu_exception_handler);
 }
 
