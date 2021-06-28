@@ -11,6 +11,7 @@ import board.power;
 import lib.heap;
 import lib.fmt;
 import core.cpu;
+import core.thread;
 
 using lib::fmt::println;
 
@@ -33,6 +34,9 @@ extern "C" [[noreturn]] void init() {
 
     core::cpu::init();
     board::init();
+
+    // init thread framework, after that we will be running in the main thread
+    core::thread::init();
 
     println("Welcome to SC");
 
