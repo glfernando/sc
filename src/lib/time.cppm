@@ -6,6 +6,8 @@
 
 export module lib.time;
 
+#include <stdint.h>
+
 import lib.timestamp;
 import std.string;
 import std.concepts;
@@ -14,11 +16,11 @@ using lib::timestamp::freq;
 
 namespace lib::time {
 
-template <unsigned long Num, unsigned long Denom = 1>
+template <uint64_t Num, uint64_t Denom = 1>
 class ratio {
  public:
-    static constexpr unsigned long num = Num;
-    static constexpr unsigned long den = Denom;
+    static constexpr uint64_t num = Num;
+    static constexpr uint64_t den = Denom;
 };
 
 using nano = ratio<1, 1000000000>;
