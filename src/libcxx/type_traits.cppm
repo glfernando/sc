@@ -76,14 +76,17 @@ struct is_same {
     static const bool value = __is_same(T, U);
 };
 
+template <typename T, typename U>
+inline constexpr bool is_same_v = is_same<T, U>::value;
+
 // is_base_of
 template <typename Base, typename Derived>
 struct is_base_of {
     static const bool value = __is_base_of(Base, Derived);
 };
 
-template <typename T, typename U>
-inline constexpr bool is_same_v = is_same<T, U>::value;
+template <class Base, class Derived>
+inline constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
 
 template <typename From, typename To>
 struct is_convertible {
