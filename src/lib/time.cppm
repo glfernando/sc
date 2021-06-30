@@ -33,16 +33,18 @@ using hour = ratio<60 * 60>;
 
 export namespace lib::time {
 
+constexpr uint64_t INFINITE = -1LL;
+
 template <typename Factor = ratio<1>>
 class time_t {
  public:
-    constexpr time_t(unsigned long val) : val(val) {}
+    constexpr time_t(uint64_t val) : val(val) {}
     template <typename F>
     constexpr time_t(time_t<F> const& t2) {
         val = t2.count() * Factor::den * F::num / Factor::num / F::den;
     }
-    unsigned long count() const { return val; }
-    unsigned long ticks() const { return val * freq() * Factor::num / Factor::den; }
+    uint64_t count() const { return val; }
+    uint64_t ticks() const { return val * freq() * Factor::num / Factor::den; }
 
     // TODO: make it more flexible
     template <typename F>
@@ -64,10 +66,10 @@ class time_t {
         return std::to_string(val);
     }
 
-    unsigned long get_val() const noexcept { return val; }
+    uint64_t get_val() const noexcept { return val; }
 
  private:
-    unsigned long val;
+    uint64_t val;
 };
 
 // helper types
@@ -120,6 +122,26 @@ bool operator==(time_t<T> const& t1, time_t<T> const& t2) {
 template <typename T>
 bool operator!=(time_t<T> const& t1, time_t<T> const& t2) {
     return !(t1 == t2);
+}
+
+template <typename T>
+bool operator==(time_t<T> const& t, uint64_t val) {
+    return t.count() == val;
+}
+
+template <typename T>
+bool operator==(uint64_t val, time_t<T> const& t) {
+    return t.count() == val;
+}
+
+template <typename T>
+bool operator!=(time_t<T> const& t, uint64_t val) {
+    return !(t == val);
+}
+
+template <typename T>
+bool operator!=(uint64_t val, time_t<T> const& t) {
+    return !(t == val);
 }
 
 template <typename T>
