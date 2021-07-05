@@ -12,7 +12,6 @@ module;
 export module core.thread;
 import core.thread.arch;
 import device.timer;
-import board.peripherals;
 
 import std.string;
 import std.memory;
@@ -92,7 +91,7 @@ namespace core::thread {
 static lock_irqsafe thread_lock;
 static equeue<thread_t> ready_queue;
 static thread_t* idle_thread;
-static auto& dev = board::peripherals::default_timer();
+static device::timer* dev;
 
 }  // namespace core::thread
 
@@ -160,10 +159,10 @@ void sleep_timer_cb(void* data) {
 
 void sleep(time_ms_t period) {
     auto t = reinterpret_cast<thread_t*>(thread_current_addr());
-    auto e = dev.create(device::timer::type::ONE_SHOT, sleep_timer_cb, t);
+    auto e = dev->create(device::timer::type::ONE_SHOT, sleep_timer_cb, t);
     lock_for(thread_lock, [&] {
         t->state = state::ASLEEP;
-        dev.set(e, period);
+        dev->set(e, period);
     });
     while (t->state == state::ASLEEP)
         schedule();
@@ -199,6 +198,8 @@ void init() {
     auto pc = reinterpret_cast<uintptr_t>(&idle_thread->thread_entry);
     auto arg = reinterpret_cast<unsigned long>(idle_thread);
     idle_thread->init_context(pc, arg, sp);
+
+    dev = device::manager::find<device::timer>();
 }
 
 }  // namespace core::thread
@@ -213,7 +214,7 @@ void thread_t::thread_entry(thread_t* self) {
     try {
         self->entry(self->arg);
     } catch (exception& e) {
-        println("thread {} caused exception", self->name);
+        println("thread {} caused exception ({})", self->name, e.msg());
         self->excep = e;
     } catch (...) { self->excep = exception("unknown"); }
     self->state = state::DONE;
