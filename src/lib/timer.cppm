@@ -4,17 +4,23 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
+module;
+
+#include <errcodes.h>
+
 export module lib.timer;
 
 export import lib.time;
 
 export import device.timer;
 export import std.type_traits;
-import board.peripherals;
 import lib.fmt;
 import lib.exception;
+import lib.lock;
 
 using lib::exception;
+using lib::lock_irqsafe;
+using lib::slock;
 using lib::fmt::println;
 using lib::time::time_us_t;
 
@@ -41,6 +47,22 @@ class timer_cb_wrapper : public timer_cb {
  private:
     std::decay_t<F> func;
 };
+
+static device::timer* timer_dev;
+static lock_irqsafe timer_lock;
+
+device::timer& get_timer() {
+    slock guard{timer_lock};
+    if (timer_dev) {
+        return *timer_dev;
+    }
+
+    timer_dev = device::manager::find<::device::timer>();
+    if (!timer_dev) {
+        throw exception("no timer", ERR_NOT_FOUND);
+    }
+    return *timer_dev;
+}
 
 }  // namespace
 
@@ -72,7 +94,7 @@ export namespace lib {
 
 template <typename F>
 void timer::start(F&& f, time_us_t period) {
-    auto& dev = board::peripherals::default_timer();
+    auto& dev = get_timer();
     cb = new timer_cb_wrapper(std::forward<F>(f));
     auto dev_type =
         type == type::ONE_SHOT ? device::timer::type::ONE_SHOT : device::timer::type::PERIODIC;
@@ -92,18 +114,18 @@ void timer::start(F&& f, time_us_t period) {
 void timer::start(time_us_t period) {
     if (cb == nullptr)
         throw exception("no callback set");
-    auto& dev = board::peripherals::default_timer();
+    auto& dev = get_timer();
     dev.set(e, period);
 }
 
 void timer::stop() {
-    auto& dev = board::peripherals::default_timer();
+    auto& dev = get_timer();
     dev.cancel(e);
 }
 
 timer::~timer() {
     if (e) {
-        auto& dev = board::peripherals::default_timer();
+        auto& dev = get_timer();
         dev.destroy(e);
         e = nullptr;
     }
