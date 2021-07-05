@@ -6,4 +6,4 @@
 .PHONY: qemu
 
 qemu: $(BUILD_DIR)/sc.bin
-	$(Q)qemu-system-aarch64 -M virt,secure=on,virtualization=on -cpu cortex-a53 -m 512 -smp 1 -nographic -semihosting -kernel $<
+	$(Q)qemu-system-aarch64 -M virt,secure=on,virtualization=on -cpu cortex-a53 -m 512 -smp 1 -nographic -semihosting -s -kernel $<
