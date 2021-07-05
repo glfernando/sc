@@ -19,6 +19,7 @@ static constexpr device::pl011::platform_data uart0_pdata{
     .base = 0x0900'0000,
     .freq = 24'000'000,
     .baudrate = 115200,
+    .irq = 33,
 };
 
 static device::pl011 uart0("uart0", uart0_pdata);
@@ -40,14 +41,15 @@ static device::timer_arm timer0("timer0", timer_pdata);
 export namespace board::peripherals {
 
 void init() {
-    uart0.init();
-    lib::fmt::register_console(&con0);
-
     gicv2.init();
     // register GIC
     device::manager::register_device(&gicv2);
 
+    uart0.init();
+    lib::fmt::register_console(&con0);
+
     timer0.init();
+    device::manager::register_device(&timer0);
 }
 
 auto& default_console() {
