@@ -11,8 +11,16 @@ export module device.uart.pl011;
 export import device.uart;
 import std.string;
 import lib.reg;
+import device;
+import device.intc;
+import core.event;
+import lib.time;
 
+using core::event;
 using lib::reg::reg32;
+using namespace lib::time;
+
+static event rx_evt;
 
 export namespace device {
 
@@ -22,10 +30,11 @@ class pl011 : public uart {
         uintptr_t base;
         unsigned freq;
         unsigned baudrate;
+        unsigned irq;
     };
 
     pl011(std::string const& name, platform_data const& pdata)
-        : uart(name), base(pdata.base), freq(pdata.freq), baud(pdata.baudrate) {}
+        : uart(name), base(pdata.base), freq(pdata.freq), baud(pdata.baudrate), irq(pdata.irq) {}
 
     inline void init() override;
     inline void baudrate(unsigned baud) override;
@@ -35,9 +44,11 @@ class pl011 : public uart {
 
  private:
     volatile uint32_t& reg(uint32_t offset) { return reg32(base + offset); }
+    void isr();
     uintptr_t base;
     unsigned freq;
     unsigned baud;
+    unsigned irq;
 };
 
 }  // namespace device
@@ -50,6 +61,10 @@ enum pl011_reg_offset : uint32_t {
     UART_FBRD   = 0x28,
     UART_LCR_H  = 0x2c,
     UART_CR     = 0x30,
+    UART_IMSC   = 0x38,
+    UART_RIS    = 0x3c,
+    UART_MIS    = 0x40,
+    UART_ICR    = 0x44,
 };
 
 enum UART_FR_bits : uint32_t {
@@ -68,6 +83,12 @@ enum UART_CR_bits : uint32_t {
     UART_CR_TXE     = 1 << 8,
     UART_CR_RXE     = 1 << 9,
 };
+
+enum UART_INT_bits : uint32_t {
+    UART_RXI        = 1U << 4,
+    UART_RTI        = 1U << 6,
+};
+
 // clang-format on
 
 namespace device {
@@ -81,6 +102,11 @@ void pl011::init() {
 
     // enable uart
     reg(UART_CR) = UART_CR_UARTEN | UART_CR_TXE | UART_CR_RXE;
+
+    auto intc = manager::find<::device::intc>();
+    intc->request_irq(
+        irq, intc::FLAG_START_ENABLED,
+        [](unsigned, void* data) { reinterpret_cast<pl011*>(data)->isr(); }, this);
 }
 
 void pl011::baudrate(unsigned baudrate) {
@@ -107,17 +133,30 @@ void pl011::putc(int c, bool wait) {
 }
 
 int pl011::getc(bool wait) {
-    if ((reg(UART_FR) & UART_FR_RXEE) && !wait)
+    if (!(reg(UART_FR) & UART_FR_RXEE)) {
+        return reg(UART_DR);
+    }
+
+    if (!wait)
         return 0;
 
-    // wait for data in rx fifo
-    while (reg(UART_FR) & UART_FR_RXEE) {}
+    do {
+        // enbable RX interrupt
+        reg(UART_IMSC) |= UART_RXI | UART_RTI;
+
+        rx_evt.wait_for_signal();
+    } while (reg(UART_FR) & UART_FR_RXEE);
 
     return reg(UART_DR);
 }
 
 void pl011::flush() {
     while (!(reg(UART_FR) & UART_FR_TXFE)) {}
+}
+
+void pl011::isr() {
+    reg(UART_IMSC) &= ~(UART_RXI | UART_RTI);
+    rx_evt.signal();
 }
 
 }  // namespace device
