@@ -14,7 +14,7 @@ export namespace device {
 
 class timer : public device {
  public:
-    constexpr static class_type dev_type = class_type::INTC;
+    constexpr static class_type dev_type = class_type::TIMER;
     class_type type() const override final { return timer::dev_type; }
 
     timer(std::string const& name) : device(name) {}
