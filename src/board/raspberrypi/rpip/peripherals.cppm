@@ -22,6 +22,7 @@ static constexpr device::pl011::platform_data uart0_pdata{
     .base = UART0_BASE,
     .freq = 125'000'000,
     .baudrate = 115200,
+    .irq = 16 + 20,
 };
 
 static constexpr device::nvic::platform_data nvic_pdata{
@@ -47,13 +48,15 @@ static soc::rp2040::gpio gpio("gpio");
 export namespace board::peripherals {
 
 void init() {
-    uart0.init();
-    lib::fmt::register_console(&con0);
     nvic.init();
     // register GIC
     device::manager::register_device(&nvic);
 
+    uart0.init();
+    lib::fmt::register_console(&con0);
+
     timer0.init();
+    device::manager::register_device(&timer0);
 }
 
 auto& default_console() {
