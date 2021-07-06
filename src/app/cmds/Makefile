@@ -1,6 +1,7 @@
 
 src-y += mem.cpp
 src-y += sleep.cpp
+src-y += echo.cpp
 
 ifeq ($(ARCH), aarch64)
 src-y += sysreg_aarch64.cpp
