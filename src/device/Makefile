@@ -6,3 +6,4 @@ src-y += console/
 src-y += gpio/
 src-y += intc/
 src-y += timer/
+src-y += pwm/

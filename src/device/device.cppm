@@ -34,6 +34,7 @@ enum class class_type {
     INTC,
     TIMER,
     GPIO,
+    PWM,
 };
 
 class device {
