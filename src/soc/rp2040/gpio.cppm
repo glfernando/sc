@@ -116,6 +116,9 @@ void gpio::config(unsigned gpio, config_t const& config) {
     auto& ctrl = get_io_ctrl(gpio);
     ctrl.funcsel = GPIO_FUNC_SIO;
 
+    pad.pde = config.pull == pull::DOWN;
+    pad.pue = config.pull == pull::UP;
+
     if (config.dir == dir::OUTPUT)
         reg(GPIO_OE_SET) = 1 << gpio;
     else
