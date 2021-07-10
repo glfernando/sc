@@ -1,11 +1,11 @@
 # sc
-SC is a modem C++ bare metal framework which provides OS type primities and libraries that allow to write code in a similar way you would write a userspace application.
+SC is a modern C++ bare metal framework which provides OS type primities and libraries that allow to write code in a similar way you would write a userspace application.
 
 ## Build status
 ![build status](https://github.com/glfernando/sc/workflows/SC%20CI/badge.svg)
 
 ## Features
-- Written in modem C++
+- Written in modern C++
 - Minimal C++ standard is C++20 (-std=c++2a)
 - Uses the **Big Four** C++20 features:
   - Modules
@@ -14,7 +14,7 @@ SC is a modem C++ bare metal framework which provides OS type primities and libr
   - Ranges (no supported yet)
 - Compact, it should be suitable for microcontrollers with 100KB+ of flash and 60KB+ of RAM
 - Dynamic memory support
-- C++ expcetions support
+- C++ exceptions support
 
 ## Requirements
 SC only supports clang compiler, the recommended version is clang-11 but minimal version that can be used to compile is clang-10. It also uses LLVM linker and llvm-objcopy.
@@ -183,9 +183,10 @@ Then CONFIG_PL011 can be set in a board `config.h` file.
 - [x] Support for interrupts
 - [x] Support for timers
 - [x] Improve build system
-- [ ] Support for threads
-- [ ] Support for blocking and waking up treads
-- [ ] Support for Events
+- [x] Support for threads
+- [x] Support for blocking and waking up treads
+- [x] Support for Events
 - [ ] Support for Mutex
+- [ ] Support for threads preemption
 - [ ] Support for Coroutines
 - [ ] Support for Ranges
