@@ -6,3 +6,4 @@ src-y += lock/
 src-y += timestamp/
 
 src-$(CONFIG_LIB_GPIO) += gpio.cppm
+src-y += servo.cppm
