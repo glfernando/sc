@@ -69,10 +69,11 @@ void event::wait_for_signal(time_us_t timeout) {
         timer.start(
             [this, &to_expeired, &t] {
                 to_expeired = true;
-                slock guard(lock);
-                // move thread from wait list to ready state
-                wait_list.remove(t);
-                thread::set_ready(t);
+                lock_for(lock, [&] {
+                    // move thread from wait list to ready state
+                    wait_list.remove(t);
+                    thread::set_ready(t);
+                });
                 thread::schedule();
             },
             timeout);
