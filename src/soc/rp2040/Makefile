@@ -5,3 +5,4 @@ src-y += lock.cppm
 src-y += gpio.cppm
 src-y += timer.cppm
 src-y += timestamp.cppm
+src-y += pwm.cppm
