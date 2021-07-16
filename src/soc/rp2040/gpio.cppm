@@ -13,16 +13,20 @@ export module soc.rp2040.gpio;
 export import device.gpio;
 
 import std.string;
-import lib.fmt;
 import soc.rp2040.address_map;
 import lib.reg;
 import lib.exception;
+import device.intc;
+import std.vector;
 
 using lib::exception;
 using lib::reg::reg32;
 using namespace soc::rp2040::address_map;
+using std::vector;
 
 namespace {
+
+constexpr unsigned MAX_GPIO_NUM = 29;
 
 // clang-format off
 enum reg_offset : uint32_t {
@@ -32,6 +36,12 @@ enum reg_offset : uint32_t {
     GPIO_OUT_CLR    = 0x18,
     GPIO_OE_SET     = 0x24,
     GPIO_OE_CLR     = 0x28,
+};
+
+enum io_bank0_offset : uint32_t {
+    INTR0           = 0x0f0,
+    PROC0_INTE0     = 0x100,
+    PROC0_INTS0     = 0x120,
 };
 
 enum drive_strength {
@@ -98,15 +108,57 @@ export namespace soc::rp2040 {
 
 class gpio : public device::gpio {
  public:
-    gpio(std::string const& name) : ::device::gpio(name) {}
+    gpio(std::string const& name, unsigned irq) : ::device::gpio(name), irq(irq) {
+        callbacks.resize(MAX_GPIO_NUM + 1);
+    }
 
+    inline void init() override;
     inline void config(unsigned gpio, config_t const& config) override;
     inline void set(unsigned gpio, bool val) override;
     inline bool get(unsigned gpio) override;
+    inline void register_irq(unsigned gpio, callback cb, void* data) override;
+
+ private:
+    struct cb_info {
+        callback cb;
+        void* data;
+    };
+    void isr();
+    unsigned irq;
+    vector<cb_info> callbacks;
 };
 
+}  // namespace soc::rp2040
+
+namespace soc::rp2040 {
+
+void gpio::init() {
+    auto intc = ::device::manager::find<::device::intc>();
+    intc->request_irq(
+        irq, 0, [](unsigned, void* data) { reinterpret_cast<gpio*>(data)->isr(); }, this);
+}
+
+void gpio::isr() {
+    for (int i = 0; i < 4; ++i) {
+        uint32_t status = reg32(IO_BANK0_BASE + i * 4 + PROC0_INTS0);
+        uint32_t tmp = status;
+
+        for (int j = 0; tmp; tmp = tmp >> 4, ++j) {
+            uint32_t mask = tmp & 0xf;
+            if (!mask)
+                continue;
+
+            unsigned gpio = i * 8 + j;
+            if (gpio > MAX_GPIO_NUM)
+                return;
+            callbacks[gpio].cb(callbacks[gpio].data);
+        }
+        reg32(IO_BANK0_BASE + 0 + INTR0 + i * 4) = status;
+    }
+}
+
 void gpio::config(unsigned gpio, config_t const& config) {
-    if (gpio > 29)
+    if (gpio > MAX_GPIO_NUM)
         throw exception("invalid gpio number");
 
     auto& pad = get_pad(gpio);
@@ -123,6 +175,33 @@ void gpio::config(unsigned gpio, config_t const& config) {
         reg(GPIO_OE_SET) = 1 << gpio;
     else
         reg(GPIO_OE_CLR) = 1 << gpio;
+
+    if (config.trigger == trigger::NONE)
+        return;
+
+    uint32_t offset = PROC0_INTE0 + gpio / 8 * 4;
+    uint32_t shift = (gpio % 8) * 4;
+    uint32_t val = reg32(IO_BANK0_BASE + offset) & ~(0xf << shift);
+    switch (config.trigger) {
+    case trigger::HIGH:
+        val |= 0x2 << shift;
+        break;
+    case trigger::LOW:
+        val |= 0x1 << shift;
+        break;
+    case trigger::RISING:
+        val |= 0x8 << shift;
+        break;
+    case trigger::FALLING:
+        val |= 0x4 << shift;
+        break;
+    case trigger::BOTH:
+        val |= 0xc << shift;
+        break;
+    case trigger::NONE:
+        return;
+    }
+    reg32(IO_BANK0_BASE + offset) = val;
 }
 
 void gpio::set(unsigned gpio, bool val) {
@@ -131,6 +210,17 @@ void gpio::set(unsigned gpio, bool val) {
 
 bool gpio::get(unsigned gpio) {
     return reg(GPIO_IN) & (1 << gpio);
+}
+
+void gpio::register_irq(unsigned gpio, callback cb, void* data) {
+    if (gpio > MAX_GPIO_NUM)
+        throw exception("invalid gpio number");
+
+    callbacks[gpio].cb = cb;
+    callbacks[gpio].data = data;
+
+    auto intc = ::device::manager::find<::device::intc>();
+    intc->enable_irq(irq);
 }
 
 }  // namespace soc::rp2040
