@@ -20,6 +20,28 @@ import std.string;
 using lib::fmt::println;
 using std::string;
 
+template <typename T>
+std::decay_t<T> decay_copy(T&& v) {
+    return std::forward<T>(v);
+}
+
+class gpio_cb {
+ public:
+    virtual void operator()() = 0;
+    virtual ~gpio_cb() {}
+};
+
+template <typename F>
+class gpio_cb_wrapper : public gpio_cb {
+ public:
+    gpio_cb_wrapper(F&& f) : func{decay_copy(std::forward<F>(f))} {}
+
+    void operator()() override { return func(); }
+
+ private:
+    std::decay_t<F> func;
+};
+
 export namespace lib::gpio {
 
 // export types as if they belong to the gpio library
@@ -28,6 +50,7 @@ using config_t = device::gpio::config_t;
 using dir = device::gpio::dir;
 using trigger = device::gpio::trigger;
 using pull = device::gpio::pull;
+using callback = device::gpio::callback;
 
 void config(unsigned gpio, config_t config) {
     auto& dev = board::peripherals::default_gpio();
@@ -42,6 +65,20 @@ void set(unsigned gpio, bool val) {
 bool get(unsigned gpio) {
     auto& dev = board::peripherals::default_gpio();
     return dev.get(gpio);
+}
+
+template <typename F>
+void register_irq(unsigned gpio, F&& f) {
+    auto& dev = board::peripherals::default_gpio();
+
+    gpio_cb* cb = new gpio_cb_wrapper(std::forward<F>(f));
+    return dev.register_irq(
+        gpio,
+        [](void* data) {
+            auto callback = reinterpret_cast<gpio_cb*>(data);
+            (*callback)();
+        },
+        cb);
 }
 
 }  // namespace lib::gpio
