@@ -43,7 +43,7 @@ static device::timer_rp2040 timer0("timer0", timer0_pdata);
 
 static device::nvic nvic("nvic", nvic_pdata);
 
-static soc::rp2040::gpio gpio("gpio");
+static soc::rp2040::gpio gpio("gpio", 16 + 13);
 
 export namespace board::peripherals {
 
@@ -57,6 +57,8 @@ void init() {
 
     timer0.init();
     device::manager::register_device(&timer0);
+
+    gpio.init();
 }
 
 auto& default_console() {
