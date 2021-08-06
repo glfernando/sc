@@ -96,6 +96,27 @@ class manager {
         }
         return nullptr;
     }
+
+    static vector<device*> find_all(class_type type) {
+        vector<device*> dev_list;
+
+        for (auto dev : devices) {
+            if (dev->type() == type)
+                dev_list.push_back(dev);
+        }
+        return dev_list;
+    }
+
+    // TODO: create Device concept
+    template <typename D>
+    static vector<D*> find_all() {
+        vector<D*> dev_list;
+        for (auto dev : devices) {
+            if (dev->type() == D::dev_type)
+                dev_list.push_back(static_cast<D*>(dev));
+        }
+        return dev_list;
+    }
 };
 
 }  // namespace device
