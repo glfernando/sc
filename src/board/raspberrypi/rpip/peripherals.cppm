@@ -11,11 +11,14 @@ export import device.console.uart;
 export import device.timer.rp2040;
 export import device.intc.nvic;
 export import soc.rp2040.gpio;
+export import soc.rp2040.i2c;
 
 import soc.rp2040.address_map;
 import std.string;
 import lib.fmt;
+import lib.exception;
 
+using lib::exception;
 using namespace soc::rp2040::address_map;
 
 static constexpr device::pl011::platform_data uart0_pdata{
@@ -35,6 +38,18 @@ static constexpr device::timer_rp2040::platform_data timer0_pdata{
     .irq = 16,
 };
 
+static constexpr soc::rp2040::i2c::platform_data i2c0_pdata{
+    .base = I2C0_BASE,
+    .freq = 125'000'000,
+    .mode = device::i2c::mode::FAST,
+};
+
+static constexpr soc::rp2040::i2c::platform_data i2c1_pdata{
+    .base = I2C1_BASE,
+    .freq = 125'000'000,
+    .mode = device::i2c::mode::FAST,
+};
+
 static device::pl011 uart0("uart0", uart0_pdata);
 
 static device::uart_console con0("con0", uart0);
@@ -44,6 +59,9 @@ static device::timer_rp2040 timer0("timer0", timer0_pdata);
 static device::nvic nvic("nvic", nvic_pdata);
 
 static soc::rp2040::gpio gpio("gpio", 16 + 13);
+
+static soc::rp2040::i2c i2c0("i2c0", i2c0_pdata);
+static soc::rp2040::i2c i2c1("i2c1", i2c1_pdata);
 
 export namespace board::peripherals {
 
@@ -59,6 +77,11 @@ void init() {
     device::manager::register_device(&timer0);
 
     gpio.init();
+
+    i2c0.init();
+    i2c1.init();
+    device::manager::register_device(&i2c0);
+    device::manager::register_device(&i2c1);
 }
 
 auto& default_console() {
@@ -75,6 +98,12 @@ auto& default_intc() {
 
 auto& default_gpio() {
     return gpio;
+}
+
+constexpr auto& i2c_by_id(unsigned id) {
+    if (id > 0)
+        throw exception("invalid i2c id");
+    return i2c0;
 }
 
 }  // namespace board::peripherals
