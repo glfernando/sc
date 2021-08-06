@@ -6,3 +6,4 @@ src-y += gpio.cppm
 src-y += timer.cppm
 src-y += timestamp.cppm
 src-y += pwm.cppm
+src-y += i2c.cppm
