@@ -51,19 +51,6 @@ enum drive_strength {
     DRIVE_12mA  = 3,
 };
 
-enum gpio_function {
-    GPIO_FUNC_XIP   = 0,
-    GPIO_FUNC_SPI   = 1,
-    GPIO_FUNC_UART  = 2,
-    GPIO_FUNC_I2C   = 3,
-    GPIO_FUNC_PWM   = 4,
-    GPIO_FUNC_SIO   = 5,
-    GPIO_FUNC_PIO0  = 6,
-    GPIO_FUNC_PIO1  = 7,
-    GPIO_FUNC_GPCK  = 8,
-    GPIO_FUNC_USB   = 9,
-    GPIO_FUNC_NULL = 0x1f,
-};
 // clang-format on
 
 struct gpio_pad {
@@ -118,6 +105,23 @@ class gpio : public device::gpio {
     inline bool get(unsigned gpio) override;
     inline void register_irq(unsigned gpio, callback cb, void* data) override;
 
+    // clang-format off
+    enum class func {
+        XIP   = 0,
+        SPI   = 1,
+        UART  = 2,
+        I2C   = 3,
+        PWM   = 4,
+        SIO   = 5,
+        PIO0  = 6,
+        PIO1  = 7,
+        GPCK  = 8,
+        USB   = 9,
+    };
+    // clang-format on
+
+    void set_func(unsigned gpio, func f);
+
  private:
     struct cb_info {
         callback cb;
@@ -166,7 +170,7 @@ void gpio::config(unsigned gpio, config_t const& config) {
     pad.od = 0;
 
     auto& ctrl = get_io_ctrl(gpio);
-    ctrl.funcsel = GPIO_FUNC_SIO;
+    ctrl.funcsel = static_cast<uint32_t>(func::SIO);
 
     pad.pde = config.pull == pull::DOWN;
     pad.pue = config.pull == pull::UP;
@@ -221,6 +225,14 @@ void gpio::register_irq(unsigned gpio, callback cb, void* data) {
 
     auto intc = ::device::manager::find<::device::intc>();
     intc->enable_irq(irq);
+}
+
+void gpio::set_func(unsigned gpio, func f) {
+    if (gpio > MAX_GPIO_NUM)
+        throw exception("invalid gpio number");
+
+    auto& ctrl = get_io_ctrl(gpio);
+    ctrl.funcsel = static_cast<uint32_t>(f);
 }
 
 }  // namespace soc::rp2040
