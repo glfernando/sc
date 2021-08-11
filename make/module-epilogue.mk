@@ -11,16 +11,19 @@ c_srcs += $(filter %.c, $(src-y))
 asm_srcs += $(filter %.S, $(src-y))
 cpp_srcs += $(filter %.cpp, $(src-y))
 mod_srcs += $(filter %.cppm, $(src-y))
-#test_dirs += $(filter %/, $(src-y))
 dir-y := $(filter %/, $(src-y))
 
-# create module flags using ouput path
-out_dir := $(addprefix $(BUILD_DIR)/,$(MODULE_PATH))
-out_dir_var_prefix := $(subst /,_,$(out_dir))
+define create_module_flags
+  out_file := $$(addprefix $$(BUILD_DIR)/,$$(dir $(1)))
+  out_dir := $$(patsubst %/,%,$$(dir $$(out_file)))
+  out_dir_var_prefix := $$(subst /,_,$$(out_dir))
 
-CPPFLAGS_$(out_dir_var_prefix) := $(MODULE_CPPFLAGS)
-CFLAGS_$(out_dir_var_prefix) := $(MODULE_CFLAGS)
-CXXFLAGS_$(out_dir_var_prefix) := $(MODULE_CXXFLAGS)
+  CPPFLAGS_$$(out_dir_var_prefix) := $$(MODULE_CPPFLAGS)
+  CFLAGS_$$(out_dir_var_prefix) := $$(MODULE_CFLAGS)
+  CXXFLAGS_$$(out_dir_var_prefix) := $$(MODULE_CXXFLAGS)
+endef
+
+$(foreach file,$(filter-out $(diry),$(src-y)),$(eval $(call create_module_flags,$(file))))
 
 # include all other directores
 module_dirs += $(addsuffix Makefile,$(dir-y))
