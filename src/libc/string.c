@@ -375,3 +375,16 @@ overflow:
         *endptr = (char*)nptr;
     return neg ? LONG_MIN : LONG_MAX;
 }
+
+char* strstr(const char* haystack, const char* needle) {
+    size_t ln = strlen(needle);
+    if (ln == 0)
+        return (char*)haystack;
+
+    for (size_t lh = strlen(haystack); lh >= ln; lh--, haystack++) {
+        if (!memcmp(haystack, needle, ln))
+            return (char*)haystack;
+    }
+
+    return NULL;
+}
