@@ -25,12 +25,12 @@ SECTIONS
 
     .text : {
         KEEP(*(.reset))
-        *(.text*)
+        *(.text .text.*)
         *(.gnu.linkonce.t.*)
     } > FLASH
 
     .rodata ALIGN(16) : {
-        *(.rodata*);
+        *(.rodata .rodata.*);
         *(.gnu.linkonce.r.*);
     } > FLASH
 
@@ -71,7 +71,7 @@ SECTIONS
     .data ALIGN(256): {
         __data_start = .;
         KEEP(*(.vector_table))
-        *(.data*)
+        *(.data .data.*)
         . = ALIGN(16);
         __data_end = .;
     } > RAM AT> FLASH
@@ -80,7 +80,7 @@ SECTIONS
 
     .bss : {
         __bss_start = .;
-        *(.bss*);
+        *(.bss .bss.*);
         . = ALIGN(16);
         __bss_end = .;
     } > RAM
