@@ -9,6 +9,7 @@ module;
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 export module lib.allocator.simple;
 import lib.lock;
@@ -62,6 +63,7 @@ class simple {
     simple(uint8_t* start, uint8_t* end) noexcept : start(start), end(end) {}
     void init() noexcept;
     void* alloc(size_t size, size_t align) noexcept;
+    void* realloc(void* p, size_t size, size_t align) noexcept;
     void free(void* p) noexcept;
 
  private:
@@ -191,6 +193,27 @@ void simple::free(void* p) noexcept {
     } else {
         printf("free: invalid chunk state %x\n", c->state);
     }
+}
+
+void* simple::realloc(void* p, size_t size, size_t align) noexcept {
+    if (!p)
+        return alloc(size, align);
+
+    chunk* c = chunk::from_mem_ptr(p);
+    if (c < chunks.first || c >= chunks.last) {
+        printf("free: invalid pointer %p\n", c);
+        return nullptr;
+    }
+
+    // simple copy
+    void* ptr = alloc(size, align);
+    if (!ptr)
+        return nullptr;
+
+    memcpy(ptr, p, c->size);
+    free(p);
+
+    return ptr;
 }
 
 chunk* simple::find_free(size_t size, size_t align) noexcept {

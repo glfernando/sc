@@ -20,6 +20,10 @@ extern "C" void* calloc(size_t nmemb, size_t size) {
     return ptr;
 }
 
+extern "C" void* realloc(void* ptr, size_t size) {
+    return lib::heap::realloc(ptr, size);
+}
+
 extern "C" void free(void* p) {
     return lib::heap::free(p);
 }

@@ -28,6 +28,10 @@ void* alloc(size_t size, size_t align = 8) {
     return ::heap.alloc(size, align);
 }
 
+void* realloc(void* p, size_t size, size_t align = 8) {
+    return ::heap.realloc(p, size, align);
+}
+
 void free(void* p) {
     return ::heap.free(p);
 }
