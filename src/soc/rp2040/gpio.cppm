@@ -231,6 +231,10 @@ void gpio::set_func(unsigned gpio, func f) {
     if (gpio > MAX_GPIO_NUM)
         throw exception("invalid gpio number");
 
+    auto& pad = get_pad(gpio);
+    pad.ie = 1;
+    pad.od = 0;
+
     auto& ctrl = get_io_ctrl(gpio);
     ctrl.funcsel = static_cast<uint32_t>(f);
 }
