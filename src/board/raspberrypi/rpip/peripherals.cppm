@@ -12,6 +12,7 @@ export import device.timer.rp2040;
 export import device.intc.nvic;
 export import soc.rp2040.gpio;
 export import soc.rp2040.i2c;
+export import soc.rp2040.spi;
 
 import soc.rp2040.address_map;
 import std.string;
@@ -50,6 +51,18 @@ static constexpr soc::rp2040::i2c::platform_data i2c1_pdata{
     .mode = device::i2c::mode::FAST,
 };
 
+static constexpr soc::rp2040::spi::platform_data spi0_pdata{
+    .base = SPI0_BASE,
+    .freq = 125'000'000,
+    .baudrate = 10'000'000,
+};
+
+static constexpr soc::rp2040::spi::platform_data spi1_pdata{
+    .base = SPI1_BASE,
+    .freq = 125'000'000,
+    .baudrate = 10'000'000,
+};
+
 static device::pl011 uart0("uart0", uart0_pdata);
 
 static device::uart_console con0("con0", uart0);
@@ -62,6 +75,9 @@ static soc::rp2040::gpio gpio("gpio", 16 + 13);
 
 static soc::rp2040::i2c i2c0("i2c0", i2c0_pdata);
 static soc::rp2040::i2c i2c1("i2c1", i2c1_pdata);
+
+static soc::rp2040::spi spi0("spi0", spi0_pdata);
+static soc::rp2040::spi spi1("spi1", spi1_pdata);
 
 export namespace board::peripherals {
 
@@ -77,11 +93,15 @@ void init() {
     device::manager::register_device(&timer0);
 
     gpio.init();
+    device::manager::register_device(&gpio);
 
     i2c0.init();
     i2c1.init();
     device::manager::register_device(&i2c0);
     device::manager::register_device(&i2c1);
+
+    device::manager::register_device(&spi0);
+    device::manager::register_device(&spi1);
 }
 
 auto& default_console() {
