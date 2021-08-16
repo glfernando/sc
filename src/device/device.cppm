@@ -36,6 +36,7 @@ enum class class_type {
     GPIO,
     PWM,
     I2C,
+    SPI,
 };
 
 class device {

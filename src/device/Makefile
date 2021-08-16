@@ -8,3 +8,4 @@ src-y += intc/
 src-y += timer/
 src-y += pwm/
 src-y += i2c/
+src-y += spi/
