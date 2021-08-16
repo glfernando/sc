@@ -118,6 +118,24 @@ class manager {
         }
         return dev_list;
     }
+
+    static device* find(class_type type, std::string const& name) {
+        for (auto dev : devices) {
+            if (dev->type() == type && dev->name() == name)
+                return dev;
+        }
+        return nullptr;
+    }
+
+    // TODO: create Device concept
+    template <typename D>
+    static D* find(std::string const& name) {
+        for (auto dev : devices) {
+            if (dev->type() == D::dev_type && dev->name() == name)
+                return static_cast<D*>(dev);
+        }
+        return nullptr;
+    }
 };
 
 }  // namespace device
