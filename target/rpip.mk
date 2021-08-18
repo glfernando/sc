@@ -8,6 +8,7 @@ CONFIG_NVIC := y
 CONFIG_SOC_RP2040 := y
 CONFIG_LIB_GPIO := y
 CONFIG_LIB_I2C := y
+CONFIG_LIB_SPI := y
 
 CPU := armv6m
 
