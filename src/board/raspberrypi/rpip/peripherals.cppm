@@ -25,7 +25,7 @@ using namespace soc::rp2040::address_map;
 static constexpr device::pl011::platform_data uart0_pdata{
     .base = UART0_BASE,
     .freq = 125'000'000,
-    .baudrate = 115200,
+    .baudrate = 230400,
     .irq = 16 + 20,
 };
 
