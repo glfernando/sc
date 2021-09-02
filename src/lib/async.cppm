@@ -13,7 +13,7 @@ export module lib.async;
 export import std.tuple;
 import std.type_traits;
 export import std.utility;
-import core.thread;
+export import core.thread;
 import lib.fmt;
 
 using lib::fmt::println;
