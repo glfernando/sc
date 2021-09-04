@@ -4,6 +4,10 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
+module;
+
+#include <stdio.h>
+
 export module board.peripherals;
 
 export import device.uart.pl011;
@@ -88,6 +92,10 @@ void init() {
 
     uart0.init();
     lib::fmt::register_console(&con0);
+    printf_set_putchar_func([](int c) {
+        uart0.putc(c);
+        return c;
+    });
 
     timer0.init();
     device::manager::register_device(&timer0);
