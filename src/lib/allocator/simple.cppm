@@ -226,7 +226,7 @@ chunk* simple::find_free(size_t size, size_t align) noexcept {
 
     // iterate over all chunks to fine one
     for (auto& chunk : chunks) {
-        if (c->state != FREE)
+        if (chunk.state != FREE)
             continue;
 
         // merge free chunks
