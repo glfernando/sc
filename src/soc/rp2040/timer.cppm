@@ -20,8 +20,8 @@ import lib.fmt;
 import lib.reg;
 import lib.lock;
 
-using lib::lock_irqsafe;
-using lib::slock;
+using lib::lock;
+using lib::slock_irqsafe;
 using lib::fmt::println;
 using lib::reg::reg32;
 using lib::time::time_us_t;
@@ -137,7 +137,7 @@ class timer_rp2040 : public timer {
 
     uintptr_t base;
     unsigned irq;
-    lock_irqsafe lock;
+    lock lock;
     // TODO: consider standard container once they are available
     timer_event_queue queue;
 };
@@ -155,7 +155,7 @@ void timer_rp2040::set(event* event, time_us_t period) {
     uint64_t now = reg(TIMERLR) | static_cast<uint64_t>(reg(TIMERHR)) << 32;
     e->exp = now + period.get_val();
 
-    slock guard(lock);
+    slock_irqsafe guard(lock);
     queue.insert(e);
     if (e == queue.front())
         reg(ALARM0) = e->exp;
@@ -194,7 +194,7 @@ void timer_rp2040::isr() {
 
 void timer_rp2040::cancel(timer::event* event) {
     auto e = static_cast<event_impl*>(event);
-    slock guard(lock);
+    slock_irqsafe guard(lock);
     e->cancelled = true;
     queue.remove(e);
 }

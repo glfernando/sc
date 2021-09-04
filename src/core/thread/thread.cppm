@@ -23,13 +23,13 @@ import lib.lock;
 import lib.time;
 import lib.elist;
 import lib.equeue;
+import lib.cpu;
 
 using lib::equeue;
 using lib::exception;
 using lib::lock;
-using lib::lock_for;
-using lib::lock_irqsafe;
-using lib::slock;
+using lib::lock_irqsafe_for;
+using lib::slock_irqsafe;
 using lib::fmt::println;
 using std::string;
 using std::unique_ptr;
@@ -88,7 +88,7 @@ class thread_t : public thread_arch, public lib::elist_node {
 // local variables
 namespace core::thread {
 
-static lock_irqsafe thread_lock;
+static lock thread_lock;
 static equeue<thread_t> ready_queue;
 static thread_t* idle_thread;
 static device::timer* dev;
@@ -101,7 +101,7 @@ thread_t* current() {
 }
 
 void schedule() {
-    slock guard(thread_lock);
+    slock_irqsafe guard(thread_lock);
 
     auto t = current();
 
@@ -142,7 +142,7 @@ void schedule() {
 }
 
 void set_ready(thread_t* t) {
-    slock guard(thread_lock);
+    slock_irqsafe guard(thread_lock);
     if (t->state != state::READY) {
         t->state = state::READY;
         ready_queue.push(t);
@@ -151,7 +151,7 @@ void set_ready(thread_t* t) {
 
 void sleep_timer_cb(void* data) {
     thread_t* t = static_cast<thread_t*>(data);
-    lock_for(thread_lock, [&] {
+    lock_irqsafe_for(thread_lock, [&] {
         t->state = state::READY;
         ready_queue.push(t);
     });
@@ -160,7 +160,7 @@ void sleep_timer_cb(void* data) {
 void sleep(time_ms_t period) {
     auto t = reinterpret_cast<thread_t*>(thread_current_addr());
     auto e = dev->create(device::timer::type::ONE_SHOT, sleep_timer_cb, t);
-    lock_for(thread_lock, [&] {
+    lock_irqsafe_for(thread_lock, [&] {
         t->state = state::ASLEEP;
         dev->set(e, period);
     });
@@ -211,6 +211,7 @@ void thread_t::thread_entry(thread_t* self) {
     // context switch is always done with thread_lock held, so manually release it the first
     // time we enter to the thread.
     thread_lock.release();
+    lib::cpu::enable_irq();
     try {
         self->entry(self->arg);
     } catch (exception& e) {
@@ -228,7 +229,7 @@ thread_t::thread_t(string const& name, entry_t entry, void* arg, size_t stack_si
     auto self_ptr = reinterpret_cast<unsigned long>(this);
     init_context(pc, self_ptr, sp);
 
-    lock_for(thread_lock, [this] {
+    lock_irqsafe_for(thread_lock, [this] {
         state = state::READY;
         ready_queue.push(this);
     });
@@ -244,7 +245,7 @@ void thread_t::join() {
         return;
     }
 
-    lock_for(thread_lock, [&] {
+    lock_irqsafe_for(thread_lock, [&] {
         t->state = state::BLOCKED;
         done_wait_list.push_back(t);
     });

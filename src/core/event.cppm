@@ -18,7 +18,7 @@ import lib.exception;
 
 using core::thread::thread_t;
 using lib::equeue;
-using lib::lock_irqsafe;
+using lib::lock;
 using lib::slock;
 using lib::fmt::println;
 
@@ -38,7 +38,7 @@ class event {
     void signal(bool all = false);
 
  private:
-    lock_irqsafe lock;
+    lock lock;
     unsigned pending_count;
     equeue<thread_t> wait_list;
 };
@@ -49,7 +49,7 @@ namespace core {
 
 void event::wait_for_signal(time_us_t timeout) {
     {
-        slock guard(lock);
+        slock_irqsafe guard(lock);
         if (pending_count == SIGNALED_ALL)
             return;
         if (pending_count) {
@@ -69,7 +69,7 @@ void event::wait_for_signal(time_us_t timeout) {
         timer.start(
             [this, &to_expeired, &t] {
                 to_expeired = true;
-                lock_for(lock, [&] {
+                lock_irqsafe_for(lock, [&] {
                     // move thread from wait list to ready state
                     wait_list.remove(t);
                     thread::set_ready(t);
@@ -88,7 +88,7 @@ void event::wait_for_signal(time_us_t timeout) {
 }
 
 void event::signal(bool all) {
-    slock guard(lock);
+    slock_irqsafe guard(lock);
     if (all) {
         pending_count = SIGNALED_ALL;
         while (!wait_list.empty()) {
