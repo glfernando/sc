@@ -106,7 +106,7 @@ class simple {
     uint8_t* const end;
     chunk* free_chunk;
     chunks chunks;
-    lock_irqsafe lock;
+    lock lock;
 };
 
 }  // namespace lib::allocator
@@ -152,7 +152,7 @@ void* simple::alloc(size_t const size, size_t align) noexcept {
     if (align < MIN_ALIGNMENT)
         align = MIN_ALIGNMENT;
 
-    slock guard{lock};
+    slock_irqsafe guard{lock};
     chunk* c = find_free(size, align);
     if (!c)
         return nullptr;

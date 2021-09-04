@@ -21,9 +21,8 @@ import std.string;
 import lib.lock;
 import lib.fmt;
 
-using lib::lock_for;
-using lib::lock_irqsafe;
-using lib::slock;
+using lib::lock;
+using lib::slock_irqsafe;
 using lib::fmt::println;
 using lib::time::now;
 using lib::time::time_us_t;
@@ -129,7 +128,7 @@ class timer_arm : public timer {
     };
     unsigned irq;
     void isr();
-    lock_irqsafe lock;
+    lock lock;
     // TODO: consider standard container once they are available
     timer_event_queue queue;
 };
@@ -161,7 +160,7 @@ void timer_arm::set(timer::event* event, time_us_t period) {
     auto to = now() + period;
     e->exp = to.ticks();
 
-    slock guard(lock);
+    slock_irqsafe guard(lock);
     queue.insert(e);
     if (e == queue.front())
         sysreg_write(cntp_cval_el0, e->exp);
@@ -169,7 +168,7 @@ void timer_arm::set(timer::event* event, time_us_t period) {
 
 void timer_arm::cancel(timer::event* event) {
     auto e = static_cast<event_arm*>(event);
-    slock guard(lock);
+    slock_irqsafe guard(lock);
     e->cancelled = true;
     queue.remove(e);
 }

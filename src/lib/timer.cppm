@@ -19,8 +19,8 @@ import lib.exception;
 import lib.lock;
 
 using lib::exception;
-using lib::lock_irqsafe;
-using lib::slock;
+using lib::lock;
+using lib::slock_irqsafe;
 using lib::fmt::println;
 using lib::time::time_us_t;
 
@@ -49,10 +49,10 @@ class timer_cb_wrapper : public timer_cb {
 };
 
 static device::timer* timer_dev;
-static lock_irqsafe timer_lock;
+static lock timer_lock;
 
 device::timer& get_timer() {
-    slock guard{timer_lock};
+    slock_irqsafe guard{timer_lock};
     if (timer_dev) {
         return *timer_dev;
     }

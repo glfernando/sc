@@ -23,16 +23,6 @@ class lock {
     unsigned val;
 };
 
-class lock_irqsafe : public lock {
- public:
-    lock_irqsafe() : lock(), flags(0) {}
-    [[gnu::always_inline]] void acquire();
-    [[gnu::always_inline]] void release();
-
- private:
-    unsigned long flags;
-};
-
 }  // namespace lib
 
 namespace lib {
@@ -43,17 +33,6 @@ void lock::acquire() {
 
 void lock::release() {
     val = 0;
-}
-
-void lock_irqsafe::acquire() {
-    flags = sysreg_read(primask);
-    asm volatile("cpsid i");
-    lock::acquire();
-}
-
-void lock_irqsafe::release() {
-    lock::release();
-    sysreg_write(primask, flags);
 }
 
 }  // namespace lib

@@ -19,16 +19,6 @@ class lock {
     unsigned val __attribute__((aligned(8)));
 };
 
-class lock_irqsafe : public lock {
- public:
-    lock_irqsafe() : lock(), flags(0) {}
-    [[gnu::always_inline]] void acquire();
-    [[gnu::always_inline]] void release();
-
- private:
-    unsigned long flags;
-};
-
 }  // namespace lib
 
 namespace lib {
@@ -55,19 +45,6 @@ void lock::acquire() {
 
 void lock::release() {
     asm volatile("stlr wzr, [%0]" ::"r"(&val));
-}
-
-void lock_irqsafe::acquire() {
-    asm volatile(
-        "mrs %0, daif\n"
-        "msr daifset, #3\n"
-        : "=r"(flags));
-    lock::acquire();
-}
-
-void lock_irqsafe::release() {
-    lock::release();
-    asm volatile("msr daif, %0" ::"r"(flags));
 }
 
 }  // namespace lib
