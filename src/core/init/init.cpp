@@ -24,6 +24,12 @@ void init_array() {
         (*f)();
 }
 
+// allow to override main
+__attribute__((weak)) int main() {
+    shell_run();
+    return 0;
+}
+
 extern "C" [[noreturn]] void init() {
     core::cpu::early_init();
     board::early_init();
