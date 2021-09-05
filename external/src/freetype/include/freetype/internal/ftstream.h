@@ -53,6 +53,7 @@ FT_BEGIN_HEADER
 #define FT_FRAME_OP_OFF3   5  /* read 3-byte value     */
 #define FT_FRAME_OP_BYTES  6  /* read a bytes sequence */
 
+#define offsetof(type, member) __builtin_offsetof(type, member)
 
   typedef enum  FT_Frame_Op_
   {
