@@ -11,6 +11,7 @@ module;
 export module lib.async;
 
 export import std.tuple;
+export import std.string;
 import std.type_traits;
 export import std.utility;
 export import core.thread;
