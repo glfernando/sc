@@ -1,6 +1,4 @@
 
-src-y += main.cpp
-
 src-y += app/
 src-y += core/
 src-y += device/
