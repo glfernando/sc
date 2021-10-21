@@ -14,10 +14,12 @@ void enable_irq() {
 
 long save_and_disable_irq() {
     long flags;
+    // clang-format off
     asm volatile(R"(
         mrs %0, daif
         msr daifset, #3
     )" : "=r"(flags));
+    // clang-format on
     return flags;
 }
 
