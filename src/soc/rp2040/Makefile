@@ -9,3 +9,4 @@ src-y += pwm.cppm
 src-y += i2c.cppm
 src-y += spi.cppm
 src-y += mailbox.cppm
+src-y += multicore.cppm
