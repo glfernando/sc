@@ -85,7 +85,7 @@ enum nvic_reg_offset : uint32_t {
 
 void nvic::init() {
     // disable and clear all pending interrupts
-    reg(NVIC_ICPR) = ~0;
+    reg(NVIC_ICER) = ~0;
     reg(NVIC_ICPR) = ~0;
 
     // TODO: set priority
@@ -102,11 +102,11 @@ void nvic::request_irq(unsigned irq, unsigned flags, handler handler, void* data
     if (!data) {
         core::cpu::armv6m::exception::register_handler(
             irq, reinterpret_cast<core::cpu::armv6m::exception::handler_t>(handler));
-        return;
+    } else {
+        handlers[irq].func = handler;
+        handlers[irq].data = data;
+        core::cpu::armv6m::exception::register_handler(irq, default_handler);
     }
-    handlers[irq].func = handler;
-    handlers[irq].data = data;
-    core::cpu::armv6m::exception::register_handler(irq, default_handler);
 
     if (flags & FLAG_START_ENABLED)
         enable_irq(irq);
