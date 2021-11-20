@@ -16,6 +16,7 @@ import core.cpu.armv6m.start;
 import lib.fmt;
 import lib.reg;
 import lib.backtrace;
+import lib.cpu;
 import lib.exception;
 import std.string;
 
@@ -106,7 +107,7 @@ static void fill_unw_context(unw_context_t& uc, excep_frame& regs) {
 }
 
 static void unhandled_excep(excep_frame& regs, unsigned exc_return) {
-    println("unhandled exception number {}", sysreg_read(ipsr));
+    println("unhandled exception number {} at core {}", sysreg_read(ipsr), lib::cpu::id());
 
     unsigned sp = reinterpret_cast<unsigned>(&regs) + sizeof regs;
     println("\nregisters:");
