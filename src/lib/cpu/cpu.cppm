@@ -6,3 +6,4 @@
 
 export module lib.cpu;
 export import lib.cpu.arch;
+export import lib.cpu.soc;
