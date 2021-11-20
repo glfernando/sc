@@ -31,11 +31,14 @@ using lib::lock;
 using lib::lock_irqsafe_for;
 using lib::slock_irqsafe;
 using lib::fmt::println;
+using lib::fmt::sprint;
 using std::string;
 using std::unique_ptr;
 using std::vector;
 
 using namespace lib::time;
+
+constexpr unsigned MAX_CPUS = 8;
 
 constexpr size_t THREAD_STACK_SIZE = 1024 * 32;
 using entry_t = void (*)(void*);
@@ -80,6 +83,7 @@ class thread_t : public thread_arch, public lib::elist_node {
 
     thread_t() {}
     friend void init();
+    friend void init_sec(unsigned cpu);
     friend void schedule();
 };
 
@@ -90,7 +94,7 @@ namespace core::thread {
 
 static lock thread_lock;
 static equeue<thread_t> ready_queue;
-static thread_t* idle_thread;
+static thread_t* idle_threads[MAX_CPUS];
 static device::timer* dev;
 
 }  // namespace core::thread
@@ -104,6 +108,8 @@ void schedule() {
     slock_irqsafe guard(thread_lock);
 
     auto t = current();
+    auto cpu = lib::cpu::id();
+    auto idle_thread = idle_threads[cpu];
 
     switch (t->state) {
     case state::DONE:
@@ -111,6 +117,7 @@ void schedule() {
         for (auto tmp : t->done_wait_list) {
             tmp->state = state::READY;
             ready_queue.push(tmp);
+            arch_kick();
         }
         break;
     default:;
@@ -119,7 +126,6 @@ void schedule() {
     thread_t* new_t;
     if (ready_queue.empty()) {
         if (t == idle_thread || t->state == state::RUNNING) {
-            // println("empty continue currning");
             return;
         }
         // switch to idle thread
@@ -128,11 +134,12 @@ void schedule() {
         new_t = ready_queue.pop();
     }
 
-    // println("{} switching to {}", new_t, new_t->name);
+    // println("[{}] {} switching to {}", cpu, t->name, new_t->name);
 
     if (t != idle_thread && t->state == state::RUNNING) {
         t->state = state::READY;
         ready_queue.push(t);
+        arch_kick();
     }
 
     new_t->state = state::RUNNING;
@@ -146,6 +153,7 @@ void set_ready(thread_t* t) {
     if (t->state != state::READY) {
         t->state = state::READY;
         ready_queue.push(t);
+        arch_kick();
     }
 }
 
@@ -154,6 +162,7 @@ void sleep_timer_cb(void* data) {
     lock_irqsafe_for(thread_lock, [&] {
         t->state = state::READY;
         ready_queue.push(t);
+        arch_kick();
     });
 }
 
@@ -175,7 +184,29 @@ void thread_idle(void*) {
     }
 }
 
+void init_sec(unsigned cpu) {
+    // make a thread for the current execution
+    auto idle_thread = new thread_t();
+    idle_thread->name = sprint("idle{}", cpu);
+    idle_thread->entry = thread_idle;
+    idle_thread->arg = nullptr;
+    idle_thread->state = state::RUNNING;
+
+    idle_threads[cpu] = idle_thread;
+
+    // tell the system it is the current thread
+    thread_current_addr(reinterpret_cast<uintptr_t>(idle_thread));
+
+    // become idle thread
+    thread_idle(nullptr);
+}
+
 void init() {
+    auto cpu = lib::cpu::id();
+    if (cpu) {
+        return init_sec(cpu);
+    }
+
     // make a thread for the current execution
     auto ti = new thread_t();
     ti->name = "init";
@@ -183,12 +214,14 @@ void init() {
     ti->arg = nullptr;
     ti->state = state::RUNNING;
 
+    arch_init();
+
     // tell the system it is the current thread
     thread_current_addr(reinterpret_cast<uintptr_t>(ti));
 
     // now let's create a idle thread
-    idle_thread = new thread_t();
-    idle_thread->name = "idle";
+    auto idle_thread = new thread_t();
+    idle_thread->name = "idle0";
     idle_thread->entry = thread_idle;
     idle_thread->arg = nullptr;
     idle_thread->state = state::READY;
@@ -198,6 +231,8 @@ void init() {
     auto pc = reinterpret_cast<uintptr_t>(&idle_thread->thread_entry);
     auto arg = reinterpret_cast<unsigned long>(idle_thread);
     idle_thread->init_context(pc, arg, sp);
+
+    idle_threads[cpu] = idle_thread;
 
     dev = device::manager::find<device::timer>();
 }
@@ -218,7 +253,9 @@ void thread_t::thread_entry(thread_t* self) {
         println("thread {} caused exception ({})", self->name, e.msg());
         self->excep = e;
     } catch (...) { self->excep = exception("unknown"); }
-    self->state = state::DONE;
+
+    lock_irqsafe_for(thread_lock, [&self] { self->state = state::DONE; });
+
     schedule();
 }
 
@@ -233,6 +270,7 @@ thread_t::thread_t(string const& name, entry_t entry, void* arg, size_t stack_si
         state = state::READY;
         ready_queue.push(this);
     });
+    arch_kick();
 }
 
 void thread_t::join() {
