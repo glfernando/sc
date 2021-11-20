@@ -44,6 +44,8 @@ extern "C" [[noreturn]] void init() {
     // init thread framework, after that we will be running in the main thread
     core::thread::init();
 
+    board::late_init();
+
     println("Welcome to SC");
 
 #ifdef RUN_ALL_TESTS
