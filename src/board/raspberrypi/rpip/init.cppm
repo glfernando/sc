@@ -14,6 +14,26 @@ export module board.init;
 import soc.rp2040;
 import board.peripherals;
 import board.pico.bootrom;
+import soc.rp2040.multicore;
+import core.thread;
+import lib.reg;
+import soc.rp2040.mailbox;
+
+using namespace soc::rp2040;
+
+static void sec_entry() {
+    board::peripherals::init_sec();
+    core::thread::init();
+}
+
+static void cpu1_start() {
+    multicore::core1_start(sec_entry);
+
+    auto& nvic = board::peripherals::default_intc();
+    nvic.request_irq(
+        16 + 15, device::intc::FLAG_START_ENABLED,
+        [](unsigned, void*) { soc::rp2040::mailbox::flush(); }, nullptr);
+}
 
 export namespace board {
 
@@ -27,6 +47,7 @@ void init() {
 }
 
 void late_init() {
+    cpu1_start();
 }
 
 }  // namespace board

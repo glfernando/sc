@@ -14,3 +14,4 @@ src-y += spi.cppm
 src-y += mailbox.cppm
 src-y += multicore.cppm
 src-y += hwspinlock.cppm
+src-y += thread.cppm

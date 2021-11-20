@@ -22,6 +22,7 @@ import soc.rp2040.address_map;
 import std.string;
 import lib.fmt;
 import lib.exception;
+import soc.rp2040.mailbox;
 
 using lib::exception;
 using namespace soc::rp2040::address_map;
@@ -110,6 +111,14 @@ void init() {
 
     device::manager::register_device(&spi0);
     device::manager::register_device(&spi1);
+}
+
+void init_sec() {
+    nvic.init();
+    soc::rp2040::mailbox::init();
+    nvic.request_irq(
+        16 + 16, device::intc::FLAG_START_ENABLED,
+        [](unsigned, void*) { soc::rp2040::mailbox::flush(); }, nullptr);
 }
 
 auto& default_console() {
