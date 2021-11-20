@@ -10,13 +10,11 @@ import soc.rp2040.hwspinlock;
 
 using soc::rp2040::hwspinlock;
 
-static unsigned hw_index;
-
 export namespace lib {
 
 class lock {
  public:
-    lock() : hwlock(hw_index++), val(0) {}
+    constexpr lock() : hwlock(0), val(0) {}
 
     [[gnu::always_inline]] void acquire();
     [[gnu::always_inline]] void release();
