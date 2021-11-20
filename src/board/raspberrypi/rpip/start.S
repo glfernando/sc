@@ -16,4 +16,6 @@ _board_entry:
         bx      r2
 
 _real_start:
+        ldr     r0, =__stack_end
+        msr     msp, r0
         bl _start
