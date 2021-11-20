@@ -10,7 +10,7 @@ export namespace lib {
 
 class lock {
  public:
-    lock() : val(0) {}
+    constexpr lock() : val(0) {}
 
     [[gnu::always_inline]] void acquire();
     [[gnu::always_inline]] void release();
