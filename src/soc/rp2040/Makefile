@@ -1,5 +1,8 @@
 
+GLOBAL_CPPFLAGS += -DCONFIG_SOC_RP2040
+
 src-y += rp2040.cppm
+src-y += cpu.cppm
 src-y += address_map.cppm
 src-y += lock.cppm
 src-y += gpio.cppm
