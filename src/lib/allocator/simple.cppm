@@ -60,7 +60,7 @@ struct chunk;
 
 class simple {
  public:
-    simple(uint8_t* start, uint8_t* end) noexcept : start(start), end(end) {}
+    constexpr simple(uint8_t* start, uint8_t* end) noexcept : start(start), end(end) {}
     void init() noexcept;
     void* alloc(size_t size, size_t align) noexcept;
     void* realloc(void* p, size_t size, size_t align) noexcept;
