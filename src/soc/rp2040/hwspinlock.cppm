@@ -15,6 +15,7 @@ using namespace soc::rp2040::address_map;
 using lib::reg::reg32;
 
 constexpr uint32_t SPINLOCK0 = 0x100;
+constexpr uint32_t SPINLOCK_ST = 0x5c;
 
 export namespace soc::rp2040 {
 
@@ -29,6 +30,20 @@ class hwspinlock {
     }
 
     void release() { reg32(addr) = 1; }
+
+    static void init() {
+        // clear all hwspinlcoks
+        auto spin_lock_addr = [](unsigned index) {
+            return SIO_BASE + SPINLOCK0 + ((index * 4) % 32);
+        };
+
+        uint32_t status = reg32(SIO_BASE + SPINLOCK_ST);
+        for (unsigned bit = 0; status; bit++, status >>= 1) {
+            if (status & 0x1) {
+                reg32(spin_lock_addr(bit)) = 0;
+            }
+        }
+    }
 
  private:
     const uintptr_t addr;

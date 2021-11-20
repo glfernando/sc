@@ -12,6 +12,8 @@ module;
 export module soc.rp2040;
 
 import soc.rp2040.address_map;
+import soc.rp2040.hwspinlock;
+import soc.rp2040.mailbox;
 import lib.reg;
 
 #define RESET      (soc::rp2040::address_map::RESETS_BASE + 0x00)
@@ -95,6 +97,9 @@ void init() {
     // gpio tx/rx func
     reg32(0x40014004) = 2;
     reg32(0x4001400c) = 2;
+
+    hwspinlock::init();
+    mailbox::init();
 }
 
 }  // namespace soc::rp2040
