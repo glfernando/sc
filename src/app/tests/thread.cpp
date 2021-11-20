@@ -8,6 +8,7 @@
 import core.thread;
 import lib.time;
 import lib.timestamp;
+import lib.lock;
 
 using core::thread::sleep;
 using core::thread::thread_t;
@@ -40,4 +41,39 @@ TEST(thread, join) {
         &good);
     t.join();
     EXPECT(good);
+}
+
+TEST(thread, busy) {
+    thread_t t1(
+        "busy-t1", [](void*) { delay(1s); }, nullptr);
+
+    thread_t t2(
+        "busy-t2", [](void*) { delay(1s); }, nullptr);
+    t1.join();
+    t2.join();
+}
+
+static int counter;
+static lock lock0;
+
+TEST(thread, spinlock) {
+    counter = 0;
+    thread_t t1(
+        "spin-t1",
+        [](void*) {
+            for (int i = 0; i < 100; ++i) {
+                lock0.acquire();
+                counter++;
+                lock0.release();
+            }
+        },
+        nullptr);
+
+    for (int i = 0; i < 100; ++i) {
+        lock0.acquire();
+        counter++;
+        lock0.release();
+    }
+    t1.join();
+    EXPECT(counter == 200);
 }
