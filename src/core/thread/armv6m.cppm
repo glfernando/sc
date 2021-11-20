@@ -10,6 +10,9 @@ module;
 #include <stdint.h>
 
 export module core.thread.arch;
+export import core.cpu.armv6m.exception;
+
+import soc.thread;
 
 __attribute__((naked)) static void thread_init_entry(void) {
     asm volatile(R"(
@@ -18,8 +21,6 @@ __attribute__((naked)) static void thread_init_entry(void) {
         bx lr
     )");
 }
-
-export import core.cpu.armv6m.exception;
 
 export namespace core::thread {
 
@@ -82,8 +83,15 @@ __attribute__((naked)) void switch_context(thread_arch* /* tto */, thread_arch* 
     )");
 }
 
+void arch_init() {}
+
 void arch_idle() {
     asm volatile("wfi");
+}
+
+void arch_kick() {
+    // there is no generic wait to kick other CPUs in ARMv6m, so it is board dependent
+    soc::thread::kick();
 }
 
 }  // namespace core::thread

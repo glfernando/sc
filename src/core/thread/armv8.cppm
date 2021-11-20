@@ -13,6 +13,11 @@ module;
 export module core.thread.arch;
 export import core.cpu.armv8.exception;
 
+import device.intc;
+import lib.exception;
+
+using lib::exception;
+
 __attribute__((naked)) static void thread_init_isr(void) {
     asm volatile(R"(
         mov lr, x18
@@ -76,6 +81,8 @@ struct context_regs {
     unsigned long q15;
 };
 
+static device::intc* intc;
+
 export namespace core::thread {
 
 constexpr size_t IDLE_THREAD_STACK_SIZE = 4096;
@@ -137,8 +144,25 @@ __attribute__((naked)) void switch_context(thread_arch* /* tto */, thread_arch* 
     )" ::"I"(sizeof(context_regs)));
 }
 
+void arch_init() {
+    if (!intc) {
+        intc = device::manager::find<device::intc>();
+        if (!intc) {
+            throw exception("not interrupt controller");
+        }
+        intc->request_irq(
+            10, device::intc::FLAG_START_ENABLED, [](auto, auto) {}, nullptr);
+    } else {
+        intc->enable_irq(10);
+    }
+}
+
 void arch_idle() {
     asm volatile("wfi");
+}
+
+void arch_kick() {
+    intc->send_ipi(device::intc::ipi_target::ALL_BUT_ME, 10);
 }
 
 }  // namespace core::thread
