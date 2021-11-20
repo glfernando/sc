@@ -59,4 +59,10 @@ void flush() noexcept {
     }
 }
 
+void init() noexcept {
+    // clear flags and flush fifo
+    flush();
+    reg(FIFO_ST) = 0xff;
+}
+
 }  // namespace soc::rp2040::mailbox
