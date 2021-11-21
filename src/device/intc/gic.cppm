@@ -69,6 +69,7 @@ enum dreg_reg_offset : uint32_t {
     GICD_ISENABLER  = 0x0100,
     GICD_ICENABLER  = 0x0180,
     GICD_ICPENDR    = 0x0280,
+    GICD_ITARGETSR  = 0x0800,
     GICD_SGIR       = 0x0f00,
 };
 
@@ -98,6 +99,8 @@ void gic::init() {
     irq_num = ((v & 0x1f) + 1) * 32;
     println("number of irq lines {}", irq_num);
 
+    auto cpus = ((v >> 5) & 0x7) + 1;
+
     if (irq_num < GIC_SPI_START)
         throw exception(sprint("invalid number of interrupts {}", irq_num));
 
@@ -108,6 +111,13 @@ void gic::init() {
     for (unsigned i = 32; i < irq_num; i += 32) {
         dreg(GICD_ICENABLER + (i / 32) * 4) = ~0;
         dreg(GICD_ICPENDR + (i / 32) * 4) = ~0;
+    }
+
+    if (cpus > 1) {
+        // init all external interrupts to target core0
+        for (unsigned i = 32; i < irq_num; i += 4) {
+            dreg(GICD_ITARGETSR + i) = 0x01010101;
+        }
     }
 
     // enable gic distributor
