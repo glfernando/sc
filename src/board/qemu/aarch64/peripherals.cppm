@@ -52,6 +52,11 @@ void init() {
     device::manager::register_device(&timer0);
 }
 
+void init_sec() {
+    gicv2.init_core();
+    timer0.init();
+}
+
 auto& default_console() {
     return con0;
 }
