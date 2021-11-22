@@ -202,6 +202,8 @@ void init_sec(unsigned cpu) {
 }
 
 void init() {
+    arch_init();
+
     auto cpu = lib::cpu::id();
     if (cpu) {
         return init_sec(cpu);
@@ -213,8 +215,6 @@ void init() {
     ti->entry = nullptr;
     ti->arg = nullptr;
     ti->state = state::RUNNING;
-
-    arch_init();
 
     // tell the system it is the current thread
     thread_current_addr(reinterpret_cast<uintptr_t>(ti));
