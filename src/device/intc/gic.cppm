@@ -43,6 +43,8 @@ class gic : public intc {
     inline void send_ipi(unsigned cpu_mask, unsigned irq) override;
     inline void send_ipi(ipi_target target, unsigned irq) override;
 
+    void init_core();
+
  private:
     volatile uint32_t& dreg(uint32_t offset) { return reg32(dbase + offset); }
     volatile uint32_t& creg(uint32_t offset) { return reg32(cbase + offset); }
@@ -123,6 +125,10 @@ void gic::init() {
     // enable gic distributor
     dreg(GICD_CTLR) |= GICD_CTLR_EN_GRP1_NS | GICD_CTLR_EN_GRP0;
 
+    init_core();
+}
+
+void gic::init_core() {
     // core enable
     creg(GICC_CTLR) = GICC_CTLR_ENABLE;
     // allow all priorities
