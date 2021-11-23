@@ -7,8 +7,8 @@
         b _real_start
         nop
 
-.global _board_entry
-_board_entry:
+.global _soc_entry
+_soc_entry:
         movs    r0, #0
         ldr     r1, =(0xe0000000 + 0x0000ed00)
         str     r0, [r1, #8]
