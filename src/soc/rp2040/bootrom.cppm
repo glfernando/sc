@@ -8,7 +8,7 @@ module;
 
 #include <stdint.h>
 
-export module board.pico.bootrom;
+export module soc.rp2040.bootrom;
 
 import lib.reg;
 
@@ -36,7 +36,7 @@ enum {
 
 static void* rom_funcs[FUNC_MAX];
 
-export namespace board::pico::bootrom {
+export namespace soc::rp2040::bootrom {
 
 extern "C" {
 
@@ -73,4 +73,4 @@ void init() {
     rom_funcs[CTZ32] = rom_func_lookup(rom_table_code('T', '3'));
 }
 
-}  // namespace board::pico::bootrom
+}  // namespace soc::rp2040::bootrom

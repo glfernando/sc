@@ -1,7 +1,7 @@
 
 BOARD_PATH := board/raspberrypi/rpip
 TARGET_CONFIG_FILE := board/raspberrypi/rpip/config.h
-LINKER_SCRIPT := src/board/raspberrypi/rpip/linker.ld
+LINKER_SCRIPT := src/soc/rp2040/linker.ld
 CONFIG_PL011 := y
 CONFIG_LIBAEABI_CORTEX_M0 := y
 CONFIG_NVIC := y

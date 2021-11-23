@@ -14,7 +14,7 @@ MEMORY
 
 REGION_ALIAS("REGION_TESTS", RAM);
 
-ENTRY(_board_entry)
+ENTRY(_soc_entry)
 SECTIONS
 {
     .boot2 ORIGIN(FLASH) : {

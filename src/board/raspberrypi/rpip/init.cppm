@@ -13,7 +13,6 @@ export module board.init;
 
 import soc.rp2040;
 import board.peripherals;
-import board.pico.bootrom;
 import soc.rp2040.multicore;
 import core.thread;
 import lib.reg;
@@ -38,7 +37,7 @@ static void cpu1_start() {
 export namespace board {
 
 void early_init() {
-    board::pico::bootrom::init();
+    soc::rp2040::early_init();
 }
 
 void init() {

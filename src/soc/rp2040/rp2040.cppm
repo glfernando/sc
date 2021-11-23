@@ -14,6 +14,7 @@ export module soc.rp2040;
 import soc.rp2040.address_map;
 import soc.rp2040.hwspinlock;
 import soc.rp2040.mailbox;
+import soc.rp2040.bootrom;
 import lib.reg;
 
 #define RESET      (soc::rp2040::address_map::RESETS_BASE + 0x00)
@@ -30,6 +31,10 @@ volatile uint32_t& reg_set(uintptr_t addr) {
 }
 
 export namespace soc::rp2040 {
+
+void early_init() {
+    bootrom::init();
+}
 
 // TODO: create proper clk, gpio, reset, etc drivers
 
