@@ -33,7 +33,7 @@ class async {
     using R = std::invoke_result_t<F, Args...>;
 
  public:
-    async(std::string const& name, F&& f, Args&&... args)
+    async(std::string const& name, unsigned affinity, F&& f, Args&&... args)
         : func{decay_copy(std::forward<F>(f))},
           args{decay_copy(std::forward<Args>(args))...},
           t{name,
@@ -41,10 +41,18 @@ class async {
                 auto self = reinterpret_cast<async*>(data);
                 self->call();
             },
-            this} {}
+            this, affinity} {}
+
+    async(unsigned affinity, F&& f, Args&&... args)
+        : async("async", affinity, std::forward<F>(f), std::forward<Args>(args)...) {}
+
+    async(std::string const& name, F&& f, Args&&... args)
+        : async(name, core::thread::AFFINITY_ALL, std::forward<F>(f), std::forward<Args>(args)...) {
+    }
 
     async(F&& f, Args&&... args)
-        : async("async", std::forward<F>(f), std::forward<Args>(args)...) {}
+        : async("async", core::thread::AFFINITY_ALL, std::forward<F>(f),
+                std::forward<Args>(args)...) {}
 
     auto wait_for_result() {
         t.join();
@@ -89,5 +97,30 @@ class async {
     async_result<R> res;
     thread_t t;
 };
+
+// deduction guides
+template <typename F, typename... Args>
+async(std::string const& name, unsigned affinity, F&&, Args&&... args) -> async<F, Args...>;
+
+template <typename F, typename... Args>
+async(std::string const&& name, unsigned affinity, F&&, Args&&... args) -> async<F, Args...>;
+
+template <typename F, typename... Args>
+async(const char* name, unsigned affinity, F&&, Args&&... args) -> async<F, Args...>;
+
+template <typename F, typename... Args>
+async(std::string const& name, F&&, Args&&... args) -> async<F, Args...>;
+
+template <typename F, typename... Args>
+async(std::string const&& name, F&&, Args&&... args) -> async<F, Args...>;
+
+template <typename F, typename... Args>
+async(const char* name, F&&, Args&&... args) -> async<F, Args...>;
+
+template <typename F, typename... Args>
+async(unsigned affinity, F&&, Args&&... args) -> async<F, Args...>;
+
+template <typename F, typename... Args>
+async(F&&, Args&&... args) -> async<F, Args...>;
 
 }  // namespace lib
