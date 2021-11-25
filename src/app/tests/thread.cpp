@@ -9,6 +9,7 @@ import core.thread;
 import lib.time;
 import lib.timestamp;
 import lib.lock;
+import lib.cpu;
 
 using core::thread::sleep;
 using core::thread::thread_t;
@@ -76,4 +77,22 @@ TEST(thread, spinlock) {
     }
     t1.join();
     EXPECT(counter == 200);
+}
+
+TEST(thread, affinity) {
+    // schedule a thread on each core
+    unsigned tcpu = -1;
+    for (unsigned cpu = 0; cpu < core::thread::core_num; ++cpu) {
+        thread_t t(
+            "aff-thread",
+            [](void* data) {
+                unsigned& cpu = *reinterpret_cast<unsigned*>(data);
+                cpu = lib::cpu::id();
+            },
+            &tcpu, 1 << cpu);
+
+        t.join();
+
+        EXPECT(cpu == tcpu);
+    }
 }
