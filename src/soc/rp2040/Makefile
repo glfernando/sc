@@ -19,3 +19,5 @@ src-y += multicore.cppm
 src-y += hwspinlock.cppm
 src-y += thread.cppm
 src-y += bootrom.cppm
+src-y += reset.cppm
+src-y += rtc.cppm
