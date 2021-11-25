@@ -7,6 +7,7 @@
 
 import lib.async;
 import core.thread;
+import lib.cpu;
 
 using lib::async;
 
@@ -23,4 +24,11 @@ TEST(async, call) {
 
     EXPECT(r1 == 100)
     EXPECT(r2 == 400)
+}
+
+TEST(async, affinity) {
+    for (unsigned cpu = 0; cpu < core::thread::core_num; ++cpu) {
+        async a{1u << cpu, [] { return lib::cpu::id(); }};
+        EXPECT(cpu == a.wait_for_result());
+    }
 }
