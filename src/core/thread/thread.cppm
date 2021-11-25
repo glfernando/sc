@@ -54,12 +54,14 @@ enum class state {
     DEAD,
 };
 
+constexpr unsigned AFFINITY_ALL = 0;
+
 class thread_t : public thread_arch, public lib::elist_node {
  public:
     static void thread_entry(thread_t* self);
 
     thread_t(string const& name, entry_t entry, void* arg = nullptr,
-             size_t stack_size_ = THREAD_STACK_SIZE);
+             unsigned affinity = AFFINITY_ALL, size_t stack_size_ = THREAD_STACK_SIZE);
 
     ~thread_t() {
         // only propagate exception when join is called directly
@@ -72,6 +74,7 @@ class thread_t : public thread_arch, public lib::elist_node {
 
     string name;
     state state;
+    unsigned affinity;
 
  private:
     entry_t entry;
@@ -92,17 +95,59 @@ class thread_t : public thread_arch, public lib::elist_node {
 // local variables
 namespace core::thread {
 
+// Affinity queue
+class aqueue : public equeue<thread_t> {
+ public:
+    constexpr bool aff_empty() const noexcept {
+        if (equeue<thread_t>::empty())
+            return true;
+        auto cpu = lib::cpu::id();
+        for (auto& t : *this) {
+            if (t.affinity == 0 || (t.affinity & (1 << cpu)))
+                return false;
+        }
+        return true;
+    }
+
+    constexpr thread_t* aff_pop() {
+        if (empty()) {
+            return nullptr;
+        }
+
+        auto cpu = lib::cpu::id();
+        thread_t* tt = nullptr;
+        for (auto& t : *this) {
+            if (t.affinity == 0 || (t.affinity & (1 << cpu))) {
+                tt = &t;
+                break;
+            }
+        }
+
+        if (tt) {
+            equeue<thread_t>::remove(tt);
+            return tt;
+        } else {
+            return nullptr;
+        }
+        // TODO: root cause compilation error without it
+        return equeue<thread_t>::pop();
+    }
+};
+
 static lock thread_lock;
-static equeue<thread_t> ready_queue;
+static aqueue ready_queue;
 static thread_t* idle_threads[MAX_CPUS];
 static device::timer* dev;
 
 }  // namespace core::thread
 
 export namespace core::thread {
+
 thread_t* current() {
     return reinterpret_cast<thread_t*>(thread_current_addr());
 }
+
+unsigned core_num = 1;
 
 void schedule() {
     slock_irqsafe guard(thread_lock);
@@ -124,14 +169,14 @@ void schedule() {
     }
 
     thread_t* new_t;
-    if (ready_queue.empty()) {
+    if (ready_queue.aff_empty()) {
         if (t == idle_thread || t->state == state::RUNNING) {
             return;
         }
         // switch to idle thread
         new_t = idle_thread;
     } else {
-        new_t = ready_queue.pop();
+        new_t = ready_queue.aff_pop();
     }
 
     // println("[{}] {} switching to {}", cpu, t->name, new_t->name);
@@ -197,6 +242,8 @@ void init_sec(unsigned cpu) {
     // tell the system it is the current thread
     thread_current_addr(reinterpret_cast<uintptr_t>(idle_thread));
 
+    lock_for(thread_lock, [] { core_num++; });
+
     // become idle thread
     thread_idle(nullptr);
 }
@@ -214,6 +261,7 @@ void init() {
     ti->name = "init";
     ti->entry = nullptr;
     ti->arg = nullptr;
+    ti->affinity = AFFINITY_ALL;
     ti->state = state::RUNNING;
 
     // tell the system it is the current thread
@@ -259,8 +307,14 @@ void thread_t::thread_entry(thread_t* self) {
     schedule();
 }
 
-thread_t::thread_t(string const& name, entry_t entry, void* arg, size_t stack_size_)
-    : name(name), entry(entry), arg(arg), stack(new uint8_t[stack_size_]), stack_size(stack_size_) {
+thread_t::thread_t(string const& name, entry_t entry, void* arg, unsigned affinity,
+                   size_t stack_size_)
+    : name(name),
+      affinity(affinity),
+      entry(entry),
+      arg(arg),
+      stack(new uint8_t[stack_size_]),
+      stack_size(stack_size_) {
     auto sp = reinterpret_cast<uintptr_t>(stack.get()) + stack_size;
     auto pc = reinterpret_cast<uintptr_t>(&thread_entry);
     auto self_ptr = reinterpret_cast<unsigned long>(this);
