@@ -15,6 +15,7 @@ import soc.rp2040.address_map;
 import soc.rp2040.hwspinlock;
 import soc.rp2040.mailbox;
 import soc.rp2040.bootrom;
+import soc.rp2040.rtc;
 import lib.reg;
 
 #define RESET      (soc::rp2040::address_map::RESETS_BASE + 0x00)
@@ -105,6 +106,7 @@ void init() {
 
     hwspinlock::init();
     mailbox::init();
+    rtc::init();
 }
 
 }  // namespace soc::rp2040
