@@ -18,7 +18,11 @@
 import lib.fmt;
 import lib.hexdump;
 import std.string;
+import core.thread;
+import lib.cpu;
+import lib.async;
 
+using lib::async;
 using lib::hexdump;
 using lib::fmt::println;
 using std::string;
@@ -27,6 +31,7 @@ void cmd_mem_usage() {
     println(
         "mem [options] <[0x]hex_addr>[:size|..<[0x]hex_range> [value]\n"
         "options:\n"
+        "   -c <num>    cpu core used to read/write memory\n"
         "   -o          print offset during memory dump\n"
         "   -a          print ascii code during memory dump\n"
         "   -g <num>    group by <num> during memory dump\n"
@@ -34,11 +39,59 @@ void cmd_mem_usage() {
         "mem command enter memory dump mode when size is different from 1/2/4/8");
 }
 
+static int mem_task(bool write, unsigned long val, size_t size, uintptr_t addr, size_t group,
+                    bool offset, bool ascii) {
+    if (write) {
+        switch (size) {
+        case 1:
+            *reinterpret_cast<uint8_t*>(addr) = val;
+            break;
+        case 2:
+            *reinterpret_cast<uint16_t*>(addr) = val;
+            break;
+        case 4:
+            *reinterpret_cast<uint32_t*>(addr) = val;
+            break;
+        case 8:
+            *reinterpret_cast<uint64_t*>(addr) = val;
+            break;
+        default:
+            println("unsupported size for writing, use 1/2/4/8");
+            return ERR_INVALID_ARGS;
+        }
+        return 0;
+    }
+
+    // read
+    switch (size) {
+    case 1:
+        println("{:02x}", *reinterpret_cast<uint8_t*>(addr));
+        break;
+    case 2:
+        println("{:04x}", *reinterpret_cast<uint16_t*>(addr));
+        break;
+    case 4:
+        println("{:08x}", *reinterpret_cast<uint32_t*>(addr));
+        break;
+    case 8:
+        println("{:016x}", *reinterpret_cast<uint64_t*>(addr));
+        break;
+    default:
+        // use hexdumo for any other size
+        hexdump(reinterpret_cast<void*>(addr), size, group, offset, ascii);
+    }
+
+    return 0;
+}
+
+constexpr unsigned CPU_ANY = ~0U;
+
 static int cmd_mem(int argc, char const* argv[]) {
     bool offset = false;
     bool ascii = false;
     size_t group = 4;
     int pos_argc = 0;
+    unsigned cpu = CPU_ANY;
     for (int i = 0; i < argc; ++i) {
         auto arg = argv[i];
 
@@ -49,6 +102,18 @@ static int cmd_mem(int argc, char const* argv[]) {
         }
 
         switch (*arg) {
+        case 'c':
+            if (++i == argc) {
+                println("missing cor number");
+                cmd_mem_usage();
+                return ERR_INVALID_ARGS;
+            }
+            cpu = strtoul(argv[i], NULL, 0);
+            if (cpu >= core::thread::core_num) {
+                println("invalid core number {}", cpu);
+                return ERR_INVALID_ARGS;
+            }
+            break;
         case 'o':
             offset = true;
             break;
@@ -116,54 +181,27 @@ static int cmd_mem(int argc, char const* argv[]) {
         return ERR_INVALID_ARGS;
     }
 
+    unsigned long val = 0;
+    bool write = false;
     if (argc == 3) {
         // we are wrting a value
         ptr = argv[2];
-        unsigned long val = strtoul(ptr, &endptr, 0);
+        val = strtoul(ptr, &endptr, 0);
         if (ptr == endptr) {
             println("invalid write value");
             return ERR_INVALID_ARGS;
         }
-        switch (size) {
-        case 1:
-            *reinterpret_cast<uint8_t*>(addr) = val;
-            break;
-        case 2:
-            *reinterpret_cast<uint16_t*>(addr) = val;
-            break;
-        case 4:
-            *reinterpret_cast<uint32_t*>(addr) = val;
-            break;
-        case 8:
-            *reinterpret_cast<uint64_t*>(addr) = val;
-            break;
-        default:
-            println("unsupported size for writing, use 1/2/4/8");
-            return ERR_INVALID_ARGS;
-        }
-        return 0;
+        write = true;
     }
 
-    // read
-    switch (size) {
-    case 1:
-        println("{:02x}", *reinterpret_cast<uint8_t*>(addr));
-        break;
-    case 2:
-        println("{:04x}", *reinterpret_cast<uint16_t*>(addr));
-        break;
-    case 4:
-        println("{:08x}", *reinterpret_cast<uint32_t*>(addr));
-        break;
-    case 8:
-        println("{:016x}", *reinterpret_cast<uint64_t*>(addr));
-        break;
-    default:
-        // use hexdumo for any other size
-        hexdump(reinterpret_cast<void*>(addr), size, group, offset, ascii);
+    // avoid spawing a new thread if not needed
+    if (cpu == CPU_ANY || cpu == lib::cpu::id()) {
+        return mem_task(write, val, size, addr, group, offset, ascii);
     }
 
-    return 0;
+    // spawn a new thread to read/write memory
+    async a{"mem-task", 1U << cpu, mem_task, write, val, size, addr, group, offset, ascii};
+    return a.wait_for_result();
 }
 
 shell_declare_static_cmd(mem, "read or write memory", cmd_mem, cmd_mem_usage);
