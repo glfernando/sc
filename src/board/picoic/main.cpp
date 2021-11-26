@@ -8,6 +8,7 @@
 
 import lib.async;
 import lib.fmt;
+import picoic.ui;
 
 using lib::async;
 using lib::fmt::println;
@@ -17,4 +18,6 @@ int main() {
 
     // run shell in parallel for debugging
     async ashell{shell_run};
+
+    picoic::ui::init();
 }
