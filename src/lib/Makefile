@@ -14,3 +14,4 @@ src-$(CONFIG_LIB_SERVO) += servo.cppm
 src-$(CONFIG_LIB_TTF) += ttf/
 src-$(CONFIG_LIB_GFX) += gfx.cppm
 src-$(CONFIG_LIB_ILI9341) += ili9341.cppm
+src-$(CONFIG_LIB_FT6206) += ft6206.cppm
