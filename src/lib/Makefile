@@ -10,3 +10,4 @@ src-$(CONFIG_LIB_GPIO) += gpio.cppm
 src-$(CONFIG_LIB_I2C) += i2c.cppm
 src-$(CONFIG_LIB_SPI) += spi.cppm
 src-$(CONFIG_LIB_SERVO) += servo.cppm
+src-$(CONFIG_LIB_TTF) += ttf/
