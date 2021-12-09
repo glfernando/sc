@@ -23,7 +23,7 @@ std::decay_t<T> decay_copy(T&& v) {
 template <typename F, typename... Args>
 class callback_wrapper;
 
-}
+}  // namespace
 
 export namespace lib {
 
@@ -39,7 +39,7 @@ class callback {
     }
 };
 
-}
+}  // namespace lib
 
 namespace {
 
@@ -54,4 +54,4 @@ class callback_wrapper : public lib::callback<Args...> {
     std::decay_t<F> func;
 };
 
-}
+}  // namespace

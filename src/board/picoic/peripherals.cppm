@@ -59,13 +59,13 @@ static constexpr soc::rp2040::i2c::platform_data i2c1_pdata{
 static constexpr soc::rp2040::spi::platform_data spi0_pdata{
     .base = SPI0_BASE,
     .freq = 125'000'000,
-    .baudrate = 10'000'000,
+    .baudrate = 40'000'000,
 };
 
 static constexpr soc::rp2040::spi::platform_data spi1_pdata{
     .base = SPI1_BASE,
     .freq = 125'000'000,
-    .baudrate = 10'000'000,
+    .baudrate = 40'000'000,
 };
 
 static device::pl011 uart0("uart0", uart0_pdata);

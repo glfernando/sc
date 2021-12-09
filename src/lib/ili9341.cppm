@@ -32,7 +32,7 @@ using std::tuple;
 using std::vector;
 using namespace lib::time;
 
-constexpr unsigned DC_GPIO = 26;
+constexpr unsigned DC_GPIO = 8;
 
 static bool bus_init;
 static lib::spi::dev ili9341_spi("spi0", 5);
@@ -111,6 +111,14 @@ static uint16_t height = 320;
 static uint16_t width = 240;
 
 export namespace lib::ili9341 {
+
+uint16_t get_width() {
+    return width;
+}
+
+uint16_t get_height() {
+    return height;
+}
 
 void clear_screen(uint16_t color) {
     auto& spi = get_device();
@@ -213,15 +221,49 @@ void scroll(uint16_t lines, uint16_t top, uint16_t bottom) {
     write(0x37, data, sizeof data);
 }
 
-void text(uint16_t x, uint16_t y, unsigned size, uint16_t color, uint16_t bg, string str) {
+struct text_size {
+    uint16_t width;
+    uint16_t height;
+};
+
+enum class update_pos : unsigned {
+    NONE,
+    X,
+    Y,
+    BOTH,
+};
+
+void text(uint16_t& x, uint16_t& y, unsigned size, uint16_t color, uint16_t bg, string const& str,
+        update_pos update, bool dryrun = false) {
+    auto pos_x = x;
     for (auto c : str) {
-        auto bitmap = lib::ttf::char_to_bitmap(c, size, 148);
-        println("bitmapp width {}, height {}, buf {}", bitmap.width, bitmap.height, bitmap.buffer);
-        println("left {}, top {}", bitmap.left, bitmap.top);
-        lib::ili9341::write_char(bitmap, x + bitmap.left, y + bitmap.top, color, bg);
-        x += bitmap.advance;
+        auto bitmap = lib::ttf::char_to_bitmap(c, size);
+        //println("bitmapp width {}, height {}, buf {}", bitmap.width, bitmap.height, bitmap.buffer);
+        //println("left {}, top {}", bitmap.left, bitmap.top);
+        if (!dryrun) {
+            lib::ili9341::write_char(bitmap, pos_x + bitmap.left, y + bitmap.top, color, bg);
+        }
+        pos_x += bitmap.advance;
+    }
+
+    if (update == update_pos::Y || update == update_pos::BOTH) {
+        y += ttf::char_height(size);
+    }
+    if (update == update_pos::X || update == update_pos::BOTH) {
+        x += pos_x;
     }
 }
+
+void text(uint16_t x, uint16_t y, unsigned size, uint16_t color, uint16_t bg, string const& str) {
+    text(x, y, size, color, bg, str, update_pos::NONE);
+}
+
+/*
+template<class T = uint16_t>
+void text(T&& x, T&& y, unsigned size, uint16_t color, uint16_t bg, string const& str,
+        update_pos update = update_pos::NONE) {
+    text(x, y, size, color, bg, str, update);
+}*/
 
 void init() {
     write(0x1);
@@ -367,7 +409,8 @@ static int cmd_ili9341(int argc, char const* argv[]) {
                 str += argv[i];
             }
         }
-        lib::ili9341::text(0, 0, size, color, bg, str);
+        uint16_t x = 0, y = 0;
+        lib::ili9341::text(x, y, size, color, bg, str);
     } else if (argc == 7 && cmd == "fill-rect") {
         uint16_t x = strtoul(argv[2], NULL, 0);
         uint16_t y = strtoul(argv[3], NULL, 0);

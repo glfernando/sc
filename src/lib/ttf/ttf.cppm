@@ -55,14 +55,20 @@ font_buf get_by_name(string const& name) {
     return {static_cast<FT_Byte const*>(ptr), size};
 }
 
+constexpr unsigned DEFAULT_DPI = 148;
+
+static unsigned dpi;
+
 }  // namespace
 
 export namespace lib::ttf {
 
-void init(string const& name = "roboto") {
+void init(string const& name = "roboto", unsigned dpi_ = DEFAULT_DPI) {
     if (library_init) {
         return;
     }
+
+    dpi = dpi_;
 
     FT_Error err = FT_Init_FreeType(&library);
     if (err) {
@@ -91,13 +97,14 @@ struct font_bitmap {
     void* buffer;
 };
 
-font_bitmap char_to_bitmap(unsigned c, unsigned size, unsigned dpi) {
+font_bitmap char_to_bitmap(unsigned c, unsigned size) {
     FT_Error err = FT_Set_Char_Size(font_face, 0, size * 64, dpi, 0);
     if (err) {
         throw exception("failed to set char size");
     }
 
     auto metrics_height = font_face->size->metrics.height >> 6;
+    //println("metrics height {}", metrics_height);
     FT_GlyphSlot slot = font_face->glyph;
     err = FT_Load_Char(font_face, c, FT_LOAD_RENDER);
     if (err) {
@@ -115,6 +122,15 @@ font_bitmap char_to_bitmap(unsigned c, unsigned size, unsigned dpi) {
     bm.buffer = bitmap->buffer;
 
     return bm;
+}
+
+uint16_t char_height(unsigned size) {
+    FT_Error err = FT_Set_Char_Size(font_face, 0, size * 64, dpi, 0);
+    if (err) {
+        throw exception("failed to set char size");
+    }
+
+    return font_face->size->metrics.height >> 6;
 }
 
 }  // namespace lib::ttf
