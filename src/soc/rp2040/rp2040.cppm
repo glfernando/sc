@@ -85,6 +85,20 @@ void init() {
     reg32(0x4002800c) = (6 << 16) | (2 << 12);
     reg_clr(0x40028004) = (1 << 3);
 
+    // USB PLL
+    // 0x4002c000
+    reg_set(0x4000c000) = 1 << 13;
+    reg_clr(0x4000c000) = 1 << 13;
+    while (!(reg32(0x4000c008) & (1 << 13))) {}
+
+    reg32(0x4002c000) = 0x1;
+    reg32(0x4002c008) = 0x28;
+    reg32(0x4002c004) = 0xffffffff;
+    reg_clr(0x4002c004) = (1 << 0) | (1 << 5);
+    while (!(reg32(0x4002c000) & (1 << 31))) {}
+    reg32(0x4002c00c) = (5 << 16) | (2 << 12);
+    reg_clr(0x4002c004) = (1 << 3);
+
     // sys clk to pll
     reg32(0x4000803c) = 1;
 
@@ -93,6 +107,17 @@ void init() {
         asm volatile("nop");
         asm volatile("yield");
     }
+
+    // enable usb clk
+    reg32(0x40008054) = 1 << 11;
+
+    // adc clk
+    reg32(0x40008060) = 1 << 11;
+
+    // rtc clk
+    reg32(0x4000806c) = 1 << 11;
+    reg32(0x40008070) = 0x00040000;
+
     // peri clk
     reg32(0x40008048) = 1 << 11;
 
