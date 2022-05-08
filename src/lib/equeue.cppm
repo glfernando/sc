@@ -6,7 +6,7 @@
 
 export module lib.equeue;
 
-import lib.elist;
+export import lib.elist;
 import lib.exception;
 
 using lib::exception;
