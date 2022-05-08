@@ -75,6 +75,7 @@ static char const* type_to_str(type type) {
 }
 
 export extern "C" uint8_t __stack_end[];
+export extern "C" void _start(void);
 
 struct excep_frame {
     unsigned r8;
