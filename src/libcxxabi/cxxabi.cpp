@@ -86,6 +86,9 @@ extern "C" void __cxa_free_exception(void* thrown_exception) {
     free(header);
 }
 
+extern "C" void __cxa_end_cleanup(void) {
+}
+
 static const uint64_t EXCEPTION_CLASS_CLANG = 0x434C4E47432B2B00;
 
 extern "C" void __cxa_throw(void* thrown_exception, struct type_info* tinfo, void (*)(void*)) {
