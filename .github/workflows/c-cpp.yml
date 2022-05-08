@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -17,11 +17,11 @@ jobs:
     - name: Setup dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y llvm-10 clang-11 lld-11 qemu-system-arm
+        sudo apt-get install -y llvm-12 clang-12 lld-12 qemu-system-arm
         sudo update-alternatives \
-            --install /usr/bin/llvm-objcopy llvm-objcopy /usr/bin/llvm-objcopy-11 100
+            --install /usr/bin/llvm-objcopy llvm-objcopy /usr/bin/llvm-objcopy-12 100
         sudo update-alternatives \
-            --install /usr/bin/ld.lld ld.lld /usr/bin/ld.lld-11 100
+            --install /usr/bin/ld.lld ld.lld /usr/bin/ld.lld-12 100
 
     - name: make
       run: make V=1
