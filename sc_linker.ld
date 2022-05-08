@@ -38,7 +38,7 @@ SECTIONS
     } > RAM
 
     .gcc_except_table ALIGN(8): {
-        KEEP(*(.gcc_except_table))
+        KEEP(*(.gcc_except_table .gcc_except_table.*))
     } > RAM
 
     .eh_frame ALIGN(8): {
