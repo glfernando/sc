@@ -11,8 +11,8 @@ import lib.fmt;
 import lib.exception;
 
 struct test_data {
-    std::string group;
-    std::string name;
+    char const* group;
+    char const* name;
     void (*func)(void);
 };
 
@@ -25,7 +25,7 @@ extern test_data __tests_end[];
 
 #define TEST(group_, name_)                                                           \
     static void group_##name_(void);                                                  \
-    test_data test_##group_##name_ __attribute__((section(".tests." #group_ #name_))) \
+    static const test_data test_##group_##name_ __attribute__((section(".tests." #group_ #name_))) \
         __attribute__((used)) = {                                                     \
             .group = #group_,                                                         \
             .name = #name_,                                                           \
