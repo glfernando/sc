@@ -25,16 +25,16 @@ SECTIONS
         *(.rodata*);
     } > RAM
 
-    .init.array ALIGN(8) : {
-        __init_array_start = .;
-        KEEP(*(.init_array))
-        __init_array_end = .;
-    } > RAM
-
     .shell_cmds ALIGN(8): {
         __shell_cmds_start = .;
         KEEP(*(SORT_BY_NAME(.shell_cmds*)))
         __shell_cmds_end = .;
+    } > RAM
+
+    .init.array ALIGN(8) : {
+        __init_array_start = .;
+        KEEP(*(.init_array))
+        __init_array_end = .;
     } > RAM
 
     .gcc_except_table ALIGN(8): {
