@@ -66,7 +66,7 @@ TEST(except, throw) {
     }*/
 
     // retrow
-    int count = 0;
+    [[maybe_unused]] int count = 0;
     try {
         try {
             throw int{5};
