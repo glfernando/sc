@@ -35,9 +35,6 @@ _start:
         msr     elr_el3, x0
 
 2:
-        // initialize sctlr_el1 reg before entering EL1
-        msr     sctlr_el1, xzr
-
         // configure EL2 registers
         mrs     x0, hcr_el2
         orr     x0, x0, HCR_EL2_RW
