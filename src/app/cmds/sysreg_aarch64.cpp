@@ -40,19 +40,28 @@ struct sysreg_data {
 //TODO: add helper macro for adding system register for all ELX
 
 sysreg_data sysregs[] = {
-    SYSREG(tcr_el1),
-    SYSREG(mair_el1),
-    SYSREG(ttbr0_el1),
-    SYSREG(ttbr1_el1),
-    SYSREG(sctlr_el1),
-    SYSREG_RO(currentel),
-    SYSREG_RO(mpidr_el1),
-    SYSREG(daif),
-    SYSREG_RO(cntpct_el0),
     SYSREG(cntfrq_el0),
+    SYSREG(cntp_ctl_el0),
     SYSREG(cntp_cval_el0),
     SYSREG(cntp_tval_el0),
-    SYSREG(cntp_ctl_el0),
+    SYSREG_RO(cntpct_el0),
+    SYSREG_RO(currentel),
+    SYSREG(daif),
+#ifdef CONFIG_AARCH64_MTE
+    SYSREG(gcr_el1),
+#endif
+    SYSREG(mair_el1),
+    SYSREG_RO(mpidr_el1),
+#ifdef CONFIG_AARCH64_MTE
+    SYSREG(rgsr_el1),
+#endif
+    SYSREG(sctlr_el1),
+#ifdef CONFIG_AARCH64_MTE
+    SYSREG_RO(tco),
+#endif
+    SYSREG(tcr_el1),
+    SYSREG(ttbr0_el1),
+    SYSREG(ttbr1_el1),
 };
 
 // clang-format on
