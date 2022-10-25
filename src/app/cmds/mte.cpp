@@ -23,6 +23,7 @@ void cmd_mte_usage() {
     println("mte irg <addr>");
     println("mte tag <addr> [size]");
     println("mte load <addr>");
+    println("mte teststack");
 }
 
 static int cmd_mte(int argc, char const* argv[]) {
@@ -61,7 +62,10 @@ static int cmd_mte(int argc, char const* argv[]) {
         unsigned long tag;
         asm volatile("ldg %0, [%1]" : "=r"(tag) : "r"(addr));
         println("addr = {:#x}, tag = {:#x}", addr, tag);
-
+    } else if (argc == 2 && cmd == "teststack") {
+        int a = 10;
+        int b = 15;
+        println("a addr {:p} b addr {:p} a*b={}", &a, &b, a * b);
     } else {
         cmd_mte_usage();
     }
