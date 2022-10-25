@@ -25,6 +25,16 @@ export using cpu_irq_handler = void(*)(int vec, void* data);
 
 namespace core::cpu {
 
+#ifdef CONFIG_AARCH64_MTE
+// 1:1 mmu mapping of the first 4GB
+static uint64_t xlate_table[4096 / 8] __attribute__((aligned(4096))) = {
+    // clang-format off
+    [0] = 0x00000421, // 1GB device memory
+    [1] = 0x40000711, // 1GB tagged memory
+    [2] = 0x80000711, // 1GB tagged memory
+    [3] = 0xc0000711, // 1GB tagged memory
+};
+#else
 // 1:1 mmu mapping of the first 4GB
 static uint64_t xlate_table[4096 / 8] __attribute__((aligned(4096))) = {
     // clang-format off
@@ -32,8 +42,14 @@ static uint64_t xlate_table[4096 / 8] __attribute__((aligned(4096))) = {
     [1] = 0x4000070d, // 1GB writeback memory
     [2] = 0x8000070d, // 1GB writeback memory
     [3] = 0xc000070d, // 1GB writeback memory
+
+    // mirror normal memory as tagged memory
+    //[5] = 0x40000711, // 1GB tagged memory
+    //[6] = 0x80000711, // 1GB tagged memory
+    //[7] = 0xc0000711, // 1GB tagged memory
     // clang-format off
 };
+#endif
 
 static cpu_irq_handler cpu_handler;
 static void* cpu_handler_data;
@@ -47,8 +63,14 @@ static int cpu_exception_handler(armv8::exception::regs*) {
 }
 
 static void mmu_init() {
+#ifdef CONFIG_AARCH64_MTE
+    //sysreg_write(tcr_el1, 0x1'0000'351cUL | (1ULL << 37)); // 36bits
+    sysreg_write(tcr_el1, 0x0000'3520UL | (1ULL << 37));
+    sysreg_write(mair_el1, 0xf0'ff44'0400UL);
+#else
     sysreg_write(tcr_el1, 0x0000'3520UL);
     sysreg_write(mair_el1, 0xff44'0400UL);
+#endif
 
     sysreg_write(ttbr0_el1, xlate_table);
 
