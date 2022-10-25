@@ -5,5 +5,11 @@
 
 .PHONY: qemu
 
+ifeq ($(CONFIG_AARCH64_MTE), y)
+QEMU_MACHINE = virt,secure=on,virtualization=on,mte=on
+else
+QEMU_MACHINE = virt,secure=on,virtualization=on
+endif
+
 qemu: $(BUILD_DIR)/sc.bin
-	$(Q)qemu-system-aarch64 -M virt,secure=on,virtualization=on -cpu max -m 3072 -smp 2 -nographic -semihosting -s -kernel $<
+	$(Q)qemu-system-aarch64 -M $(QEMU_MACHINE) -cpu max -m 3072 -smp 2 -nographic -semihosting -s -kernel $<
