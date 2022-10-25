@@ -10,3 +10,5 @@ endif
 ifeq ($(ARCH), arm)
 src-y += sysreg_arm.cpp
 endif
+
+src-$(CONFIG_AARCH64_MTE) += mte.cpp
