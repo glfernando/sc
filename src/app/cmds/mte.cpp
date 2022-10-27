@@ -15,6 +15,7 @@
 import core.thread;
 import lib.fmt;
 import std.string;
+import arch.aarch64.mte;
 
 using lib::fmt::println;
 using std::string;
@@ -38,8 +39,7 @@ static int cmd_mte(int argc, char const* argv[]) {
     if (argc == 3 && cmd == "irg") {
         auto addr = strtoul(argv[2], NULL, 16);
 
-        unsigned long tag;
-        asm volatile("irg %0, %1" : "=r"(tag) : "r"(addr));
+        unsigned long tag = aarch64::irg(addr);
         println("addr = {:#x}, tag = {:#x}", addr, tag);
     } else if (argc >= 3 && cmd == "tag") {
         auto addr = strtoul(argv[2], NULL, 16);
@@ -50,7 +50,7 @@ static int cmd_mte(int argc, char const* argv[]) {
         println("tagging region {:#x} size {:#x}", addr, size);
 
         for (size_t i = 0; i < size; i += 16) {
-            asm volatile("stg %0, [%0]" ::"r"(addr));
+            aarch64::stg(addr);
             addr += 16;
         }
 
@@ -58,9 +58,7 @@ static int cmd_mte(int argc, char const* argv[]) {
         asm volatile("isb");
     } else if (argc == 3 && cmd == "load") {
         auto addr = strtoul(argv[2], NULL, 16);
-
-        unsigned long tag;
-        asm volatile("ldg %0, [%1]" : "=r"(tag) : "r"(addr));
+        unsigned long tag = aarch64::ldg(addr);
         println("addr = {:#x}, tag = {:#x}", addr, tag);
     } else if (argc == 2 && cmd == "teststack") {
         int a = 10;
