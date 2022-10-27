@@ -19,6 +19,10 @@ import lib.fmt;
 import core.cpu.armv8.common;
 import lib.backtrace;
 
+#ifdef CONFIG_AARCH64_MTE
+import arch.aarch64.mte;
+#endif
+
 using lib::backtrace;
 using lib::fmt::print;
 using lib::fmt::println;
@@ -52,8 +56,18 @@ static void fill_unw_context(unw_context_t& uc, regs* regs) {
 }
 
 int default_exception_handler(regs* regs) {
-    println("ESR         {:#08x}    FAR {:#016x}    ELR {:#016x}\n", sysreg_read(esr_el1),
-            sysreg_read(far_el1), sysreg_read(elr_el1));
+    auto far = sysreg_read(far_el1);
+    auto esr = sysreg_read(esr_el1);
+    println("ESR         {:#08x}    ELR {:#016x}", esr, sysreg_read(elr_el1));
+    println("FAR {:#016x}", far);
+#ifdef CONFIG_AARCH64_MTE
+    auto fsc = esr & 0x3f;
+    if (fsc == 0x11) {
+        // Synchronous Tag Check Fault
+        println("TAG {:#016x}", aarch64::ldg(far));
+    }
+#endif
+    println("");
 
     // print general purpose registers
     for (int i = 0; i < 10; ++i) {
