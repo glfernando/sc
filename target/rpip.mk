@@ -14,4 +14,5 @@ CPU := armv6m
 
 ARCH = arm
 
-GLOBAL_CFLAGS += -DARMV6M -target armv6m-none-eabi -mcpu=cortex-m0plus -mthumb -mfloat-abi=soft
+GLOBAL_CPPFLAGS += -DARMV6M -target armv6m-none-eabi -mcpu=cortex-m0plus
+GLOBAL_CFLAGS += -mthumb -mfloat-abi=soft

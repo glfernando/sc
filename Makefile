@@ -13,11 +13,12 @@ else
 Q = @
 endif
 
-CPPFLAGS = -Isrc/include -include config.h -MMD -MP
-CFLAGS = -fno-builtin -nodefaultlibs -Wall -Wextra -Werror
-CFLAGS += -g -ffunction-sections -fdata-sections
-CXXFLAGS = -std=c++2a -fno-rtti -nostdinc++ -Wno-deprecated-volatile -Wno-c99-designator
-CXXFLAGS += -Wno-user-defined-literals
+CPPFLAGS = -Isrc/include -include config.h
+CPPFLAGS += -fno-builtin -nodefaultlibs
+CFLAGS =  -g -ffunction-sections -fdata-sections -Wall -Wextra -Werror -MMD -MP
+CFLAGS += -Wno-deprecated-volatile -Wno-c99-designator -Wno-user-defined-literals
+CXXFLAGS = -std=c++2a -fno-rtti -nostdinc++
+
 OBJCPYFLAGS = -O binary --strip-all
 LDFLAGS = --gc-sections
 
@@ -60,13 +61,13 @@ include target/$(TARGET).mk
 RELOCABLE ?= 0
 
 ifeq ($(RELOCABLE), 1)
-CPPFLAGS += -fpie -DRELOCABLE
+CFLAGS += -fpie -DRELOCABLE
 LDFLAGS += --pie
 endif
 
 ifeq ($(RUN_ALL_TESTS), 1)
 CONFIG_INCLUDE_TESTS := y
-CXXFLAGS += -DRUN_ALL_TESTS
+CFLAGS += -DRUN_ALL_TESTS
 endif
 
 # include top directories
@@ -87,14 +88,15 @@ LINKER_SCRIPT ?= sc_linker.ld
 CPPFLAGS += $(GLOBAL_CPPFLAGS)
 CFLAGS += $(GLOBAL_CFLAGS)
 CXXFLAGS += $(GLOBAL_CXXFLAGS)
-CXXFLAGS += $(CFLAGS)
 LDFLAGS += $(GLOBAL_LDFLAGS)
 
 cpp_objs := $(patsubst %.cpp, $(BUILD_DIR)/%.cpp.o, $(cpp_srcs))
+cpp_pre  := $(patsubst %.cpp, $(BUILD_DIR)/%.cpp.i, $(cpp_srcs))
 asm_objs := $(patsubst %.S, $(BUILD_DIR)/%.S.o, $(asm_srcs))
 c_objs := $(patsubst %.c, $(BUILD_DIR)/%.c.o, $(c_srcs))
 mod_pcms := $(patsubst %.cppm, $(BUILD_DIR)/%.pcm, $(mod_srcs))
 mod_objs := $(patsubst %.cppm, $(BUILD_DIR)/%.cppm.o, $(mod_srcs))
+mod_pre  := $(patsubst %.cppm, $(BUILD_DIR)/%.cppm.i, $(mod_srcs))
 
 objs := $(cpp_objs) $(asm_objs) $(c_objs) $(mod_objs)
 deps := $(objs:.o=.d)
@@ -130,20 +132,36 @@ $(BUILD_DIR)/%.c.o : %.c
 
 $(BUILD_DIR)/%.cpp.o : %.cpp
 	$(eval OBJ_PATH_VAR = $(subst /,_,$(@D)))
-	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CXXFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
+	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CXXFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
 	$(Q)mkdir -p $(dir $@)
-	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) $(FLAGS_EXTRA) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -c $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS) $(FLAGS_EXTRA) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -c $< -o $@
+
+$(BUILD_DIR)/%.cpp.i : %.cpp
+	$(eval OBJ_PATH_VAR = $(subst /,_,$(@D)))
+	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
+	$(Q)mkdir -p $(dir $@)
+	$(Q)$(CC) $(CPPFLAGS) $(FLAGS_EXTRA) -std=c++17 -E -x assembler-with-cpp -P -o $@ $<
+
+$(BUILD_DIR)/%.cppm.i : %.cppm
+	$(eval OBJ_PATH_VAR = $(subst /,_,$(@D)))
+	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
+	$(Q)mkdir -p $(@D)
+	$(Q)$(CC) $(CPPFLAGS) $(FLAGS_EXTRA) -std=c++17 -E -x assembler-with-cpp -P -o $@ $<
 
 $(BUILD_DIR)/%.pcm : %.cppm
 	$(eval OBJ_PATH_VAR = $(subst /,_,$(@D)))
-	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CXXFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
+	$(eval FLAGS_EXTRA = $(CPPFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CFLAGS_$(subst /,_,$(OBJ_PATH_VAR))) $(CXXFLAGS_$(subst /,_,$(OBJ_PATH_VAR))))
 	$(Q)mkdir -p $(@D)
-	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) $(FLAGS_EXTRA) -fimplicit-modules -fimplicit-module-maps -fmodules -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ --precompile $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS) $(FLAGS_EXTRA) -fimplicit-modules -fimplicit-module-maps -fmodules -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ --precompile $< -o $@
 
 $(BUILD_DIR)/%.cppm.o : $(BUILD_DIR)/%.pcm
-	$(Q)$(CC) $(CPPFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS) -fimplicit-modules -fimplicit-module-maps -fprebuilt-module-path=$(MOD_PREBUILT_DIR)/ -Wno-unused-command-line-argument -c $< -o $@
 
 $(objs) : $(CONFIG_FILE) $(BUILD_DIR)/module-order-deps.d
+
+$(cpp_pre) : $(CONFIG_FILE)
+
+$(mod_pre) : $(CONFIG_FILE)
 
 $(CONFIG_FILE): src/$(TARGET_CONFIG_FILE)
 	$(Q)mkdir -p $(@D)
@@ -161,7 +179,7 @@ clean:
 	$(Q)rm -f $(CONFIG_FILE)
 	$(Q)rm -f tags
 
-$(BUILD_DIR)/module-order-deps.d: $(cpp_srcs) $(mod_srcs)
+$(BUILD_DIR)/module-order-deps.d: $(cpp_pre) $(mod_pre)
 	$(Q)mkdir -p $(MOD_PREBUILT_DIR)
 	$(Q)$(SCRIPTS_DIR)/moddeps.py $(MOD_PREBUILT_DIR) $(BUILD_DIR) $^ > $@
 
