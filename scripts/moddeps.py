@@ -10,11 +10,13 @@ class mod_dep:
 
 
 def create_dep(file_name, args):
+    # remove .i extension
+    src = os.path.splitext(file_name)[0]
     dep = mod_dep()
-    dep.src = file_name
-    dep.is_mod = file_name.endswith('.cppm')
-    dep.target = os.path.splitext(file_name)[0] + ('.pcm' if dep.is_mod else '.cpp.o')
-    dep.target = os.path.join(args.out_obj_dir, dep.target)
+    dep.src = src
+    dep.is_mod = src.endswith('.cppm')
+    dep.target = os.path.splitext(src)[0] + ('.pcm' if dep.is_mod else '.cpp.o')
+    # dep.target = os.path.join(args.out_obj_dir, dep.target)
     dep.target = os.path.normpath(dep.target)
 
     with open(file_name, 'r') as f:
@@ -63,8 +65,8 @@ def main():
 
     args = parser.parse_args()
 
-    # let's do a sanity check, we are only interested on .cpp and .cppm files
-    files = [file for file in args.files if file.endswith('.cppm') or file.endswith('.cpp')]
+    # let's do a sanity check, we are only interested on .cpp.i and .cppm.i files
+    files = [file for file in args.files if file.endswith('.cppm.i') or file.endswith('.cpp.i')]
 
     # per each file create an object describing the depencies
     deps = [create_dep(file, args) for file in files]
