@@ -4,10 +4,12 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module device.spi;
+module;
 
 #include <stddef.h>
 #include <stdint.h>
+
+export module device.spi;
 
 export import device;
 import std.string;
