@@ -4,7 +4,7 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module lib.elist;
+module;
 
 //
 // Embedded list or elist is used when the node is part of the class, so that just can insert or
@@ -13,6 +13,8 @@ export module lib.elist;
 //
 
 #include <stddef.h>
+
+export module lib.elist;
 
 import std.type_traits;
 

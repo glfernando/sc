@@ -4,10 +4,12 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module device.i2c;
+module;
 
 #include <stddef.h>
 #include <stdint.h>
+
+export module device.i2c;
 
 export import device;
 import std.string;

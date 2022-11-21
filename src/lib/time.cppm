@@ -4,9 +4,11 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module lib.time;
+module;
 
 #include <stdint.h>
+
+export module lib.time;
 
 import lib.timestamp;
 import std.string;
