@@ -26,6 +26,26 @@ using lib::time::time_us_t;
 
 namespace {
 
+static device::timer* timer_dev;
+static lock timer_lock;
+
+device::timer& get_timer() {
+    slock_irqsafe guard{timer_lock};
+    if (timer_dev) {
+        return *timer_dev;
+    }
+
+    timer_dev = device::manager::find<::device::timer>();
+    if (!timer_dev) {
+        throw exception("no timer", ERR_NOT_FOUND);
+    }
+    return *timer_dev;
+}
+
+}  // namespace
+
+export namespace lib {
+
 template <typename T>
 std::decay_t<T> decay_copy(T&& v) {
     return std::forward<T>(v);
@@ -47,26 +67,6 @@ class timer_cb_wrapper : public timer_cb {
  private:
     std::decay_t<F> func;
 };
-
-static device::timer* timer_dev;
-static lock timer_lock;
-
-device::timer& get_timer() {
-    slock_irqsafe guard{timer_lock};
-    if (timer_dev) {
-        return *timer_dev;
-    }
-
-    timer_dev = device::manager::find<::device::timer>();
-    if (!timer_dev) {
-        throw exception("no timer", ERR_NOT_FOUND);
-    }
-    return *timer_dev;
-}
-
-}  // namespace
-
-export namespace lib {
 
 class timer {
  public:
