@@ -9,6 +9,8 @@ module;
 #include <stddef.h>
 #include <stdint.h>
 
+#include <new>
+
 export module std.vector;
 
 export import std.initializer_list;
