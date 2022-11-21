@@ -8,7 +8,6 @@ export module board.peripherals;
 export import device.uart.pl011;
 export import device.intc.gic;
 export import device.console.uart;
-export import device.console.uart;
 export import device.timer.arm;
 
 import std.string;
