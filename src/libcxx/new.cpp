@@ -43,6 +43,10 @@ void* operator new(size_t, void* p) {
     return p;
 }
 
+void* operator new[](size_t, void* p) {
+    return p;
+}
+
 void* operator new(size_t size, std::align_val_t align) {
     void* ptr = alloc(size, static_cast<size_t>(align));
     if (!ptr)
