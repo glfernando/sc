@@ -4,9 +4,11 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module device.uart.pl011;
+module;
 
 #include <stdint.h>
+
+export module device.uart.pl011;
 
 export import device.uart;
 import std.string;
