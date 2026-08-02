@@ -15,14 +15,14 @@ export import std.string;
 export import std.concepts;
 import device.console;
 
-static device::console* con;
+device::console* con;
 
-static inline void putchar(int c) {
+inline void putchar(int c) {
     if (con)
         con->putc(c);
 }
 
-static inline void puts(char const* str) {
+inline void puts(char const* str) {
     if (con)
         while (int c = *str++)
             con->putc(c);

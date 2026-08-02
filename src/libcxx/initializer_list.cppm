@@ -4,9 +4,12 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module std.initializer_list;
+
+module;
 
 #include <stddef.h>
+
+export module std.initializer_list;
 
 export namespace std {
 

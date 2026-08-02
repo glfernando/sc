@@ -63,7 +63,7 @@ class device {
 }  // namespace device
 
 namespace device {
-static vector<device*> devices;
+vector<device*> devices;
 }
 
 export namespace device {

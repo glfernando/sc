@@ -4,9 +4,11 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module core.event;
+module;
 
 #include <errcodes.h>
+
+export module core.event;
 
 import core.thread;
 import lib.fmt;

@@ -22,7 +22,7 @@ using core::event;
 using lib::reg::reg32;
 using namespace lib::time;
 
-static event rx_evt;
+event rx_evt;
 
 export namespace device {
 

@@ -5,9 +5,12 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module core.cpu.armv8.common;
+
+module;
 
 #include <arch/aarch64/sysreg.h>
+
+export module core.cpu.armv8.common;
 
 export namespace core::cpu {
 

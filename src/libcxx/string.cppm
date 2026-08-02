@@ -75,7 +75,7 @@ class basic_string {
 template <typename C>
 void basic_string<C>::copy_from(const basic_string& s) {
     if (s.sz <= short_max) {
-        memcpy(this, &s, sizeof(s));
+        memcpy(static_cast<void*>(this), &s, sizeof(s));
         ptr = ch;
     } else {
         ptr = expand(s.ptr, s.sz + 1);
@@ -87,7 +87,7 @@ void basic_string<C>::copy_from(const basic_string& s) {
 template <typename C>
 void basic_string<C>::move_from(basic_string& s) {
     if (s.sz <= short_max) {
-        memcpy(this, &s, sizeof(s));
+        memcpy(static_cast<void*>(this), &s, sizeof(s));
         ptr = ch;
     } else {
         ptr = s.ptr;

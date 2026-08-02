@@ -353,4 +353,9 @@ struct invoke_result : detail::invoke_result<void, F, ArgTypes...> {};
 template <typename F, typename... ArgTypes>
 using invoke_result_t = typename invoke_result<F, ArgTypes...>::type;
 
+template <typename T>
+constexpr std::decay_t<T> decay_copy(T&& v) {
+    return std::forward<T>(v);
+}
+
 }  // namespace std
