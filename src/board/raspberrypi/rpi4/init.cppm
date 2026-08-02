@@ -66,4 +66,6 @@ void init() {
     board::peripherals::init();
 }
 
+void late_init() {}
+
 }  // namespace board

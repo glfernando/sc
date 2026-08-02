@@ -24,8 +24,6 @@ using lib::reg::reg32;
 using namespace soc::rp2040::address_map;
 using std::vector;
 
-namespace {
-
 constexpr unsigned MAX_GPIO_NUM = 29;
 
 // clang-format off
@@ -88,8 +86,6 @@ gpio_pad& get_pad(unsigned gpio) {
 io_ctrl& get_io_ctrl(unsigned gpio) {
     return *reinterpret_cast<io_ctrl*>(IO_BANK0_BASE + 0x4 + gpio * 8);
 }
-
-}  // namespace
 
 export namespace soc::rp2040 {
 

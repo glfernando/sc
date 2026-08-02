@@ -16,8 +16,6 @@ import soc.rp2040.address_map;
 using lib::reg::reg32;
 using namespace soc::rp2040::address_map;
 
-namespace {
-
 constexpr unsigned RTC_CLK_FREQ = 46875;
 
 // clang-format off
@@ -30,8 +28,6 @@ enum reg_offset : uint32_t {
 static volatile uint32_t& reg(uint32_t offset) {
     return reg32(RESETS_BASE + offset);
 }
-
-}  // namespace
 
 export namespace soc::rp2040::reset {
 

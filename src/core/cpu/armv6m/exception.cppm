@@ -49,31 +49,6 @@ struct vector_table_t {
     volatile handler_t ext_int[EXT_INT_MAX];
 };
 
-enum class type {
-    NMI,
-    HARD_FAULT,
-    MEM_MANAGE,
-    BUS_FAULT,
-    USAGE_FAULT,
-};
-
-static char const* type_to_str(type type) {
-    switch (type) {
-    case type::NMI:
-        return "nmi";
-    case type::HARD_FAULT:
-        return "hard fault";
-    case type::MEM_MANAGE:
-        return "mem manage";
-    case type::BUS_FAULT:
-        return "bus fault";
-    case type::USAGE_FAULT:
-        return "usage fault";
-    default:
-        return "unknown";
-    }
-}
-
 export extern "C" uint8_t __stack_end[];
 export extern "C" void _start(void);
 

@@ -4,11 +4,13 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module soc.rp2040.spi;
+module;
 
 #include <endian.h>
 #include <stddef.h>
 #include <stdint.h>
+
+export module soc.rp2040.spi;
 
 export import device.spi;
 
@@ -22,8 +24,6 @@ using lib::fmt::println;
 using lib::reg::reg32;
 using std::string;
 
-namespace {
-
 // clang-format off
 enum regs : uint32_t {
     SSPCR0      = 0x00,
@@ -35,8 +35,6 @@ enum regs : uint32_t {
     SSPDMACR    = 0x24,
 };
 // clang-format on
-
-};  // namespace
 
 export namespace soc::rp2040 {
 
