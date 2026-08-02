@@ -4,9 +4,11 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module soc.rp2040.mailbox;
+module;
 
 #include <stdint.h>
+
+export module soc.rp2040.mailbox;
 
 import lib.reg;
 import soc.rp2040.address_map;

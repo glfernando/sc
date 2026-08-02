@@ -14,7 +14,7 @@ export namespace board {
         asm volatile("wfi");
 }
 
-[[noreturn]] void poweroff(int exit_code = 0) {
+[[noreturn]] void poweroff([[maybe_unused]] int exit_code = 0) {
     // TODO: implement
     for (;;)
         asm volatile("wfi");

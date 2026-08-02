@@ -21,8 +21,6 @@ using lib::exception;
 using namespace soc::rp2040::address_map;
 using namespace lib::time;
 
-namespace {
-
 // TODO: make it configurable
 constexpr unsigned CLK_FREQ = 125'000'000;
 
@@ -121,8 +119,6 @@ pwm_pad& get_pad(unsigned pwm) {
 io_ctrl& get_io_ctrl(unsigned pwm) {
     return *reinterpret_cast<io_ctrl*>(IO_BANK0_BASE + 0x4 + pwm * 8);
 }
-
-}  // namespace
 
 export namespace soc::rp2040 {
 

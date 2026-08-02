@@ -4,10 +4,12 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module soc.rp2040.multicore;
+module;
 
 #include <stddef.h>
 #include <stdint.h>
+
+export module soc.rp2040.multicore;
 
 import lib.reg;
 import soc.rp2040.mailbox;

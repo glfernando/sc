@@ -29,8 +29,6 @@ using std::string;
 
 namespace device {
 
-namespace {
-
 // clang-format off
 enum regs : uint32_t {
     TIMERHR = 0x08,
@@ -56,8 +54,6 @@ struct event_impl : public timer::event {
 
     event_impl* operator*() { return this; }
 };
-
-}  // namespace
 
 }  // namespace device
 

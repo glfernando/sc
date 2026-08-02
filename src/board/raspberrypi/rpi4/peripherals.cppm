@@ -17,6 +17,7 @@ static constexpr device::pl011::platform_data uart0_pdata{
     .base = 0xfe20'1000,
     .freq = 48'000'000,
     .baudrate = 921600,
+    .irq = 0,
 };
 
 static device::pl011 uart0("uart0", uart0_pdata);

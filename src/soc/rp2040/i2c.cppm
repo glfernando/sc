@@ -4,10 +4,12 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module soc.rp2040.i2c;
+module;
 
 #include <stddef.h>
 #include <stdint.h>
+
+export module soc.rp2040.i2c;
 
 export import device.i2c;
 
@@ -18,8 +20,6 @@ import lib.reg;
 using lib::fmt::println;
 using lib::reg::reg32;
 using std::string;
-
-namespace {
 
 // clang-format off
 enum regs : uint32_t {
@@ -36,8 +36,6 @@ enum regs : uint32_t {
     FS_SPKLEN   = 0xa0,
 };
 // clang-format on
-
-};  // namespace
 
 export namespace soc::rp2040 {
 

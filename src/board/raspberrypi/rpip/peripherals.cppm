@@ -68,21 +68,21 @@ static constexpr soc::rp2040::spi::platform_data spi1_pdata{
     .baudrate = 10'000'000,
 };
 
-static device::pl011 uart0("uart0", uart0_pdata);
+device::pl011 uart0("uart0", uart0_pdata);
 
-static device::uart_console con0("con0", uart0);
+device::uart_console con0("con0", uart0);
 
-static device::timer_rp2040 timer0("timer0", timer0_pdata);
+device::timer_rp2040 timer0("timer0", timer0_pdata);
 
-static device::nvic nvic("nvic", nvic_pdata);
+device::nvic nvic("nvic", nvic_pdata);
 
-static soc::rp2040::gpio gpio("gpio", 16 + 13);
+soc::rp2040::gpio gpio("gpio", 16 + 13);
 
-static soc::rp2040::i2c i2c0("i2c0", i2c0_pdata);
-static soc::rp2040::i2c i2c1("i2c1", i2c1_pdata);
+soc::rp2040::i2c i2c0("i2c0", i2c0_pdata);
+soc::rp2040::i2c i2c1("i2c1", i2c1_pdata);
 
-static soc::rp2040::spi spi0("spi0", spi0_pdata);
-static soc::rp2040::spi spi1("spi1", spi1_pdata);
+soc::rp2040::spi spi0("spi0", spi0_pdata);
+soc::rp2040::spi spi1("spi1", spi1_pdata);
 
 export namespace board::peripherals {
 

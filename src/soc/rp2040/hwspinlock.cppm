@@ -4,9 +4,11 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module soc.rp2040.hwspinlock;
+module;
 
 #include <stdint.h>
+
+export module soc.rp2040.hwspinlock;
 
 import soc.rp2040.address_map;
 import lib.reg;
