@@ -4,10 +4,12 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module lib.timestamp.arch;
+module;
 
 #include <arch/aarch64/sysreg.h>
 #include <stdint.h>
+
+export module lib.timestamp.arch;
 
 export namespace lib::timestamp {
 

@@ -31,6 +31,10 @@ void operator delete(void* p) noexcept {
     free(p);
 }
 
+void operator delete(void* p, size_t) noexcept {
+    free(p);
+}
+
 void* operator new[](size_t size) {
     return operator new(size);
 }
@@ -39,12 +43,8 @@ void operator delete[](void* p) noexcept {
     operator delete(p);
 }
 
-void* operator new(size_t, void* p) {
-    return p;
-}
-
-void* operator new[](size_t, void* p) {
-    return p;
+void operator delete[](void* p, size_t) noexcept {
+    operator delete(p);
 }
 
 void* operator new(size_t size, std::align_val_t align) {
@@ -62,6 +62,14 @@ void operator delete(void* p, std::align_val_t) noexcept {
     free(p);
 }
 
+void operator delete(void* p, size_t, std::align_val_t) noexcept {
+    free(p);
+}
+
 void operator delete[](void* p, std::align_val_t) noexcept {
+    free(p);
+}
+
+void operator delete[](void* p, size_t, std::align_val_t) noexcept {
     free(p);
 }

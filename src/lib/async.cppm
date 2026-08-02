@@ -23,19 +23,14 @@ export namespace lib {
 
 using core::thread::thread_t;
 
-template <class T>
-std::decay_t<T> decay_copy(T&& v) {
-    return std::forward<T>(v);
-}
-
 template <typename F, typename... Args>
 class async {
     using R = std::invoke_result_t<F, Args...>;
 
  public:
     async(std::string const& name, unsigned affinity, F&& f, Args&&... args)
-        : func{decay_copy(std::forward<F>(f))},
-          args{decay_copy(std::forward<Args>(args))...},
+        : func{std::decay_copy(std::forward<F>(f))},
+          args{std::decay_copy(std::forward<Args>(args))...},
           t{name,
             [](void* data) {
                 auto self = reinterpret_cast<async*>(data);

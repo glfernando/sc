@@ -24,8 +24,6 @@ using lib::slock_irqsafe;
 using lib::fmt::println;
 using lib::time::time_us_t;
 
-namespace {
-
 static device::timer* timer_dev;
 static lock timer_lock;
 
@@ -42,14 +40,7 @@ device::timer& get_timer() {
     return *timer_dev;
 }
 
-}  // namespace
-
 export namespace lib {
-
-template <typename T>
-std::decay_t<T> decay_copy(T&& v) {
-    return std::forward<T>(v);
-}
 
 class timer_cb {
  public:
@@ -60,7 +51,7 @@ class timer_cb {
 template <typename F>
 class timer_cb_wrapper : public timer_cb {
  public:
-    timer_cb_wrapper(F&& f) : func{decay_copy(std::forward<F>(f))} {}
+    timer_cb_wrapper(F&& f) : func{std::decay_copy(std::forward<F>(f))} {}
 
     void operator()() override { return func(); }
 

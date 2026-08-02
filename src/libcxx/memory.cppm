@@ -4,9 +4,11 @@
  * Copyright (c) 2021 Fernando Lugo <lugo.fernando@gmail.com>
  */
 
-export module std.memory;
+module;
 
 #include <stddef.h>
+
+export module std.memory;
 
 export namespace std {
 

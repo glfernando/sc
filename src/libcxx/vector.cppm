@@ -16,10 +16,6 @@ export module std.vector;
 export import std.initializer_list;
 export import std.type_traits;
 
-// placement new prototypes
-void* operator new(size_t size, void* ptr);
-void* operator new[](size_t size, void* ptr);
-
 export namespace std {
 
 template <typename T>
