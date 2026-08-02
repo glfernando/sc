@@ -1,6 +1,7 @@
 
 src-y += mem.cpp
 src-y += sleep.cpp
+src-y += time.cpp
 src-y += echo.cpp
 src-y += loop.cpp
 src-y += heap.cpp
