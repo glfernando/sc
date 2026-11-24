@@ -1,2 +1,3 @@
 
 src-$(CONFIG_SOC_RP2040) += rp2040/
+src-$(CONFIG_SOC_RP2350) += rp2350/
