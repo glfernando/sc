@@ -12,21 +12,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Setup dependencies
       run: |
+        LLVM_VERSION=22
+        CODENAME=$(lsb_release -cs)
+        sudo wget -qO /etc/apt/trusted.gpg.d/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key
+        echo "deb http://apt.llvm.org/${CODENAME}/ llvm-toolchain-${CODENAME}-${LLVM_VERSION} main" | sudo tee /etc/apt/sources.list.d/llvm.list
         sudo apt-get update
-        sudo apt-get install -y llvm-12 clang-12 lld-12 qemu-system-arm
-        sudo update-alternatives \
-            --install /usr/bin/llvm-objcopy llvm-objcopy /usr/bin/llvm-objcopy-12 100
-        sudo update-alternatives \
-            --install /usr/bin/ld.lld ld.lld /usr/bin/ld.lld-12 100
+        sudo apt-get install -y llvm-${LLVM_VERSION} clang-${LLVM_VERSION} lld-${LLVM_VERSION} qemu-system-arm
+        for tool in clang clang++ ld.lld llvm-objcopy; do
+          sudo ln -sf /usr/bin/${tool}-${LLVM_VERSION} /usr/local/bin/${tool}
+        done
+        clang++ --version
+        ld.lld --version
+        llvm-objcopy --version
+        qemu-system-aarch64 --version
 
-    - name: make
-      run: make V=1
-
-    - name: Run all test
+    - name: Build all targets
       run: |
-        make clean
+        for target in qemu-aarch64 rpi4 rpip pico2; do
+          make TARGET=${target} -j$(nproc) V=1
+        done
+
+    - name: Run all tests
+      run: |
+        make clean TARGET=qemu-aarch64
+        make TARGET=qemu-aarch64 RUN_ALL_TESTS=1 -j$(nproc)
         make qemu RUN_ALL_TESTS=1 TARGET=qemu-aarch64
