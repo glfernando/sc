@@ -1,7 +1,7 @@
 
 src-y += cpu.cppm
 
-ifeq ($(CPU), armv6m)
+ifneq ($(filter armv6m armv8m,$(CPU)),)
 src-y += armv6m.cppm
 endif
 
