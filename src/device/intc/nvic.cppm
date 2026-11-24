@@ -13,7 +13,11 @@ export module device.intc.nvic;
 
 export import device.intc;
 
+#ifdef ARMV8M
+import core.cpu.armv8m.exception;
+#else
 import core.cpu.armv6m.exception;
+#endif
 
 import std.string;
 import std.vector;
@@ -21,14 +25,18 @@ import lib.reg;
 import lib.fmt;
 import lib.exception;
 
+#ifdef ARMV8M
+namespace cpu_excep = core::cpu::armv8m::exception;
+#else
+namespace cpu_excep = core::cpu::armv6m::exception;
+#endif
+
 using lib::exception;
 using lib::fmt::println;
 using lib::fmt::sprint;
 using lib::reg::reg32;
 using std::string;
 using std::vector;
-
-constexpr unsigned EXT_INT_MAX = 32;
 
 export namespace device {
 
@@ -40,7 +48,10 @@ class nvic : public intc {
         unsigned irq_num;
     };
 
-    nvic(string const& name, platform_data const& pdata) : intc(name), base(pdata.base) {
+    nvic(string const& name, platform_data const& pdata)
+        : intc(name),
+          base(pdata.base),
+          ext_irq_num(pdata.irq_num > 16 ? pdata.irq_num - 16 : 0) {
         handlers.resize(pdata.irq_num);
     }
 
@@ -65,6 +76,7 @@ class nvic : public intc {
     }
 
     uintptr_t base;
+    unsigned ext_irq_num;
     static inline vector<handler_info> handlers;
 };
 
@@ -85,8 +97,11 @@ enum nvic_reg_offset : uint32_t {
 
 void nvic::init() {
     // disable and clear all pending interrupts
-    reg(NVIC_ICER) = ~0;
-    reg(NVIC_ICPR) = ~0;
+    unsigned words = (ext_irq_num + 31) / 32;
+    for (unsigned i = 0; i < words; ++i) {
+        reg(NVIC_ICER + i * 4) = ~0U;
+        reg(NVIC_ICPR + i * 4) = ~0U;
+    }
 
     // TODO: set priority
 
@@ -95,17 +110,17 @@ void nvic::init() {
 }
 
 void nvic::request_irq(unsigned irq, unsigned flags, handler handler, void* data) {
-    if (irq > handlers.size()) {
+    if (irq >= handlers.size()) {
         println("invalid irq {}", irq);
         return;
     }
     if (!data) {
-        core::cpu::armv6m::exception::register_handler(
-            irq, reinterpret_cast<core::cpu::armv6m::exception::handler_t>(handler));
+        cpu_excep::register_handler(
+            irq, reinterpret_cast<cpu_excep::handler_t>(handler));
     } else {
         handlers[irq].func = handler;
         handlers[irq].data = data;
-        core::cpu::armv6m::exception::register_handler(irq, default_handler);
+        cpu_excep::register_handler(irq, default_handler);
     }
 
     if (flags & FLAG_START_ENABLED)
@@ -119,13 +134,17 @@ void nvic::free_irq(unsigned irq) {
 }
 
 void nvic::enable_irq(unsigned irq) {
-    if (irq >= 16)
-        reg(NVIC_ISER) = 1 << (irq - 16);
+    if (irq >= 16) {
+        unsigned ext = irq - 16;
+        reg(NVIC_ISER + (ext / 32) * 4) = 1U << (ext % 32);
+    }
 }
 
 void nvic::disable_irq(unsigned irq) {
-    if (irq >= 16)
-        reg(NVIC_ICER) = 1 << (irq - 16);
+    if (irq >= 16) {
+        unsigned ext = irq - 16;
+        reg(NVIC_ICER + (ext / 32) * 4) = 1U << (ext % 32);
+    }
 }
 
 void nvic::send_ipi(unsigned cpu_mask, unsigned irq) {
@@ -142,11 +161,13 @@ void nvic::send_ipi(unsigned cpu_mask, unsigned irq) {
     case 15:
         reg(ICSR) = 1 << 26;
         break;
-    case 16 ...(16 + EXT_INT_MAX):
-        reg(NVIC_ISPR) = 1 << (irq - 16);
-        break;
     default:
-        exception(lib::fmt::sprint("invalid irq numner {}", irq));
+        if (irq >= 16 && irq < handlers.size()) {
+            unsigned ext = irq - 16;
+            reg(NVIC_ISPR + (ext / 32) * 4) = 1U << (ext % 32);
+        } else {
+            throw exception(lib::fmt::sprint("invalid irq number {}", irq));
+        }
         break;
     }
 }
